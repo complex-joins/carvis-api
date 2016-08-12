@@ -1,4 +1,5 @@
-import {getUserDashboardData, updateUserData, createUser, getAllUserData} from './models/User';
+import {getUserDashboardData, updateUserData, createUser,
+        getAllUserData, findOrCreateUser } from './models/User';
 import {getRidesForUser, addRide, deleteRide} from './models/Ride';
 
 export default function(app) {
@@ -8,6 +9,8 @@ export default function(app) {
   app.get('/dev/users', getAllUserData);
 
   app.post('/dev/users', createUser);
+
+  app.post('/auth/users', findOrCreateUser);
 
   app.post('/users/update/:userid', updateUserData);
 
