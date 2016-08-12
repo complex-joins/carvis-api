@@ -1,6 +1,6 @@
 import dbm from '../dbm';
 import {RideSchema} from '../Ride';
-import {UserSchema} from '../User'; 
+import {UserSchema} from '../User';
 const {db} = dbm;
 
 const resetDb = async function() {
@@ -22,5 +22,6 @@ const resetDb = async function() {
   await db.destroy(); /* eslint-ignore */
   console.log('connection destroyed');
 };
+
 
 resetDb();
