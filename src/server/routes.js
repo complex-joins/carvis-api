@@ -1,6 +1,6 @@
 import {getUserDashboardData, updateUserData, createUser,
         getAllUserData, findOrCreateUser } from './models/User';
-import {getRidesForUser, addRide, deleteRide} from './models/Ride';
+import {getRidesForUser, addRide, updateRide, deleteRide} from './models/Ride';
 
 export default function(app) {
   // TODO only let the user with that ID find users (middleware);
@@ -12,14 +12,14 @@ export default function(app) {
 
   app.post('/auth/users', findOrCreateUser);
 
-  app.post('/users/update/:userid', updateUserData);
+  app.put('/users/update/:userid', updateUserData);
 
-  // get all rides for a particular user
-  app.get('/rides/:userid', getRidesForUser);
+  app.get('/rides/user/:userid', getRidesForUser);
 
-  // post a new ride to the db
+  app.put('/rides/:rideid', updateRide);
+
   app.post('/rides', addRide);
 
-  app.post('/rides/delete/:rideid', deleteRide);
+  app.delete('/rides/:rideid', deleteRide);
 
 }
