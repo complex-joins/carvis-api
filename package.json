@@ -8,6 +8,7 @@
     "build:db": "babel ./src/db -d ./dist/db --presets es2015,stage-2,es2016 --copy-files",
     "build": "npm run build:db; npm run build:server",
     "reset:db": "babel-node ./utils/wipeDB.js",
+    "setup":"node ./tools/resolveGitIgnored.js;",
     "docker:deploy": "npm run build; docker build -t alexcstark/carvis-api .; docker push alexcstark/carvis-api",
     "start": "npm run build; node ./dist/server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"

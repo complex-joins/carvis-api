@@ -1,8 +1,9 @@
-import {VALID_API_TOKENS} from '../../../secret/config';
+import {CARVIS_API_KEY} from '../../../secret/config';
 
 export default function(req, res, next) {
   console.log('checking validity');
-  if (VALID_API_TOKENS.indexOf(req.headers.authorization) >= 0) {
+  const token = req.body.token || req.query.token || req.headers['x-access-token'] || null;
+  if (CARVIS_API_KEY.indexOf(token) >= 0) {
     next();
     console.log('this is valid!');
   } else {
