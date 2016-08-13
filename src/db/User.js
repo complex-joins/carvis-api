@@ -26,13 +26,13 @@ export const UserSchema = function (user) {
   // data returned from lyft specific functions
   user.string('firstName', 100);
   user.string('lastName', 100);
-  user.string('picture', 100);
+  user.string('picture', 200);
   user.string('lyftEmail', 100);
   // the phone number used for lyft authentication
   user.string('lyftPhoneNumber', 100);
   // data lyft uses for request-ride calls
-  user.string('lyftPaymentInfo', 100);
-  user.string('lyftToken', 100)
+  user.string('lyftPaymentInfo', 200);
+  user.string('lyftToken', 200)
     .unique();
   // location shortcut data returned from Lyft
   user.string('lyftHomeLat', 255);
