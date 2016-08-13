@@ -1,8 +1,8 @@
-import dbm from './dbm';
+import db from './db';
 export const UserSchema = function (user) {
   user.increments('id')
     .primary();
-  user.timestamps();
+  user.timestamp('created_at').defaultTo(db.knex.fn.now());
 
   // carvis auth -- might be factored out.
   user.string('email', 100)
@@ -52,4 +52,4 @@ export const UserSchema = function (user) {
 
 };
 
-export const User = dbm.model('users');
+export const User = db.model('users');
