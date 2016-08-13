@@ -7,6 +7,8 @@
     "build:server": "babel ./src/server -d ./dist/server --presets es2015,stage-2,es2016 --copy-files",
     "build:db": "babel ./src/db -d ./dist/db --presets es2015,stage-2,es2016 --copy-files",
     "build": "npm run build:db; npm run build:server",
+    "reset:db": "babel-node ./utils/wipeDB.js",
+    "docker:deploy": "npm run build; docker build -t alexcstark/carvis-api .; docker push alexcstark/carvis-api",
     "start": "npm run build; node ./dist/server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -21,8 +23,11 @@
   },
   "homepage": "https://github.com/complex-joins/carvis-api#readme",
   "dependencies": {
+    "axios": "^0.13.1",
     "babel-cli": "^6.11.4",
     "babel-core": "^6.13.2",
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "babel-plugin-transform-regenerator": "^6.11.4",
     "babel-preset-es2015": "^6.13.2",
     "babel-preset-es2016": "^6.11.3",
     "babel-preset-stage-2": "^6.13.0",
@@ -30,12 +35,16 @@
     "bluebird": "^3.4.1",
     "body-parser": "^1.15.2",
     "cookie-parser": "^1.4.3",
+    "cors": "^2.7.1",
     "express": "^4.14.0",
     "express-session": "^1.14.0",
+    "jwt-simple": "^0.5.0",
     "knex": "^0.11.10",
     "lodash": "^4.15.0",
     "passport": "^0.3.2",
+    "passport-jwt": "^2.1.0",
+    "passport-local": "^1.0.0",
     "pg": "^6.1.0",
-    "redis": "^2.6.2"
+    "storkSQL": "^0.1.13"
   }
 }

@@ -10,7 +10,8 @@ export const addRide = function (req, res) {
     .then((ride) => {
       rideId = ride.id; // is there a cleaner way to do this?
       return res.json(ride);
-    });
+    })
+    .catch((err) => res.json(err)); // add catch for errors.
 
   let vendor = req.body.winner;
   let origin = {
@@ -63,15 +64,24 @@ export const addRide = function (req, res) {
 
 export const getRidesForUser = function (req, res) {
   Ride.find({ userId: req.params.userid })
-    .then((rides) => res.json(rides));
+    .then((rides) => res.json(rides))
+    .catch((err) => res.json(err));
 };
 
 export const updateRide = function (req, res) {
-  Ride.update(req.body)
-    .then((ride) => res.json(ride));
+  Ride.update({ id: req.params.rideid }, req.body)
+    .then((ride) => res.json(ride))
+    .catch((err) => res.json(err));
+};
+
+export const getAllRideData = function (req, res) {
+  Ride.findAll()
+    .then((rides) => res.json(rides))
+    .catch((err) => res.json(err));
 };
 
 export const deleteRide = function (req, res) {
-  Ride.delete(req.body)
-    .then((ride) => res.json(ride));
+  Ride.delete({ id: req.params.rideid })
+    .then((ride) => res.json(ride))
+    .catch((err) => res.json(err));
 };

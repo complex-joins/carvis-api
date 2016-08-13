@@ -1,9 +1,8 @@
-import dbm from './dbm';
+import db from './db';
 
 export const RideSchema = function (ride) {
-  ride.increments('id')
-    .primary();
-  ride.timestamps();
+  ride.increments('id').primary();
+  ride.timestamp('created_at').defaultTo(db.knex.fn.now());
   ride.integer('userId'); // foreign key for the User table |-> carvis ID
 
   // default: 'estimate' - on booked: 'booked' - on cancel: 'cancelled'
@@ -32,4 +31,4 @@ export const RideSchema = function (ride) {
   ride.string('tripDuration', 255); // duration of the ride origin to destination - returned by vendor on confirmation of request-ride
 };
 
-export const Ride = dbm.model('rides');
+export const Ride = db.model('rides');
