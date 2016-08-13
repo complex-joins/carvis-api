@@ -10,9 +10,9 @@ export default function(app) {
   // TODO only let the user with that ID find users (middleware);
   app.get('/users/:userid', getUserDashboardData);
 
-  app.get('/dev/users', getAllUserData);
+  app.get('/dev/users', hasValidAPIToken, getAllUserData);
 
-  app.post('/dev/users', createUser);
+  app.post('/dev/users', hasValidAPIToken, createUser);
 
   app.post('/auth/users', findOrCreateUser);
 

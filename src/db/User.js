@@ -1,4 +1,5 @@
 import db from './db';
+import {USER_ENCRYPT} from '../../secret/config';
 export const UserSchema = function (user) {
   user.increments('id')
     .primary();
@@ -52,7 +53,7 @@ export const UserSchema = function (user) {
 
 export const User = db.model('users', {
   secureFields: {
-    password: '239823jf', // TODO hide this
+    password: USER_ENCRYPT, 
     fields: ['lyftToken', 'lyftPaymentInfo', 'uberPassword', 'uberToken', 'password', 'alexaUserId']
   }
 });

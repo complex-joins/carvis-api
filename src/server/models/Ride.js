@@ -1,8 +1,8 @@
 import { Ride } from '../../db/Ride';
 
-var lyfthelper = require('../../../../carvis/carvis-web/src/server/utils/lyft-helper.js');
-var uberhelper = require('../../../../carvis/carvis-web/src/server/utils/uber-helper.js');
 var config = require('../../../../carvis/carvis-web/secret/config.js');
+var lyfthelper = require('../utils/lyft-helper.js');
+var uberhelper = require('../utils/uber-helper.js');
 
 export const addRide = function (req, res) {
   var rideId;
