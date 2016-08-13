@@ -1,7 +1,7 @@
 import dbm from '../dbm';
 import {RideSchema} from '../Ride';
 import {UserSchema} from '../User';
-const {db} = dbm;
+const db = dbm;
 
 const resetDb = async function() {
   await db.schema.dropTableIfExists('users');
@@ -22,6 +22,5 @@ const resetDb = async function() {
   await db.destroy(); /* eslint-ignore */
   console.log('connection destroyed');
 };
-
 
 resetDb();
