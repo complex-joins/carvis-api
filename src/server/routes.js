@@ -5,6 +5,9 @@ import passport from 'passport';
 import passportService from './services/passport';
 import Authentication from './controllers/authentication';
 
+const requireAuth = passport.authenticate('jwt', { session: false });
+const requireSignin = passport.authenticate('local', { session: false });
+
 export default function(app) {
   // TODO only let the user with that ID find users (middleware);
   app.get('/users/:userid', getUserDashboardData);
