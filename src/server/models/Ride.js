@@ -9,6 +9,10 @@ export const getRidesForUser = function (req, res) {
   .then((rides) => res.json(rides));
 };
 
+export const updateRide = function (req, res) {
+  Ride.update(req.body)
+  .then((ride) => res.json(ride));
+};
 
 export const deleteRide = function (req, res) {
   Ride.delete(req.body)
