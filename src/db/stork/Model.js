@@ -31,13 +31,19 @@ class Model {
     });
   }
 
-  // TODO
   updateOrCreate(obj) {
-
+    return this.db.find(obj)
+    .then((foundObj) => {
+      if (!foundObj) {
+        return this.create(obj);
+      } else {
+        return update(foundObj, obj);
+      }
+    });
   }
 
   create(obj) {
-    return this.db.insert(obj).into(this.table).returning(...Object.keys(obj));
+    return this.db.insert(obj).into(this.table).returning(...Object.keys(obj), 'id');
   }
 
   save(obj) {
@@ -48,7 +54,7 @@ class Model {
     return this.db(this.table)
       .update(updateObj, [...updateObj])
       .where(criteriaObj)
-      .returning(...Object.keys(updateObj));
+      .returning(...Object.keys(updateObj), 'id');
   }
 
   remove(obj) {

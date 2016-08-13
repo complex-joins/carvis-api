@@ -22,6 +22,6 @@ export const getAllUserData = (req, res) => {
 
 
 export const findOrCreateUser = (req, res) => {
-  User.findOrCreateUser(req.body)
+  User.findOrCreate(req.body)
   .then((user) => res.json(user));
 };
