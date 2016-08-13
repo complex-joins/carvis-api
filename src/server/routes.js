@@ -38,7 +38,7 @@ export default function(app) {
 
   app.delete('/rides/:rideid', deleteRide);
 
-  app.post('/alexa', alexa.handleIntent);
+  app.post('/alexa/launch', alexa.handleLaunch);
 
   // app.post('/signin', requireSignin, Authentication.signin);
   // app.post('/signup', Authentication.signup);
