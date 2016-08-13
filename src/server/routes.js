@@ -9,6 +9,12 @@ const requireAuth = passport.authenticate('jwt', { session: false });
 const requireSignin = passport.authenticate('local', { session: false });
 
 export default function(app) {
+  //Example of how we would use require Auth 
+  // app.get('/', requireAuth, function(req, res) {
+  //   res.send( {message: 'Super awesome sauce code is SHEZZZZ' });
+  // });
+
+
   // TODO only let the user with that ID find users (middleware);
   app.get('/users/:userid', getUserDashboardData);
 
