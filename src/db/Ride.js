@@ -23,7 +23,8 @@ export const RideSchema = function (ride) {
   ride.string('lyftEstimatedETA', 100); // minutes
   ride.string('uberEstimatedFare', 255);
   ride.string('uberEstimatedETA', 100);
-  ride.string('winner', 255); // the vendor we book with - ex. 'uber'
+  ride.string('winner', 255); // the vendor we book with - ex. 'Uber'
+  ride.string('partySize', 1); // either 1 or 2. -- int ? 
 
   // below is returned on the request-ride calls
   ride.string('eta', 255); // actual ETA of the specific booked car
