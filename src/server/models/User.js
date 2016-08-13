@@ -2,7 +2,7 @@ import { User } from '../../db/User';
 
 export const getUserDashboardData = (req, res) => {
   User.find({id: req.params.userid})
-  .then((user) => res.json(user))
+  .then((user) => res.json(User.decryptModel(user)))
   .catch((err) => res.json(err));
 };
 
@@ -20,7 +20,7 @@ export const createUser = (req, res) => {
 
 export const getAllUserData = (req, res) => {
   User.findAll()
-  .then((users) => res.json(users))
+  .then((users) => res.json(User.decryptCollection(users)))
   .catch((err) => res.json(err));
 };
 

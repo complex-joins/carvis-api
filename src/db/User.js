@@ -52,4 +52,9 @@ export const UserSchema = function (user) {
 
 };
 
-export const User = db.model('users');
+export const User = db.model('users', {
+  secureFields: {
+    password: '239823jf', // TODO hide this
+    fields: ['lyftToken', 'lyftPaymentInfo', 'uberPassword', 'uberToken', 'password', 'alexaUserId']
+  }
+});
