@@ -1,14 +1,9 @@
 import {getUserDashboardData, updateUserData, createUser,
-<<<<<<< HEAD
         getAllUserData, findOrCreateUser, updateOrCreateUser } from './models/User';
 import {getRidesForUser, addRide, updateRide, getAllRideData, deleteRide} from './models/Ride';
-=======
-        getAllUserData, findOrCreateUser } from './models/User';
-import {getRidesForUser, addRide, updateRide, deleteRide} from './models/Ride';
 import passport from 'passport';
 import passportService from './services/passport';
 import Authentication from './controllers/authentication';
->>>>>>> 9740c8a3243f3639a1cde8778c0e7adf5a183d99
 
 export default function(app) {
   // TODO only let the user with that ID find users (middleware);
@@ -34,7 +29,7 @@ export default function(app) {
 
   app.delete('/rides/:rideid', deleteRide);
 
-  app.post('/signin', requireSignin, Authentication.signin);
-  app.post('/signup', Authentication.signup);
+  // app.post('/signin', requireSignin, Authentication.signin);
+  // app.post('/signup', Authentication.signup);
 
 }

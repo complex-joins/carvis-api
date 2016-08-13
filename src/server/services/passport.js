@@ -1,9 +1,9 @@
 import passport from 'passport';
 import User from '../models/User';
-import config from '../config';
+import jwtconfig from '../jwtconfig';
 import LocalStrategy from 'passport-local';
-import JwtStrategy from 'passport-jwt.Strategy';
-import ExtractJwt from 'passport-jwt.ExtractJwt';
+import {Strategy as JwtStrategy} from 'passport-jwt';
+import {ExtractJwt} from 'passport-jwt';
 
 const localOptions = { usernnameField: 'email' };
 const localLogin = new LocalStrategy(localOptions, function(email, password, done) {
@@ -20,9 +20,9 @@ const localLogin = new LocalStrategy(localOptions, function(email, password, don
   });
 });
 
-cont jwtOptions = {
+const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromHeader('authorization'),
-  secretOrKey: config.secret
+  secretOrKey: jwtconfig.secret
 };
 
 const jwtLogin = new JwtStrategy(jwtOptions, function(payload, done) {
