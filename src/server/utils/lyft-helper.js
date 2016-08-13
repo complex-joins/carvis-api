@@ -1,6 +1,6 @@
 var fetch = require('node-fetch');
 var btoa = require('btoa');
-var lyftMethods = require('../../../secret/lyftPrivateMethods');
+var lyftMethods = require('./lyftPrivateMethods');
 var auth = require('../../../secret/config.js')
   .LYFT_USER_ID;
 var baseURL = 'https://api.lyft.com/v1/'; // on which path is added.

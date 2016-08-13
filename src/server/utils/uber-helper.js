@@ -1,5 +1,5 @@
 var fetch = require('node-fetch');
-var uberMethods = require('../../../secret/uberPrivateMethods');
+var uberMethods = require('./uberPrivateMethods');
 var baseURL = 'https://cn-sjc1.uber.com'; // https ?
 
 var login = function(username, password) {
