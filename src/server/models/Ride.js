@@ -2,6 +2,7 @@ import { Ride } from '../../db/Ride';
 
 var lyfthelper = require('../../../../carvis/carvis-web/src/server/utils/lyft-helper.js');
 var uberhelper = require('../../../../carvis/carvis-web/src/server/utils/uber-helper.js');
+var config = require('../../../../carvis/carvis-web/secret/config.js');
 
 export const addRide = function (req, res) {
   var rideId;
@@ -28,12 +29,13 @@ export const addRide = function (req, res) {
 
   // carvisUserId -- to query the user table for tokens etc.
   let userId = req.body.userId;
-  let dbURL = 'http://54.183.205.82/users' + userId;
+  let dbURL = 'http://' + config.CARVIS_API + '/users' + userId;
 
   return fetch(dbURL, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-access-token': config.CARVIS_API_KEY
       }
     })
     .then(function (res) {
