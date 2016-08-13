@@ -10,7 +10,7 @@ export const updateUserData = (req, res) => {
   User.update({id: req.params.userid}, req.body)
   .then((user) => res.json(user))
   .catch((err) => res.json(err));
-}
+};
 
 export const createUser = (req, res) => {
   User.create(req.body)
@@ -31,7 +31,8 @@ export const findOrCreateUser = (req, res) => {
 };
 
 export const updateOrCreateUser = (req, res) => {
-  User.updateOrCreate(req.body)
+  let firstParam = Object.keys(req.body)[0];
+  User.updateOrCreate({[firstParam]: req.body[firstParam]}, req.body)
   .then((user) => res.json(user))
   .catch((err) => res.json(err));
 };
