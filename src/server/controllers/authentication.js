@@ -1,6 +1,6 @@
 import jwt from 'jwt-simple';
 import User from '../models/User';
-import config from '../jwtconfig';
+// import config from '../jwtconfig';
 
 function tokenForUser(user) {
   const timestamp = new Date().getTime();
