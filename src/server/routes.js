@@ -4,6 +4,7 @@ import {getRidesForUser, addRide, updateRide, getAllRideData, deleteRide} from '
 import passport from 'passport';
 import passportService from './services/passport';
 import Authentication from './controllers/authentication';
+import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 
 export default function(app) {
   // TODO only let the user with that ID find users (middleware);

@@ -5,12 +5,12 @@ export const UserSchema = function (user) {
   user.timestamp('created_at').defaultTo(db.knex.fn.now());
 
   // carvis auth -- might be factored out.
-  user.string('email', 100)
+  user.string('email', 255)
     .unique();
   user.string('password', 100);
 
   // the Amazon Alexa userId
-  user.string('alexaUserId', 100)
+  user.text('alexaUserId', 'longtext')
     .unique();
 
   // location shortcut data from our own web client
@@ -31,9 +31,8 @@ export const UserSchema = function (user) {
   // the phone number used for lyft authentication
   user.string('lyftPhoneNumber', 100);
   // data lyft uses for request-ride calls
-  user.string('lyftPaymentInfo', 200);
-  user.string('lyftToken', 200)
-    .unique();
+  user.text('lyftPaymentInfo', 'longtext');
+  user.text('lyftToken', 'longtext');
   // location shortcut data returned from Lyft
   user.string('lyftHomeLat', 255);
   user.string('lyftHomeLng', 255);
@@ -44,11 +43,10 @@ export const UserSchema = function (user) {
 
   // data returned from uber specific functions
   // token used for uber request-ride
-  user.string('uberToken', 100)
-    .unique();
+  user.text('uberToken', 'longtext');
   // data used for uber authentication
-  user.string('uberEmail', 100);
-  user.string('uberPassword', 100);
+  user.string('uberEmail', 255);
+  user.string('uberPassword', 255);
 
 };
 

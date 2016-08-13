@@ -46,5 +46,8 @@
     "passport-local": "^1.0.0",
     "pg": "^6.1.0",
     "storkSQL": "^0.1.13"
+  },
+  "devDependencies": {
+    "morgan": "^1.7.0"
   }
 }
