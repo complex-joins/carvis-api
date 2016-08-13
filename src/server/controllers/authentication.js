@@ -1,11 +1,11 @@
 import jwt from 'jwt-simple';
-import User from '../models/users';
-import config from '../config'; 
+import User from '../models/User';
+import config from '../config';
 
 function tokenForUser(user) {
   const timestamp = new Date().getTime();
   return jwt.encode({ sub: user.id, iat: timestamp }, config.secret);
-}
+} 
 
 exports.signin = function(req, res, next) {
   // User has already had their email and password auth'd
