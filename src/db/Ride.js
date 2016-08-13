@@ -18,11 +18,11 @@ export const RideSchema = function (ride) {
   ride.string('destinationRoutableAddress', 255);
 
   // below is returned on the public estimate calls
-  ride.string('vendorRideType', 255); // ex: 'pool', 'line', etc.
+  ride.string('winningVendorRideType', 255); // ex: 'pool', 'line', etc.
   ride.string('lyftEstimatedFare', 255); // dollars and cents
-  ride.string('lyftEstimatedDuration', 100); // minutes
+  ride.string('lyftEstimatedETA', 100); // minutes
   ride.string('uberEstimatedFare', 255);
-  ride.string('uberEstimatedDuration', 100);
+  ride.string('uberEstimatedETA', 100);
   ride.string('winner', 255); // the vendor we book with - ex. 'uber'
 
   // below is returned on the request-ride calls

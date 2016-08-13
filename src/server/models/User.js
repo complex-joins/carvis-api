@@ -1,4 +1,4 @@
-import {User} from '../../db/User';
+import { User } from '../../db/User';
 
 export const getUserDashboardData = (req, res) => {
   User.find({id: req.params.userid})
@@ -10,7 +10,7 @@ export const updateUserData = (req, res) => {
   User.update({id: req.params.userid}, req.body)
   .then((user) => res.json(user))
   .catch((err) => res.json(err));
-};
+}
 
 export const createUser = (req, res) => {
   User.create(req.body)
@@ -23,7 +23,6 @@ export const getAllUserData = (req, res) => {
   .then((users) => res.json(users))
   .catch((err) => res.json(err));
 };
-
 
 export const findOrCreateUser = (req, res) => {
   User.findOrCreate(req.body)
