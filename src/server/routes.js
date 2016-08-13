@@ -1,6 +1,6 @@
 import {getUserDashboardData, updateUserData, createUser,
         getAllUserData, findOrCreateUser } from './models/User';
-import {getRidesForUser, addRide, updateRide, deleteRide} from './models/Ride';
+import {getRidesForUser, addRide, updateRide, getAllRideData, deleteRide} from './models/Ride';
 
 export default function(app) {
   // TODO only let the user with that ID find users (middleware);
@@ -14,7 +14,7 @@ export default function(app) {
 
   app.put('/users/update/:userid', updateUserData);
 
-  app.get('/dev/rides', getAllUserData);
+  app.get('/dev/rides', getAllRideData);
 
   app.get('/rides/user/:userid', getRidesForUser);
 
