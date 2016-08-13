@@ -8,12 +8,12 @@ import {ExtractJwt} from 'passport-jwt';
 const localOptions = { usernnameField: 'email' };
 const localLogin = new LocalStrategy(localOptions, function(email, password, done) {
   User.findOrCreateUser({ email: email }, function(err, user) {
-    if(err) { return done(err) };
-    if(!user) { return done(null, false) };
+    if (err) { return done(err); }
+    if (!user) { return done(null, false); }
 
     user.isValidPassword(password, function(err, isMatch) {
-      if(err) { return done(err) };
-      if(!isMatch) { return done(null, false) };
+      if (err) { return done(err); }
+      if (!isMatch) { return done(null, false); }
 
       return done(null, user);
     });
@@ -27,9 +27,9 @@ const jwtOptions = {
 
 const jwtLogin = new JwtStrategy(jwtOptions, function(payload, done) {
   User.findById(payload.sub, function(err, user) {
-    if(err) { return done(err, false); }
+    if (err) { return done(err, false); }
 
-    if(user) {
+    if (user) {
       done(null, user);
     } else {
       done(null, false);
