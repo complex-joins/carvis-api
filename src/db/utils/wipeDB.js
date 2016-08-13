@@ -1,7 +1,7 @@
-import dbm from '../dbm';
+import dbConnection from '../dbm';
 import {RideSchema} from '../Ride';
 import {UserSchema} from '../User';
-const db = dbm;
+const db = dbConnection.db;
 
 const resetDb = async function() {
   await db.schema.dropTableIfExists('users');
