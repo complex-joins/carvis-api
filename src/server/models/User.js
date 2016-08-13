@@ -30,3 +30,9 @@ export const findOrCreateUser = (req, res) => {
   .then((user) => res.json(user))
   .catch((err) => res.json(err));
 };
+
+export const updateOrCreateUser = (req, res) => {
+  User.updateOrCreate(req.body)
+  .then((user) => res.json(user))
+  .catch((err) => res.json(err));
+};
