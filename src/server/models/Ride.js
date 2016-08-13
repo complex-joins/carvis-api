@@ -14,6 +14,11 @@ export const updateRide = function (req, res) {
   .then((ride) => res.json(ride));
 };
 
+export const getAllRideData = function(req, res) {
+  Ride.getAll()
+  .then((rides) => res.json(rides));
+};
+
 export const deleteRide = function (req, res) {
   Ride.delete(req.body)
   .then((ride) => res.json(ride));

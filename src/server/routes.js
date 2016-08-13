@@ -14,6 +14,8 @@ export default function(app) {
 
   app.put('/users/update/:userid', updateUserData);
 
+  app.get('/dev/rides', getAllUserData);
+
   app.get('/rides/user/:userid', getRidesForUser);
 
   app.put('/rides/:rideid', updateRide);
