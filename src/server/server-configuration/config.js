@@ -12,7 +12,7 @@ export const PORT = process.env.PORT || 8000;
 export const configureServer = function(app) {
   app.use(express.static(path.join(__dirname, '/../../client')));
   app.use(express.static(path.join(__dirname, '/../../../node_modules')));
-  // app.use(cookieParser());
+  app.use(cookieParser());
   app.use(cors());
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
