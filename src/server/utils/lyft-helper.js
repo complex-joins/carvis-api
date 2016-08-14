@@ -116,7 +116,7 @@ var lyftPhoneCodeAuth = function (fourDigitCode, phoneNumber, userLocation, user
 };
 
 var getCost = function (token, origin, destination, paymentInfo, partySize, rideId) {
-  var url = baseURL + lyftMethods.getCost.path(origin, destination);
+  var url = lyftMethods.getCost.path(origin, destination);
   var headers = lyftMethods.getCost.headers(token);
 
   fetch(url, {
@@ -127,7 +127,7 @@ var getCost = function (token, origin, destination, paymentInfo, partySize, ride
       return res.json();
     })
     .then(function (data) {
-      console.log('successful getCost post LYFT', data);
+      console.log('successful getCost LYFT', data);
       var response = lyftMethods.getCost.responseMethod(data);
 
       // random time 1-5 seconds - to simulate more 'natural' patterns
@@ -137,15 +137,18 @@ var getCost = function (token, origin, destination, paymentInfo, partySize, ride
       }, time);
     })
     .catch(function (err) {
-      console.log('error post of getCost LYFT', err);
+      console.log('error getCost LYFT', err);
     });
 
 };
 
 var requestRide = function (token, costToken, destination, origin, paymentInfo, partySize, rideId, tripDuration) {
-  var url = baseURL + lyftMethods.requestRide.path;
+  var url = lyftMethods.requestRide.path;
   var headers = lyftMethods.requestRide.headers(token);
   var body = lyftMethods.requestRide.body(costToken, destination, origin, paymentInfo, partySize);
+
+  console.log('costToken pre requestRide', costToken);
+  console.log('body pre requestRide', body);
 
   fetch(url, {
       method: 'POST',

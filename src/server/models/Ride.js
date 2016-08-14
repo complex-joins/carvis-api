@@ -1,9 +1,11 @@
 import { Ride } from '../../db/Ride';
+import { User } from '../../db/User';
 
 var fetch = require('node-fetch');
 var config = require('../../../../carvis/carvis-web/secret/config.js');
 var lyfthelper = require('./../utils/lyft-helper.js');
 var uberhelper = require('./../utils/uber-helper.js');
+
 
 export const addRide = function (req, res) {
   Ride.create(req.body)
@@ -27,6 +29,7 @@ export const addRide = function (req, res) {
 
       // carvisUserId -- to query the user table for tokens etc.
       let userId = ride.userId;
+
       // let dbURL = 'http://' + config.CARVIS_API + '/users/' + userId;
       let dbURL = 'http://localhost:8080/users/' + userId;
       console.log('pre db get', vendor, userId, dbURL, rideId);
@@ -49,19 +52,17 @@ const getUserAndRequestRide = function (dbURL, origin, destination, partySize, r
       return res.json();
     })
     .then(function (data) {
-      console.log('success fetching user from DB', data);
-      console.log('vendor in get', vendor);
-
-      data = User.decryptModel(data); // decrypt the tokens to pass to vendor
+      // console.log('success fetching user from DB', data); // pre-decrypt.
+      data = User.decryptModel(data[0]); // decrypt the tokens to pass to vendor
 
       if (vendor === 'Uber') {
         let token = data[0].uberToken;
         uberhelper.confirmPickup(origin, token, destination);
 
       } else if (vendor === 'Lyft') {
-        let lyftPaymentInfo = data[0].lyftPaymentInfo;
-        let lyftToken = data[0].lyftToken;
-        console.log('token', lyftToken, 'lyftPaymentInfo', lyftPaymentInfo);
+        let lyftPaymentInfo = data.lyftPaymentInfo;
+        let lyftToken = data.lyftToken;
+        console.log('token post decrypt', lyftToken); // works!
 
         lyfthelper.getCost(lyftToken, origin, destination, lyftPaymentInfo, partySize, rideId);
 
