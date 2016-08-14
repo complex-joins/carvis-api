@@ -2,7 +2,7 @@ import {getUserDashboardData, updateUserData, createUser,
         getAllUserData, findOrCreateUser, updateOrCreateUser } from './models/User';
 import {getRidesForUser, addRide, updateRide, getAllRideData, deleteRide} from './models/Ride';
 import passport from 'passport';
-import passportService from './services/passport';
+// import passportService from './services/passport';
 import Authentication from './controllers/authentication';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 

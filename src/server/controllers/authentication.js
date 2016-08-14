@@ -1,5 +1,6 @@
 import jwt from 'jwt-simple';
 import User from '../models/User';
+// import config from '../jwtconfig';
 
 function tokenForUser(user) {
   const timestamp = new Date()
@@ -25,7 +26,8 @@ exports.signup = function (req, res, next) {
   // See if a user with the given email exists
   User.findOne({ email: email }, function (err, existingUser) {
     if (err) {
-      return next(err); }
+      return next(err);
+    }
 
     // If a user with email does exist, return an error
     if (existingUser) {
@@ -41,7 +43,8 @@ exports.signup = function (req, res, next) {
 
     user.save(function (err) {
       if (err) {
-        return next(err); }
+        return next(err);
+      }
 
       // Repond to request indicating the user was created
       res.json({ token: tokenForUser(user) });

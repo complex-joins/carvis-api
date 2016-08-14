@@ -1,5 +1,6 @@
 import passport from 'passport';
 import User from '../models/User';
+// import jwtconfig from '../jwtconfig';
 import LocalStrategy from 'passport-local';
 
 const localOptions = { usernnameField: 'email' };
