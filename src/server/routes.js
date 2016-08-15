@@ -40,6 +40,8 @@ export default function(app) {
 
   app.post('/alexa/launch', alexa.handleLaunch);
 
+  app.post('/alexa/estimate', alexa.getEstimate);
+
   // app.post('/signin', requireSignin, Authentication.signin);
   // app.post('/signup', Authentication.signup);
 
