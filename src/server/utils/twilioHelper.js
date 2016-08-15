@@ -1,4 +1,4 @@
-var twilioCredentials = require('../../../secret/config.js').twilioCredentials;
+var twilioCredentials = JSON.parse(process.env.twilioCredentials) || require('../../../secret/config.js').twilioCredentials;
 var client = require('twilio')(twilioCredentials.accountSid, twilioCredentials.authToken);
 
 // NOTE: Twilio will only work with approved numbers on the free trial account, for now Chris' number is approved.

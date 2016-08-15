@@ -53,7 +53,7 @@ export const UserSchema = function (user) {
 
 export const User = db.model('users', {
   secureFields: {
-    password: USER_ENCRYPT, 
+    password: process.env.USER_ENCRYPT || USER_ENCRYPT, 
     fields: ['lyftToken', 'lyftPaymentInfo', 'uberPassword', 'uberToken', 'password', 'alexaUserId']
   }
 });
