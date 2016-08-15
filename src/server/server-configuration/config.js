@@ -5,7 +5,6 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import morgan from 'morgan';
-import config from '../../../secret/config';
 
 export const PORT = process.env.PORT || 8000;
 
@@ -21,6 +20,5 @@ export const configureServer = function(app) {
     resave: true,
     saveUninitialized: true
   }));
-  app.set('tokenSecret', config.secret);
   app.use(morgan('dev'));
 };

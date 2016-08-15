@@ -9,7 +9,7 @@ import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 export default function(app) {
   // TODO only let the user with that ID find users (middleware);
   app.get('/', (req, res) => {
-    res.status(200).send('Welcome to the Carvi API.');
+    res.status(200).send('Welcome to the Carvis API.');
   });
 
   app.get('/users/:userid', getUserDashboardData);

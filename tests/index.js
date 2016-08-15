@@ -20,6 +20,18 @@ describe('API server', function () {
         done();
       });
     });
+
+    describe('Check restful routes', function () {
+      it('should ', function (done) {
+        axios.get('http://localhost:3030/dev/users', {
+          headers: {'x-access-token': process.env.CARVIS_API_KEY || require('../secret/config').CARVIS_API_KEY}
+        })
+        .then((res) => {
+          assert.equal(res.status, 200, 'did not return 200', res.status);
+          done();
+        });
+      });
+    });
   });
 
 

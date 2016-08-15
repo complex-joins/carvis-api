@@ -1,6 +1,4 @@
-import {CARVIS_API_KEY} from '../../../secret/config';
-
-let API_KEY = process.env.CARVIS_API_KEY ? process.env.CARVIS_API_KEY : CARVIS_API_KEY;
+const API_KEY = process.env.CARVIS_API_KEY ? process.env.CARVIS_API_KEY : require('../../../secret/config').CARVIS_API_KEY;
 
 export default function(req, res, next) {
   console.log('checking validity');
