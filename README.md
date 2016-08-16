@@ -3,7 +3,7 @@ Pithy project description
 
 ##Team
 
-Built by @alexcstark, @cpruijsen, @daredia, @JasonArkens17 as our final project @hackreactor .
+Built by `@alexcstark`, `@cpruijsen`, `@daredia`, `@JasonArkens17` as our final project `@hackreactor` .
 
 ##Stack:
 Built using Node, Express, Passport, [StorkSQL](https://www.npmjs.com/package/storkSQL)
