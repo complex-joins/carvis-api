@@ -7,9 +7,9 @@ import cors from 'cors';
 import morgan from 'morgan';
 import config from '../../../secret/config';
 
-export const PORT = process.env.PORT || 8000;
+export const PORT = process.env.PORT || 8080; // note: different from carvis-web
 
-export const configureServer = function(app) {
+export const configureServer = function (app) {
   app.use(express.static(path.join(__dirname, '/../../client')));
   app.use(express.static(path.join(__dirname, '/../../../node_modules')));
   // app.use(cookieParser());
