@@ -1,8 +1,8 @@
 var twilioCredentials = JSON.parse(process.env.twilioCredentials) || require('../../../secret/config.js').twilioCredentials;
 var client = require('twilio')(twilioCredentials.accountSid, twilioCredentials.authToken);
 
-// NOTE: Twilio will only work with approved numbers on the free trial account, for now Chris' number is approved.
-// NOTE: a test notice is included in all messages until we load $$$ to Twilio.
+// NOTE:0 Twilio will only work with approved numbers on the free trial account, for now Chris' number is approved.
+// NOTE:10 a test notice is included in all messages until we load $$$ to Twilio.
 
 // Twilio SMS send to be invoked via a client side form, which upon click sends a POST request to our server on the '/message' path with a body of { number: targetPhoneNumber, message: intendedMessage }
 

@@ -6,7 +6,7 @@ import { rawUserData } from './models/User';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 
 export default function(app) {
-  // TODO only let the user with that ID find users (middleware);
+  // TODO:0 only let the user with that ID find users (middleware);
   app.get('/', (req, res) => {
     res.status(200).send('Welcome to the Carvis API.');
   });

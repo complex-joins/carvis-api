@@ -1,7 +1,7 @@
 // secret/randomizeLatLng
 /** credit: https://gist.github.com/mkhatib/5641004
 
-NOTE: not 100% accurate, and doesn't account of course for non-valid locations such as in the middle of water-bodies etc.
+NOTE:20 not 100% accurate, and doesn't account of course for non-valid locations such as in the middle of water-bodies etc.
 
 to increase validity one can look at:
 http://stackoverflow.com/questions/31192451/generate-random-geo-coordinates-within-specific-radius-from-seed-point
