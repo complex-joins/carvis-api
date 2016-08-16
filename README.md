@@ -17,13 +17,17 @@ Uber, Lyft, Google Places, Twilio.
 
 ###Installing Dependencies
 
-From within the root directory:
-
-`npm install`
+1. From within the root directory `npm install`
+2. Internal => Run `npm run setup`. Others => You need to make a decision on where your secret config files will live and how to go about updating them. See the `npm run setup` script in the `package.json` for a good refrence. 
 
 ##Moving Forward
 
 From here you will need to link to the [Carvis-web](https://github.com/complex-joins/carvis). Also this repo does not include any of the Alexa skill side of the project. For Alexa skill go [here](https://github.com/complex-joins/alexa-poc)
+
+
+##Possible future changes.
+The Complex-Joins team will be working towards making this api service a usable endpoint for those wishing to use its functionality. Stay tuned for future updates! 
+
 
 Contributing
 
