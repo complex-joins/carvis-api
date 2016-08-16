@@ -56,8 +56,9 @@ const getUserAndRequestRide = function (dbURL, origin, destination, partySize, r
       data = User.decryptModel(data[0]); // decrypt the tokens to pass to vendor
 
       if (vendor === 'Uber') {
-        let token = data[0].uberToken;
-        uberhelper.confirmPickup(origin, token, destination);
+        let token = data.uberToken;
+        console.log('uber token post decrypt', token);
+        uberhelper.confirmPickup(origin, token, destination, rideId);
 
       } else if (vendor === 'Lyft') {
         let lyftPaymentInfo = data.lyftPaymentInfo;

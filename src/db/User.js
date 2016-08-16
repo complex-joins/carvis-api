@@ -1,9 +1,10 @@
 import db from './db';
-import {USER_ENCRYPT} from '../../secret/config';
+import { USER_ENCRYPT } from '../../secret/config';
 export const UserSchema = function (user) {
   user.increments('id')
     .primary();
-  user.timestamp('created_at').defaultTo(db.knex.fn.now());
+  user.timestamp('created_at')
+    .defaultTo(db.knex.fn.now());
 
   // carvis auth -- might be factored out.
   user.string('email', 255)
@@ -53,7 +54,7 @@ export const UserSchema = function (user) {
 
 export const User = db.model('users', {
   secureFields: {
-    password: USER_ENCRYPT, 
+    password: USER_ENCRYPT,
     fields: ['lyftToken', 'lyftPaymentInfo', 'uberPassword', 'uberToken', 'password', 'alexaUserId']
   }
 });

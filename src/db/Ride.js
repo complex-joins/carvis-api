@@ -1,8 +1,10 @@
 import db from './db';
 
 export const RideSchema = function (ride) {
-  ride.increments('id').primary();
-  ride.timestamp('created_at').defaultTo(db.knex.fn.now());
+  ride.increments('id')
+    .primary();
+  ride.timestamp('created_at')
+    .defaultTo(db.knex.fn.now());
   ride.integer('userId'); // foreign key for the User table |-> carvis ID
 
   // default: 'estimate' - on booked: 'booked' - on cancel: 'cancelled'
@@ -23,7 +25,7 @@ export const RideSchema = function (ride) {
   ride.string('uberEstimatedFare', 255);
   ride.string('uberEstimatedETA', 100);
   ride.string('winner', 255); // the vendor we book with - ex. 'Uber'
-  ride.string('partySize', 1); // either 1 or 2. -- int ? 
+  ride.string('partySize', 1); // either 1 or 2. -- int ?
 
   // below is returned on the request-ride calls
   ride.string('eta', 255); // actual ETA of the specific booked car
