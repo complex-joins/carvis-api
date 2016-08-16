@@ -1,5 +1,4 @@
 import db from './db';
-import { USER_ENCRYPT } from '../../secret/config';
 
 export const UserSchema = function (user) {
   user.increments('id')
