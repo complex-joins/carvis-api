@@ -161,9 +161,11 @@ var getEstimate = function (requestType, start, dest, cb) {
 };
 
 var addRide = function(ride, userId, origin, destination, cb) {
-  var endpoint = 'http://54.183.205.82/rides'; // TODO: swap this out with prod url
+  var endpoint = 'http://54.183.205.82/rides'; // TODO: make dynamic based on env
+  // var endpoint = 'http://localhost:8080/rides';
+
   var body = {
-    userId: 2, // TODO: make this dynamic and not hardcoded once alexa auth is implemented
+    userId: 3, // TODO: make this dynamic and not hardcoded once alexa auth is implemented
     rideStatus: 'estimate',
     originLat: origin.coords[0],
     originLng: origin.coords[1],
