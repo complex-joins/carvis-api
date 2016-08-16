@@ -1,5 +1,5 @@
 var fetch = require('node-fetch');
-var uberMethods = !process.env.PROD ? require('./uberPrivateMethods') : null;
+var uberMethods = !process.env.TRAVIS ? require('./uberPrivateMethods') : null;
 var baseURL = 'https://cn-sjc1.uber.com'; // https ?
 var APItoken = !process.env.PROD ? require('../../../secret/config.js')
   .CARVIS_API_KEY : null;

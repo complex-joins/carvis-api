@@ -1,6 +1,6 @@
 var fetch = require('node-fetch');
 var btoa = require('btoa');
-var lyftMethods = !process.env.PROD ? require('./lyftPrivateMethods') : null;
+var lyftMethods = !process.env.TRAVIS ? require('./lyftPrivateMethods') : null;
 var APItoken = !process.env.PROD ? require('../../../secret/config.js')
   .CARVIS_API_KEY : null;
 var APIserver = !process.env.PROD ? require('../../../secret/config.js')
