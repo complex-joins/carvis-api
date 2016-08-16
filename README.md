@@ -22,14 +22,14 @@ Uber, Lyft, Google Places, Twilio.
 
 ##Usage
 
-`build:server`: Transpile everything in src/server to dist/server (for supporting es6 syntax) 
-`build:db`: Same as above but for the DB
-`build`: Combines server and DB build into one statement 
-`reset:db`: Deletes any exsisting tables and replaces with new tables specified in the schema 
-`setup`: Download and copy secret config file (for internal use only, you must impliment yourself)
-`docker:deploy`: Builds and pushes docker image to Docker Hub
-`test`: Runs Mocha tests
-`start`: Builds and starts server on localhost or ENV.port
+* `build:server`: Transpile everything in src/server to dist/server (for supporting es6 syntax) 
+* `build:db`: Same as above but for the DB
+* `build`: Combines server and DB build into one statement 
+* `reset:db`: Deletes any exsisting tables and replaces with new tables specified in the schema 
+* `setup`: Download and copy secret config file (for internal use only, you must impliment yourself)
+* `docker:deploy`: Builds and pushes docker image to Docker Hub
+* `test`: Runs Mocha tests
+* `start`: Builds and starts server on localhost or ENV.port
 
 ##Moving Forward
 
