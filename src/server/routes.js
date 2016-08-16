@@ -1,5 +1,5 @@
 import {getUserDashboardData, updateUserData, createUser,
-        getAllUserData, findOrCreateUser, updateOrCreateUser } from './models/User';
+        getAllUserData, findOrCreateUser, updateOrCreateUser, deleteUser } from './models/User';
 import {getRidesForUser, addRide, updateRide, getAllRideData, deleteRide} from './models/Ride';
 import passport from 'passport';
 // import passportService from './services/passport';
@@ -24,6 +24,9 @@ export default function(app) {
 
   app.put('/users/update/:userid', updateUserData);
 
+  app.delete('/dev/users/:userid', deleteUser);
+
+
   app.get('/dev/rides', getAllRideData);
 
   app.get('/rides/user/:userid', getRidesForUser);
@@ -33,6 +36,8 @@ export default function(app) {
   app.post('/rides', addRide);
 
   app.delete('/rides/:rideid', deleteRide);
+
+
 
   // app.post('/signin', requireSignin, Authentication.signin);
   // app.post('/signup', Authentication.signup);

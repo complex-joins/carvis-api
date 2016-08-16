@@ -1,5 +1,5 @@
 var fetch = require('node-fetch');
-var uberMethods = require('./uberPrivateMethods');
+var uberMethods = !process.env.TRAVIS ? require('./uberPrivateMethods') : null;
 var baseURL = 'https://cn-sjc1.uber.com'; // https ?
 
 var login = function(username, password) {

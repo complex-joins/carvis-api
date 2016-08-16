@@ -22,7 +22,8 @@ describe('API server', function () {
     });
 
     describe('Check restful routes', function () {
-      it('should ', function (done) {
+
+      it('should get all users when presented with the API access token', function (done) {
         axios.get('http://localhost:3030/dev/users', {
           headers: {'x-access-token': process.env.CARVIS_API_KEY || require('../secret/config').CARVIS_API_KEY}
         })
@@ -31,6 +32,30 @@ describe('API server', function () {
           done();
         });
       });
+
+      let testUserId;
+
+      it('should allow a developer to add a user when presented with the right access token', function (done) {
+        axios.post('http://localhost:3030/dev/users', {email: 'test@gmail.com', password: 'test'}, {
+          headers: {'x-access-token': process.env.CARVIS_API_KEY || require('../secret/config').CARVIS_API_KEY}
+        })
+        .then((res) => {
+          testUserId = res.data[0].id;
+          assert.equal(res.status, 200, 'did not return 200', res.status);
+          done();
+        });
+      });
+
+      it('should delete the user created by the developer', function (done) {
+        axios.delete('http://localhost:3030/dev/users/' + testUserId, {
+          headers: {'x-access-token': process.env.CARVIS_API_KEY || require('../secret/config').CARVIS_API_KEY}
+        })
+        .then((res) => {
+          assert.equal(res.status, 200, 'did not return 200', res.status);
+          done();
+        });
+      });
+
     });
   });
 
