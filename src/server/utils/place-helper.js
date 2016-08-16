@@ -2,14 +2,11 @@ var fetch = require('node-fetch');
 fetch.Promise = require('bluebird');
 var _ = require('lodash');
 
-try {
+if (!process.env.PROD) {
   var key = require('../../../../carvis/carvis-web/secret/config')
     .GOOGLE_PLACES_API_KEY;
-} catch (ex) {
-  // use local repo's config file as fallback
-  console.log('exception:', ex);
-  var key = require('../../../secret/config')
-    .GOOGLE_PLACES_API_KEY;
+} else {
+  var key = process.env.GOOGLE_PLACES_API_KEY;
 }
 
 var placesCall = function(place, cb, nearbyLoc) {

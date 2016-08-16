@@ -1,9 +1,9 @@
 var fetch = require('node-fetch');
 var btoa = require('btoa');
-var lyftMethods = !process.env.TRAVIS ? require('./lyftPrivateMethods') : null;
-var APItoken = !process.env.TRAVIS ? require('../../../secret/config.js')
+var lyftMethods = !process.env.PROD ? require('./lyftPrivateMethods') : null;
+var APItoken = !process.env.PROD ? require('../../../secret/config.js')
   .CARVIS_API_KEY : null;
-var APIserver = !process.env.TRAVIS ? require('../../../secret/config.js')
+var APIserver = !process.env.PROD ? require('../../../secret/config.js')
   .CARVIS_API : null;
 var auth = process.env.LYFT_USER_ID || require('../../../secret/config.js')
   .LYFT_USER_ID;

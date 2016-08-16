@@ -1,9 +1,9 @@
 var fetch = require('node-fetch');
-var uberMethods = !process.env.TRAVIS ? require('./uberPrivateMethods') : null;
+var uberMethods = !process.env.PROD ? require('./uberPrivateMethods') : null;
 var baseURL = 'https://cn-sjc1.uber.com'; // https ?
-var APItoken = !process.env.TRAVIS ? require('../../../secret/config.js')
+var APItoken = !process.env.PROD ? require('../../../secret/config.js')
   .CARVIS_API_KEY : null;
-var APIserver = !process.env.TRAVIS ? require('../../../secret/config.js')
+var APIserver = !process.env.PROD ? require('../../../secret/config.js')
   .CARVIS_API : null;
 
 var login = function (username, password, userId) {
