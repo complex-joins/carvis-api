@@ -41,7 +41,7 @@ describe('API server', function () {
       });
 
       it('should allow a developer to add a user when presented with the right access token', function (done) {
-        axios.post('http://localhost:3030/dev/users', {email: `test${testCount}`, password: 'test'}, {
+        axios.post('http://localhost:3030/dev/users', {email: `test${testCount}`, password: 'test', lyftToken: '23jlkjd39'}, {
           headers: {'x-access-token': process.env.CARVIS_API_KEY || require('../secret/config').CARVIS_API_KEY}
         })
         .then((res) => {
@@ -56,8 +56,9 @@ describe('API server', function () {
           headers: {'x-access-token': process.env.CARVIS_API_KEY || require('../secret/config').CARVIS_API_KEY}
         })
         .then((res) => {
-          assert.equal(res.status, 200, 'did not return 200');
+          expect(res.status).to.equal(200);
           expect('test').to.equal(res.data[0].password);
+          expect('23jlkjd39').to.equal(res.data[0].lyftToken);
           done();
         });
       });
@@ -75,6 +76,16 @@ describe('API server', function () {
 
       it('should delete the user created by the developer', function (done) {
         axios.delete(`http://localhost:3030/dev/users/${testUserId}`, {
+          headers: {'x-access-token': process.env.CARVIS_API_KEY || require('../secret/config').CARVIS_API_KEY}
+        })
+        .then((res) => {
+          assert.equal(res.status, 200, 'did not return 200', res.status);
+          done();
+        });
+      });
+
+      it('should properly update or create', function (done) {
+        axios.post(`http://localhost:3030/users/updateOrCreate`, {
           headers: {'x-access-token': process.env.CARVIS_API_KEY || require('../secret/config').CARVIS_API_KEY}
         })
         .then((res) => {
