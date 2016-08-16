@@ -14,29 +14,29 @@ export default function(app) {
     res.status(200).send('Welcome to the Carvis API.');
   });
 
-  app.get('/users/:userid', getUserDashboardData);
+  app.get('/users/:userid', hasValidAPIToken, getUserDashboardData);
 
   app.get('/dev/users', hasValidAPIToken, getAllUserData);
 
   app.post('/dev/users', hasValidAPIToken, createUser);
 
-  app.post('/auth/users', findOrCreateUser);
+  app.post('/auth/users', hasValidAPIToken, findOrCreateUser);
 
-  app.post('/users/updateOrCreate', updateOrCreateUser);
+  app.post('/users/updateOrCreate', hasValidAPIToken, updateOrCreateUser);
 
-  app.put('/users/update/:userid', updateUserData);
+  app.put('/users/:userid', hasValidAPIToken, updateUserData);
 
-  app.delete('/dev/users/:userid', deleteUser);
+  app.delete('/dev/users/:userid', hasValidAPIToken, deleteUser);
 
-  app.get('/dev/rides', getAllRideData);
+  app.get('/dev/rides', hasValidAPIToken, getAllRideData);
 
-  app.get('/rides/user/:userid', getRidesForUser);
+  app.get('/rides/user/:userid', hasValidAPIToken, getRidesForUser);
 
-  app.put('/rides/:rideid', updateRide);
+  app.put('/rides/:rideid', hasValidAPIToken, updateRide);
 
-  app.post('/rides', addRide);
+  app.post('/rides', hasValidAPIToken, addRide);
 
-  app.delete('/rides/:rideid', deleteRide);
+  app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);
 
   app.post('/alexa/launch', alexa.handleLaunch);
 
