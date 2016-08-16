@@ -4,7 +4,7 @@ var baseURL = 'https://cn-sjc1.uber.com'; // https ?
 var APItoken = !process.env.PROD ? require('../../../secret/config.js')
   .CARVIS_API_KEY : null;
 var APIserver = !process.env.PROD ? require('../../../secret/config.js')
-  .CARVIS_API : null;
+  .CARVIS_API : 'localhost:8080';
 
 var login = function (username, password, userId) {
   var path = baseURL + uberMethods.login.path;
@@ -25,8 +25,7 @@ var login = function (username, password, userId) {
       var response = uberMethods.login.responseMethod(data, password, userId);
 
       // POST THE USER DATA TO OUR RELATIONAL DATABASE
-      // var dbpostURL = 'http://' + APIserver + '/users/updateOrCreate';
-      var dbpostURL = 'http://localhost:8080/users/updateOrCreate';
+      var dbpostURL = 'http://' + APIserver + '/users/updateOrCreate';
 
       console.log('response pre DB post', response);
 
@@ -99,8 +98,7 @@ var confirmPickup = function (userLocation, token, destination, rideId) {
       // DB post all data.
       var response = uberMethods.confirmPickup.responseMethod(data);
 
-      // var dbpostURL = 'http://' + APIserver + '/rides/' + rideId;
-      var dbpostURL = 'http://localhost:8080/rides/' + rideId;
+      var dbpostURL = 'http://' + APIserver + '/rides/' + rideId;
 
       // once we receive the request-ride confirmation response
       // we update the DB record for that ride with eta and vendorRideId

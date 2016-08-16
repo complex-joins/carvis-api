@@ -4,7 +4,7 @@ var lyftMethods = !process.env.TRAVIS ? require('./lyftPrivateMethods') : null;
 var APItoken = !process.env.PROD ? require('../../../secret/config.js')
   .CARVIS_API_KEY : null;
 var APIserver = !process.env.PROD ? require('../../../secret/config.js')
-  .CARVIS_API : null;
+  .CARVIS_API : 'localhost:8080';
 var auth = process.env.LYFT_USER_ID || require('../../../secret/config.js')
   .LYFT_USER_ID;
 var baseURL = 'https://api.lyft.com/v1/'; // on which path is added.
@@ -86,8 +86,7 @@ var lyftPhoneCodeAuth = function (fourDigitCode, phoneNumber, userLocation, user
     var response = lyftMethods.phoneCodeAuth.responseMethod(data, userId);
 
     // POST THE USER DATA TO OUR RELATIONAL DATABASE
-    // var dbpostURL = 'http://' + APIserver + '/users/updateOrCreate';
-    var dbpostURL = 'http://localhost:8080/users/updateOrCreate';
+    var dbpostURL = 'http://' + APIserver + '/users/updateOrCreate';
 
     fetch(dbpostURL, {
       method: 'POST',
@@ -160,8 +159,7 @@ var requestRide = function (token, costToken, destination, origin, paymentInfo, 
     console.log('successful requestRide post LYFT', data);
     var response = lyftMethods.requestRide.responseMethod(data, tripDuration);
 
-    // var dbpostURL = 'http://' + APIserver + '/rides/' + rideId;
-    var dbpostURL = 'http://localhost:8080/rides/' + rideId;
+    var dbpostURL = 'http://' + APIserver + '/rides/' + rideId;
 
     // once we receive the request-ride confirmation response
     // we update the DB record for that ride with eta and vendorRideId
