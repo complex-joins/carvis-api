@@ -9,16 +9,16 @@ Built by `@alexcstark`, `@cpruijsen`, `@daredia`, `@JasonArkens17` as our final 
 ##Stack:
 Built using Node, Express, Passport, [StorkSQL](https://www.npmjs.com/package/storkSQL)
 
-##Deployment: 
+##Deployment:
 Docker, AWS EC2, Build tools: NPM scripting, Webpack, ESlint. Testing: TravisCI, Mocha, Chai.
 
-##APIs: 
-Uber, Lyft, Google Places, Twilio. 
+##APIs:
+Uber, Lyft, Google Places, Twilio.
 
 ###Installing Dependencies
 
 1. From within the root directory `npm install`
-2. Internal => Run `npm run setup`. Others => You need to make a decision on where your secret config files will live and how to go about updating them. See the `npm run setup` script in the `package.json` for a good refrence. 
+2. Internal => Run `npm run setup`. Others => You need to make a decision on where your secret config files will live and how to go about updating them. See the `npm run setup` script in the `package.json` for a good refrence.
 
 ##Moving Forward
 
@@ -26,7 +26,7 @@ From here you will need to link to the [Carvis-web](https://github.com/complex-j
 
 
 ##Possible future changes.
-The Complex-Joins team will be working towards making this api service a usable endpoint for those wishing to use its functionality. Stay tuned for future updates! 
+The Complex-Joins team will be working towards making this api service a usable endpoint for those wishing to use its functionality. Stay tuned for future updates!
 
 
 Contributing
