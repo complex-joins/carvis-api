@@ -60,11 +60,9 @@ var lyftPhoneAuth = function (phoneNumberString) {
     });
 };
 
-// NOTE: userLocation should come from the user client // Alexa.
 var lyftPhoneCodeAuth = function (fourDigitCode, phoneNumber, userLocation, userId) {
 
-  userId = userId || null;
-
+  userId = userId || null; // alexaUserId
   userLocation = userLocation || null;
 
   var url = lyftMethods.phoneCodeAuth.path;
@@ -160,7 +158,7 @@ var requestRide = function (token, costToken, destination, origin, paymentInfo, 
     })
     .then(function (data) {
       console.log('successful requestRide post LYFT', data);
-      var response = lyftMethods.requestRide.responseMethod(data, userId, tripDuration);
+      var response = lyftMethods.requestRide.responseMethod(data, tripDuration);
 
       // var dbpostURL = 'http://' + APIserver + '/rides/' + rideId;
       var dbpostURL = 'http://localhost:8080/rides/' + rideId;
