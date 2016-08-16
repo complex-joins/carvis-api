@@ -36,3 +36,9 @@ export const updateOrCreateUser = (req, res) => {
   .then((user) => res.json(user))
   .catch((err) => res.json(err));
 };
+
+export const deleteUser = (req, res) => {
+  User.remove({id: req.params.userid})
+  .then((user) => res.json(user))
+  .catch((err) => res.json(err));
+};

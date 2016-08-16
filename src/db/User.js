@@ -1,5 +1,6 @@
 import db from './db';
 import { USER_ENCRYPT } from '../../secret/config';
+
 export const UserSchema = function (user) {
   user.increments('id')
     .primary();
@@ -49,12 +50,12 @@ export const UserSchema = function (user) {
   // data used for uber authentication
   user.string('uberEmail', 255);
   user.string('uberPassword', 255);
-
 };
 
 export const User = db.model('users', {
   secureFields: {
-    password: USER_ENCRYPT,
+    password: process.env.USER_ENCRYPT || require('../../secret/config')
+      .USER_ENCRYPT,
     fields: ['lyftToken', 'lyftPaymentInfo', 'uberPassword', 'uberToken', 'password', 'alexaUserId']
   }
 });

@@ -2,7 +2,7 @@ import { Ride } from '../../db/Ride';
 import { User } from '../../db/User';
 
 var fetch = require('node-fetch');
-var config = require('../../../../carvis/carvis-web/secret/config.js');
+// var config = require('../../secret/config.js');
 var lyfthelper = require('./../utils/lyft-helper.js');
 var uberhelper = require('./../utils/uber-helper.js');
 

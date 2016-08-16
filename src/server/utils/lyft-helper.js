@@ -1,12 +1,12 @@
 var fetch = require('node-fetch');
 var btoa = require('btoa');
-var lyftMethods = require('./lyftPrivateMethods');
-var auth = require('./../../../secret/config.js')
+var lyftMethods = !process.env.TRAVIS ? require('./lyftPrivateMethods') : null;
+var APItoken = !process.env.TRAVIS ? require('../../../secret/config.js')
+  .CARVIS_API_KEY : null;
+var APIserver = !process.env.TRAVIS ? require('../../../secret/config.js')
+  .CARVIS_API : null;
+var auth = process.env.LYFT_USER_ID || require('../../../secret/config.js')
   .LYFT_USER_ID;
-var APItoken = require('./../../../secret/config.js')
-  .CARVIS_API_KEY;
-var APIserver = require('./../../../secret/config.js')
-  .CARVIS_API;
 var baseURL = 'https://api.lyft.com/v1/'; // on which path is added.
 
 var refreshBearerToken = function () {

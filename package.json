@@ -8,10 +8,10 @@
     "build:db": "babel ./src/db -d ./dist/db --presets es2015,stage-2,es2016 --copy-files",
     "build": "npm run build:db; npm run build:server",
     "reset:db": "babel-node ./utils/wipeDB.js",
-    "setup":"node ./tools/resolveGitIgnored.js;",
+    "setup": "node ./tools/resolveGitIgnored.js;",
     "docker:deploy": "npm run build; docker build -t alexcstark/carvis-api .; docker push alexcstark/carvis-api",
-    "start": "npm run build; node ./dist/server/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --compilers js:babel-core/register ./tests/index.js",
+    "start": "npm run build; node ./dist/server/index.js"
   },
   "repository": {
     "type": "git",
@@ -41,17 +41,19 @@
     "express": "^4.14.0",
     "express-session": "^1.14.0",
     "jwt-simple": "^0.5.0",
-    "knex": "^0.11.10",
     "lodash": "^4.15.0",
     "node-fetch": "^1.6.0",
     "passport": "^0.3.2",
     "passport-jwt": "^2.1.0",
     "passport-local": "^1.0.0",
     "pg": "^6.1.0",
+    "shelljs": "^0.7.3",
     "storkSQL": "^0.1.13",
     "twilio": "^2.9.2"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.2",
     "morgan": "^1.7.0"
   }
 }
