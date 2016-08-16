@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/complex-joins/carvis-api.svg?branch=master)](https://travis-ci.org/complex-joins/carvis-api)
+
 # carvis-api
 Pithy project description
 
@@ -8,11 +10,11 @@ Built by `@alexcstark`, `@cpruijsen`, `@daredia`, `@JasonArkens17` as our final 
 ##Stack:
 Built using Node, Express, Passport, [StorkSQL](https://www.npmjs.com/package/storkSQL)
 
-##Deployment: 
+##Deployment:
 Docker, AWS EC2, Build tools: NPM scripting, Webpack, ESlint. Testing: TravisCI, Mocha, Chai.
 
-##APIs: 
-Uber, Lyft, Google Places, Twilio. 
+##APIs:
+Uber, Lyft, Google Places, Twilio.
 
 ###Installing Dependencies
 
