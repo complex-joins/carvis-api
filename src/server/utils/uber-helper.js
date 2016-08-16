@@ -6,10 +6,12 @@ var APItoken = !process.env.TRAVIS ? require('../../../secret/config.js')
 var APIserver = !process.env.TRAVIS ? require('../../../secret/config.js')
   .CARVIS_API : null;
 
-var login = function (username, password) {
+var login = function (username, password, userId) {
   var path = baseURL + uberMethods.login.path;
   var body = uberMethods.login.body(username, password);
   var headers = uberMethods.login.headers();
+
+  userId = userId || null; // alexaUserId
 
   fetch(path, {
       method: 'POST',
@@ -20,13 +22,13 @@ var login = function (username, password) {
       return res.json();
     })
     .then(function (data) {
-      // DB post all data --
-      var response = uberMethods.login.responseMethod(data);
-      // response.email for DB && response.token for subsequent calls.
+      var response = uberMethods.login.responseMethod(data, password, userId);
 
       // POST THE USER DATA TO OUR RELATIONAL DATABASE
       // var dbpostURL = 'http://' + APIserver + '/users/updateOrCreate';
       var dbpostURL = 'http://localhost:8080/users/updateOrCreate';
+
+      console.log('response pre DB post', response);
 
       fetch(dbpostURL, {
           method: 'POST',

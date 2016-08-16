@@ -3,7 +3,8 @@ import db from './db';
 export const UserSchema = function (user) {
   user.increments('id')
     .primary();
-  user.timestamp('created_at').defaultTo(db.knex.fn.now());
+  user.timestamp('created_at')
+    .defaultTo(db.knex.fn.now());
 
   // carvis auth -- might be factored out.
   user.string('email', 255)
@@ -48,12 +49,12 @@ export const UserSchema = function (user) {
   // data used for uber authentication
   user.string('uberEmail', 255);
   user.string('uberPassword', 255);
-
 };
 
 export const User = db.model('users', {
   secureFields: {
-    password: process.env.USER_ENCRYPT || require('../../secret/config').USER_ENCRYPT,
+    password: process.env.USER_ENCRYPT || require('../../secret/config')
+      .USER_ENCRYPT,
     fields: ['lyftToken', 'lyftPaymentInfo', 'uberPassword', 'uberToken', 'password', 'alexaUserId']
   }
 });
