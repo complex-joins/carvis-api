@@ -26,7 +26,7 @@ From here you will need to link to the [Carvis-web](https://github.com/complex-j
 
 
 ##Possible future changes.
-We will be working towards making this api service a usable endpoint for those wishing to use its functionality. Stay tuned for future updates! 
+The Complex-Joins team will be working towards making this api service a usable endpoint for those wishing to use its functionality. Stay tuned for future updates! 
 
 
 Contributing
