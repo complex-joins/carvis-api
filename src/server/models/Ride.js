@@ -53,8 +53,9 @@ const getUserAndRequestRide = function (dbURL, origin, destination, partySize, r
       return res.json();
     })
     .then(function (data) {
-      // console.log('success fetching user from DB', data); // pre-decrypt.
+      console.log('success fetching user from DB', data); // pre-decrypt.
       data = User.decryptModel(data[0]); // decrypt the tokens to pass to vendor
+      console.log('user post decrypt', data);
 
       if (vendor === 'Uber') {
         let token = data.uberToken;
