@@ -36,7 +36,7 @@ describe('API server', function () {
       let testUserId;
 
       it('should allow a developer to add a user when presented with the right access token', function (done) {
-        axios.post('http://localhost:3030/dev/users', {email: 'test@gmail.com', password: 'test'}, {
+        axios.post('http://localhost:3030/dev/users', {email: 'testy@gmail.com', password: 'test'}, {
           headers: {'x-access-token': process.env.CARVIS_API_KEY || require('../secret/config').CARVIS_API_KEY}
         })
         .then((res) => {

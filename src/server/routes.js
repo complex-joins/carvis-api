@@ -26,7 +26,6 @@ export default function(app) {
 
   app.delete('/dev/users/:userid', deleteUser);
 
-
   app.get('/dev/rides', getAllRideData);
 
   app.get('/rides/user/:userid', getRidesForUser);
@@ -36,8 +35,6 @@ export default function(app) {
   app.post('/rides', addRide);
 
   app.delete('/rides/:rideid', deleteRide);
-
-
 
   // app.post('/signin', requireSignin, Authentication.signin);
   // app.post('/signup', Authentication.signup);
