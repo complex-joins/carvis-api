@@ -1,6 +1,6 @@
-import {getRidesForUser, addRide, updateRide, getAllRideData, deleteRide} from '../models/Ride';
+import {getRidesForUser, addRide, updateRide, getAllRideData, deleteRide} from './models/Ride';
 import {getUserDashboardData, updateUserData, createUser,
-        getAllUserData, findOrCreateUser, updateOrCreateUser, deleteUser } from '../models/User';
+        getAllUserData, findOrCreateUser, updateOrCreateUser, deleteUser } from './models/User';
 // import passport from 'passport';
 // import passportService from './services/passport';
 import { rawUserData } from './models/User';
