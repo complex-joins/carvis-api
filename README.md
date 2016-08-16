@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/complex-joins/carvis-api.svg?branch=master)](https://travis-ci.org/complex-joins/carvis-api)
 # carvis-api
 Pithy project description
 
