@@ -97,6 +97,9 @@ var confirmPickup = function (userLocation, token, destination, rideId) {
     })
     .then(function (data) {
       // DB post all data.
+
+      console.log('uber confirmPickup data', data);
+
       var response = uberMethods.confirmPickup.responseMethod(data);
 
       // var dbpostURL = 'http://' + APIserver + '/rides/' + rideId;
@@ -124,7 +127,7 @@ var confirmPickup = function (userLocation, token, destination, rideId) {
 
     })
     .catch(function (err) {
-      console.log('ERROR login UBER', err);
+      console.log('ERROR pickup UBER', err);
     });
 };
 

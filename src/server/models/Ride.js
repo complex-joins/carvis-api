@@ -53,20 +53,15 @@ const getUserAndRequestRide = function (dbURL, origin, destination, partySize, r
       return res.json();
     })
     .then(function (data) {
-      console.log('success fetching user from DB', data); // pre-decrypt.
-      data = User.decryptModel(data[0]); // decrypt the tokens to pass to vendor
-      console.log('user post decrypt', data);
+      data = data[0];
 
       if (vendor === 'Uber') {
         let token = data.uberToken;
-        console.log('uber token post decrypt', token);
         uberhelper.confirmPickup(origin, token, destination, rideId);
 
       } else if (vendor === 'Lyft') {
         let lyftPaymentInfo = data.lyftPaymentInfo;
         let lyftToken = data.lyftToken;
-        console.log('token post decrypt', lyftToken); // works!
-
         lyfthelper.getCost(lyftToken, origin, destination, lyftPaymentInfo, partySize, rideId);
 
       } else {
