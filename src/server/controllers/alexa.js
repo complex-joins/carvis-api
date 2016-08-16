@@ -56,11 +56,15 @@ exports.getEstimate = function(req, res) {
         if (destination.descrip) {
           // make getEstimate call since destination.descrip async call resolved first
           rideHelper.getEstimate(mode, origin.coords, destination.coords, function (winner) {
-            rideHelper.addRide(winner, userId, origin, destination, function() {
-              // TODO: update alexa response based on ride status (i.e., once we know it has been ordered)
-              prompt = rideHelper.formatAnswer(winner, mode, origin.descrip, destination.descrip, staging);
+            prompt = rideHelper.formatAnswer(winner, mode, origin.descrip, destination.descrip, staging);
+            if (staging) { // no need to post ride to the db
               res.json({ prompt: prompt });
-            });
+            } else {
+              rideHelper.addRide(winner, userId, origin, destination, function() {
+                // TODO: update alexa response based on ride status (i.e., once we know it has been ordered)              
+                res.json({ prompt: prompt });
+              });  
+            }
           });
         }
       });
@@ -77,11 +81,15 @@ exports.getEstimate = function(req, res) {
       if (origin.descrip) {
         // make getEstimate call since originDescrip async call resolved first
         rideHelper.getEstimate(mode, origin.coords, destination.coords, function (winner) {
-          rideHelper.addRide(winner, userId, origin, destination, function() {
-            // TODO: update alexa response based on ride status (i.e., once we know it has been ordered)
-            prompt = rideHelper.formatAnswer(winner, mode, origin.descrip, destination.descrip, staging);
+          prompt = rideHelper.formatAnswer(winner, mode, origin.descrip, destination.descrip, staging);
+          if (staging) { // no need to post ride to the db
             res.json({ prompt: prompt });
-          });
+          } else {
+            rideHelper.addRide(winner, userId, origin, destination, function() {
+              // TODO: update alexa response based on ride status (i.e., once we know it has been ordered)              
+              res.json({ prompt: prompt });
+            });  
+          }
         });
       }
     }, origin.coords);

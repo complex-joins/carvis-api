@@ -161,7 +161,7 @@ var getEstimate = function (requestType, start, dest, cb) {
 };
 
 var addRide = function(ride, userId, origin, destination, cb) {
-  var endpoint = '/rides';
+  var endpoint = 'http://localhost:8000/rides'; // TODO: swap this out with prod url
   var body = {
     userId: 1, // TODO: make this dynamic and not hardcoded once alexa auth is implemented
     rideStatus: 'estimate',
@@ -189,26 +189,24 @@ var addRide = function(ride, userId, origin, destination, cb) {
     }
   }
 
-  cb(); // TODO: remove this line when i uncomment fetch
-
   // make post request to /rides endpoint with ride
-  // fetch(endpoint, {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify(body)
-  //   })
-  //   .then(function (res) {
-  //     return res.json();
-  //   })
-  //   .then(function (data) {
-  //     console.log('data inside POST to /rides:', data);
-  //     cb(data);
-  //   })
-  //   .catch(function (err) {
-  //     console.log('ERROR posting to /rides', err);
-  //   });
+  fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  })
+  .then(function (res) {
+    return res.json();
+  })
+  .then(function (data) {
+    console.log('data inside POST to /rides:', data);
+    cb(data);
+  })
+  .catch(function (err) {
+    console.log('ERROR posting to /rides', err);
+  });
 };
 
 var formatAnswer = function (winner, mode, originDescrip, destDescrip, staging) {
