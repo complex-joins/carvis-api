@@ -18,7 +18,7 @@ Uber, Lyft, Google Places, Twilio.
 
 From within the root directory:
 
-npm install
+`npm install`
 
 ##Moving Forward
 
