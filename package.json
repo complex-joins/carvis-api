@@ -48,7 +48,7 @@
     "passport-local": "^1.0.0",
     "pg": "^6.1.0",
     "shelljs": "^0.7.3",
-    "storkSQL": "^0.1.18",
+    "storkSQL": "^0.1.19",
     "twilio": "^2.9.2"
   },
   "devDependencies": {
