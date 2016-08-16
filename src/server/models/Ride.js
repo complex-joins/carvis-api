@@ -36,7 +36,7 @@ export const addRide = function (req, res) {
 
       return getUserAndRequestRide(dbURL, origin, destination, partySize, rideId, vendor)
     })
-    .catch((err) => res.json(err)); // add catch for errors.
+    .catch((err) => res.status(400).json(err)); // add catch for errors.
 };
 
 const getUserAndRequestRide = function (dbURL, origin, destination, partySize, rideId, vendor) {
@@ -78,23 +78,23 @@ const getUserAndRequestRide = function (dbURL, origin, destination, partySize, r
 export const getRidesForUser = function (req, res) {
   Ride.find({ userId: req.params.userid })
     .then((rides) => res.json(rides))
-    .catch((err) => res.json(err));
+    .catch((err) => res.status(400).json(err));
 };
 
 export const updateRide = function (req, res) {
   Ride.update({ id: req.params.rideid }, req.body)
     .then((ride) => res.json(ride))
-    .catch((err) => res.json(err));
+    .catch((err) => res.status(400).json(err));
 };
 
 export const getAllRideData = function (req, res) {
   Ride.findAll()
     .then((rides) => res.json(rides))
-    .catch((err) => res.json(err));
+    .catch((err) => res.status(400).json(err));
 };
 
 export const deleteRide = function (req, res) {
   Ride.delete({ id: req.params.rideid })
     .then((ride) => res.json(ride))
-    .catch((err) => res.json(err));
+    .catch((err) => res.status(400).json(err));
 };
