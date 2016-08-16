@@ -30,6 +30,7 @@ export const RideSchema = function (ride) {
   // below is returned on the request-ride calls
   ride.string('eta', 255); // actual ETA of the specific booked car
   ride.string('vendorRideId', 255); // vendor string to reference cancellations
+  ride.string('vendorRideToken', 255); // vendor string to reference cancellations -- UBER specific
   ride.string('tripDuration', 255); // duration of the ride origin to destination - returned by vendor on confirmation of request-ride
 };
 
