@@ -1,10 +1,10 @@
 var _ = require('lodash');
 var rideHelper = require('../utils/ride-helper');
 
-var staging = false;
+var fakeoutMode = false; // when true, CARVIS will tell you about taxi fares, not uber and lyft estimates
 var config = {};
 
-if (staging) {
+if (fakeoutMode) {
   config.prompt = 'With CARVIS you can find the average taxi fare from an airport to your hotel, and vice versa. For example, you can ask, CARVIS, how much is a taxi from Marriot San Francisco to SFO airport?';
   config.reprompt = 'Tell me where you want to be picked up, and where you want to go';
   config.helpSpeech = config.prompt;
@@ -25,7 +25,7 @@ exports.getEstimate = function(req, res) {
   console.log('slots:', slots);
 
   var userId = req.body.userId; // the unique alexa session userId. that said, its the *carvis userId* i should be storing in the session and passing to carvis api endpoints
-  var mode = (staging) ? 'cheapest' : slots.MODE.value; // cheapest or fastest
+  var mode = (fakeoutMode) ? 'cheapest' : slots.MODE.value; // cheapest or fastest
 
   // find the ORIGIN slot that is populated in this request, if any
   var originArray = _.filter(slots, function (slotValue, slotKey) {
@@ -56,8 +56,8 @@ exports.getEstimate = function(req, res) {
         if (destination.descrip) {
           // make getEstimate call since destination.descrip async call resolved first
           rideHelper.getEstimate(mode, origin.coords, destination.coords, function (winner) {
-            prompt = rideHelper.formatAnswer(winner, mode, origin.descrip, destination.descrip, staging);
-            if (staging) { // no need to post ride to the db
+            prompt = rideHelper.formatAnswer(winner, mode, origin.descrip, destination.descrip, fakeoutMode);
+            if (fakeoutMode) { // no need to post ride to the db
               res.json({ prompt: prompt });
             } else {
               rideHelper.addRide(winner, userId, origin, destination, function() {
@@ -81,8 +81,8 @@ exports.getEstimate = function(req, res) {
       if (origin.descrip) {
         // make getEstimate call since originDescrip async call resolved first
         rideHelper.getEstimate(mode, origin.coords, destination.coords, function (winner) {
-          prompt = rideHelper.formatAnswer(winner, mode, origin.descrip, destination.descrip, staging);
-          if (staging) { // no need to post ride to the db
+          prompt = rideHelper.formatAnswer(winner, mode, origin.descrip, destination.descrip, fakeoutMode);
+          if (fakeoutMode) { // no need to post ride to the db
             res.json({ prompt: prompt });
           } else {
             rideHelper.addRide(winner, userId, origin, destination, function() {
