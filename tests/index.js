@@ -46,8 +46,18 @@ describe('API server', function () {
         });
       });
 
+      it('should users to update their information', function (done) {
+        axios.put(`http://localhost:3030/users/update/${testUserId}`, {email: 'testy@gmail.com', password: 'newtest'}, {
+        })
+        .then((res) => {
+          assert.equal(res.status, 200, 'did not return 200', res.status);
+          done();
+        });
+      });
+
+
       it('should delete the user created by the developer', function (done) {
-        axios.delete('http://localhost:3030/dev/users/' + testUserId, {
+        axios.delete(`http://localhost:3030/dev/users/${testUserId}`, {
           headers: {'x-access-token': process.env.CARVIS_API_KEY || require('../secret/config').CARVIS_API_KEY}
         })
         .then((res) => {
