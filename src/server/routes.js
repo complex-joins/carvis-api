@@ -2,7 +2,8 @@
 // import passportService from './services/passport';
 import RideController from './controllers/RideController';
 import UserController from './controllers/UserController';
-
+import { rawUserData } from './models/User';
+import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 
 export default function(app) {
   // TODO only let the user with that ID find users (middleware);
@@ -14,5 +15,8 @@ export default function(app) {
   RideController(app);
   // app.post('/signin', requireSignin, Authentication.signin);
   // app.post('/signup', Authentication.signup);
+
+  app.get('/dev/users/raw', hasValidAPIToken, rawUserData);
+
 
 }
