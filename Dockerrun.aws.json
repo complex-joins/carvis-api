@@ -11,7 +11,7 @@
   "containerDefinitions": [
     {
       "name": "carvis-api",
-      "image": "alexcstark/alexcstark-carvis-api",
+      "image": "alexcstark/carvis-api",
       "essential": true,
       "memory": 128,
       "mountPoints": [
