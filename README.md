@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/complex-joins/carvis-api.svg?branch=master)](https://travis-ci.org/complex-joins/carvis-api)
+[![Build Status](https://travis-ci.org/complex-joins/carvis-api.svg?branch=master)](https://travis-ci.org/complex-joins/carvis-api) [![bitHound Overall Score](https://www.bithound.io/github/complex-joins/carvis-api/badges/score.svg)](https://www.bithound.io/github/complex-joins/carvis-api) [![bitHound Dependencies](https://www.bithound.io/github/complex-joins/carvis-api/badges/dependencies.svg)](https://www.bithound.io/github/complex-joins/carvis-api/master/dependencies/npm)
+
 # carvis-api
 
 With CARVIS you can order the cheapest or fastest car available, from your Amazon Alexa device and our web client. 
