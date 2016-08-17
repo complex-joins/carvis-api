@@ -4,15 +4,6 @@
     {
       "name": "carvis-api",
       "image": "alexcstark/carvis-api",
-      "essential": true,
-      "memory": 128,
-      "mountPoints": [
-        {
-          "sourceVolume": "node-app-template",
-          "containerPath": "/var/opt/app",
-          "readOnly": true
-        }
-      ],
       "portMappings": [
         {
           "hostPort": 80,
