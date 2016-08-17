@@ -1,5 +1,6 @@
 import { Ride } from '../../db/Ride';
 import { User } from '../../db/User';
+import { createMessage } from './../utils/twilioHelper';
 import fetch from 'node-fetch';
 
 const CARVIS_API_KEY = !process.env.PROD ? require('./../../../secret/config.js')
@@ -69,7 +70,7 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
           rideId: rideId
         };
 
-        var helperURL = CARVIS_HELPER_API + '/uber/requestRide';
+        let helperURL = CARVIS_HELPER_API + '/uber/requestRide';
 
         fetch(helperURL, {
             method: 'POST',
@@ -79,13 +80,13 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
             },
             body: JSON.stringify(body)
           })
-          .then(function (res) {
+          .then(res => {
             return res.json();
           })
-          .then(function (data) {
+          .then(data => {
             console.log('success lyft phone auth', data);
           })
-          .catch(function (err) {
+          .catch(err => {
             console.warn('err lyft phone auth', err);
           });
 
@@ -102,7 +103,7 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
           rideId: rideId
         };
 
-        var helperURL = CARVIS_HELPER_API + '/lyft/getCost';
+        let helperURL = CARVIS_HELPER_API + '/lyft/getCost';
 
         fetch(helperURL, {
             method: 'POST',
@@ -112,13 +113,13 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
             },
             body: JSON.stringify(body)
           })
-          .then(function (res) {
+          .then(res => {
             return res.json();
           })
-          .then(function (data) {
+          .then(data => {
             console.log('success lyft phone auth', data);
           })
-          .catch(function (err) {
+          .catch(err => {
             console.warn('err lyft phone auth', err);
           });
 
@@ -129,6 +130,41 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
     .catch(err => {
       console.warn('error fetching user from db', err);
     });
+};
+
+export const shareRideETA = (req, res) => {
+  let rideId = req.params.rideid;
+  let number = req.body.number;
+  let message = req.body.message || "You can track my Lyft via this link: ";
+
+  let helperURL = CARVIS_HELPER_API + '/lyft/shareETA';
+  let body = {
+    rideId: rideId
+  };
+
+  fetch(helperURL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': CARVIS_HELPER_API_KEY
+      },
+      body: JSON.stringify(body)
+    })
+    .then(response => {
+      return response.json();
+    })
+    .then(data => {
+      console.log('success lyft shareETA', data);
+
+      let URLmessage = message + data.shareUrl;
+      createMessage(number, URLmessage);
+      res.json();
+    })
+    .catch(err => {
+      console.warn('err lyft shareETA', err);
+    });
+
+
 };
 
 export const getRidesForUser = (req, res) => {
