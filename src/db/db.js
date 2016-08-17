@@ -1,6 +1,7 @@
 import Stork from 'storkSQL';
 console.log('before requiring in db/db.js');
 console.log('DB_CONFIG_JSON:', process.env.DB_CONFIG_JSON);
+console.log('process.env:', process.env);
 const DB_CONFIG_OBJ = (process.env.DB_CONFIG_JSON) ? JSON.parse(DB_CONFIG_JSON) : require('../../secret/config').DB_CONFIG_OBJ;
 console.log('after requiring in db/db.js');
 
