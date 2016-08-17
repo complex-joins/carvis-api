@@ -2,9 +2,7 @@ import { Ride } from '../../db/Ride';
 import { User } from '../../db/User';
 import fetch from 'node-fetch';
 
-var config = require('./../../../secret/config.js');
-// var lyfthelper = require('./../utils/lyft-helper.js');
-// var uberhelper = require('./../utils/uber-helper.js');
+const config = require('./../../../secret/config.js');
 
 export const addRide = function (req, res) {
   Ride.create(req.body)
@@ -57,15 +55,61 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
       if (vendor === 'Uber') {
         let token = data.uberToken;
 
-        // TODO: fetch() POST to the helper API server '/uber/requestRide'
-        uberhelper.confirmPickup(origin, token, destination, rideId);
+        let body = {
+          origin: origin,
+          token: token,
+          destination: destination,
+          rideId: rideId
+        };
+
+        fetch('http://localhost:8888/uber/requestRide', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': config.CARVIS_HELPER_API_KEY
+            },
+            body: JSON.stringify(body)
+          })
+          .then(function (res) {
+            return res.json();
+          })
+          .then(function (data) {
+            console.log('success lyft phone auth', data);
+          })
+          .catch(function (err) {
+            console.warn('err lyft phone auth', err);
+          });
 
       } else if (vendor === 'Lyft') {
         let lyftPaymentInfo = data.lyftPaymentInfo;
         let lyftToken = data.lyftToken;
 
-        // TODO: fetch() POST to the helper API server '/lyft/getCost'
-        lyfthelper.getCost(lyftToken, origin, destination, lyftPaymentInfo, partySize, rideId);
+        let body = {
+          lyftPaymentInfo: lyftPaymentInfo,
+          lyftToken: lyftToken,
+          origin: origin,
+          partySize: partySize,
+          destination: destination,
+          rideId: rideId
+        };
+
+        fetch('http://localhost:8888/lyft/getCost', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': config.CARVIS_HELPER_API_KEY
+            },
+            body: JSON.stringify(body)
+          })
+          .then(function (res) {
+            return res.json();
+          })
+          .then(function (data) {
+            console.log('success lyft phone auth', data);
+          })
+          .catch(function (err) {
+            console.warn('err lyft phone auth', err);
+          });
 
       } else {
         console.warn('not a valid vendor - check stacktrace');

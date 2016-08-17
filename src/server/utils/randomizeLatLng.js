@@ -13,7 +13,7 @@ https://www.npmjs.com/package/haversine
 * @param {number} count Number of points to generate.
 * @return {array} Array of Objects with lat and lng attributes.
 */
-export const generateRandomPoints(center, radius, count) => {
+export const generateRandomPoints = (center, radius, count) => {
   let points = [];
   for (let i = 0; i < count; i++) {
     points.push(generateRandomPoint(center, radius));
@@ -29,7 +29,7 @@ export const generateRandomPoints(center, radius, count) => {
  * @return {Object} The generated random points as JS object with lat and lng attributes.
  */
 
-export const generateRandomPoint(center, radius) => {
+export const generateRandomPoint = (center, radius) => {
   let x0 = center.lng;
   let y0 = center.lat;
   // Convert Radius from meters to degrees.
