@@ -1,7 +1,6 @@
 ### node etc ###
 
 
-
 work-stash
 
 # Logs
@@ -68,4 +67,3 @@ bower_components/
 Network Trash Folder
 Temporary Items
 .apdisk
-carvis-api/secret/config.js
