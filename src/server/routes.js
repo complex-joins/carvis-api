@@ -8,7 +8,16 @@ import Authentication from './controllers/authentication';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 import alexa from './controllers/alexa';
 
+const requireAuth = passport.authenticate('jwt', { session: false });
+const requireSignin = passport.authenticate('local', { session: false });
+
 export default function(app) {
+  //Example of how we would use require Auth 
+  // app.get('/', requireAuth, function(req, res) {
+  //   res.send( {message: 'Super awesome sauce code is SHEZZZZ' });
+  // });
+
+
   // TODO only let the user with that ID find users (middleware);
   app.get('/', (req, res) => {
     res.status(200).send('Welcome to the Carvis API.');
