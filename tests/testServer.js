@@ -1,3 +1,4 @@
+console.log('before requiring in testServer.js');
 import express from 'express';
 import { PORT, configureServer } from '../src/server/server-configuration/config';
 import routes from '../src/server/routes';

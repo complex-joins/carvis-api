@@ -1,3 +1,4 @@
+console.log('before requiring in routes.js');
 import {getRidesForUser, addRide, updateRide, getAllRideData, deleteRide} from './models/Ride';
 import {getUserDashboardData, updateUserData, createUser,
         getAllUserData, findOrCreateUser, updateOrCreateUser, deleteUser } from './models/User';
