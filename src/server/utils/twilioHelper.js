@@ -8,7 +8,7 @@ const client = require('twilio')(twilioCredentials.accountSid, twilioCredentials
 // Twilio SMS send to be invoked via a client side form, which upon click sends a POST request to our server on the '/message' path with a body of { number: targetPhoneNumber, message: intendedMessage }
 
 // Twilio Functions
-export const createMessage(req, res) => {
+export const createMessage = (req, res) => {
   let number = req.body.number;
   let message = req.body.message;
 
