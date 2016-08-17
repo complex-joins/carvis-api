@@ -37,23 +37,35 @@ Uber, Lyft, Google Places, Twilio.
 
 All routes require the appropriate API token.
 
-  app.get('/users/:userid', hasValidAPIToken, getUserDashboardData);
-  app.get('/dev/users', hasValidAPIToken, getAllUserData);
-  app.post('/dev/users', hasValidAPIToken, createUser);
-  app.post('/auth/users', hasValidAPIToken, findOrCreateUser);
-  app.post('/users/updateOrCreate', hasValidAPIToken, updateOrCreateUser);
-  app.put('/users/:userid', hasValidAPIToken, updateUserData);
-  app.delete('/dev/users/:userid', hasValidAPIToken, deleteUser);
-  app.get('/dev/users/raw', hasValidAPIToken, rawUserData);
+  `app.get('/users/:userid', hasValidAPIToken, getUserDashboardData);`
+  
+  `app.get('/dev/users', hasValidAPIToken, getAllUserData);`
+  
+  `app.post('/dev/users', hasValidAPIToken, createUser);`
+  
+  `app.post('/auth/users', hasValidAPIToken, findOrCreateUser);`
+  
+  `app.post('/users/updateOrCreate', hasValidAPIToken, updateOrCreateUser);`
+  
+  `app.put('/users/:userid', hasValidAPIToken, updateUserData);`
+  
+  `app.delete('/dev/users/:userid', hasValidAPIToken, deleteUser);`
+  
+  `app.get('/dev/users/raw', hasValidAPIToken, rawUserData);`
 
-  app.get('/dev/rides', hasValidAPIToken, getAllRideData);
-  app.get('/rides/user/:userid', hasValidAPIToken, getRidesForUser);
-  app.put('/rides/:rideid', hasValidAPIToken, updateRide);
-  app.post('/rides', hasValidAPIToken, addRide);
-  app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);
+  `app.get('/dev/rides', hasValidAPIToken, getAllRideData);`
+  
+  `app.get('/rides/user/:userid', hasValidAPIToken, getRidesForUser);`
+  
+  `app.put('/rides/:rideid', hasValidAPIToken, updateRide);`
+  
+  `app.post('/rides', hasValidAPIToken, addRide);`
+  
+  `app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);`
 
-  app.post('/alexa/launch', alexa.handleLaunch);
-  app.post('/alexa/estimate', alexa.getEstimate);
+  `app.post('/alexa/launch', alexa.handleLaunch);`
+  
+  `app.post('/alexa/estimate', alexa.getEstimate);`
 
 ##Moving Forward
 
