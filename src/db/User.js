@@ -51,6 +51,8 @@ export const UserSchema = function (user) {
   user.string('uberPassword', 255);
 };
 
+console.log('before requiring in db/User.js');
+
 export const User = db.model('users', {
   secureFields: {
     password: process.env.USER_ENCRYPT || require('../../secret/config')
@@ -58,3 +60,5 @@ export const User = db.model('users', {
     fields: ['lyftToken', 'lyftPaymentInfo', 'uberPassword', 'uberToken', 'password', 'alexaUserId']
   }
 });
+
+console.log('after requiring in db/User.js');
