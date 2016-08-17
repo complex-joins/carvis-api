@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "carvis-api",
-      "image": "alexcstark/carvis-api",
+      "image": "carvis/carvis-api",
       "essential": true,
       "memory": 128,
       "portMappings": [
