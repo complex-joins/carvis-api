@@ -1,0 +1,32 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "volumes": [
+    {
+      "name": "node-app-template",
+      "host": {
+        "sourcePath": "/var/app/current/app"
+      }
+    }
+  ],
+  "containerDefinitions": [
+    {
+      "name": "carvis-api",
+      "image": "alexcstark/alexcstark-carvis-api",
+      "essential": true,
+      "memory": 128,
+      "mountPoints": [
+        {
+          "sourceVolume": "node-app-template",
+          "containerPath": "/var/opt/app",
+          "readOnly": true
+        }
+      ],
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 8000
+        }
+      ]
+    }
+  ]
+}
