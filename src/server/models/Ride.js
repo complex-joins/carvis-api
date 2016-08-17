@@ -8,6 +8,8 @@ const CARVIS_API = !process.env.PROD ? require('./../../../secret/config.js')
   .CARVIS_API : process.env.CARVIS_API;
 const CARVIS_HELPER_API_KEY = !process.env.PROD ? require('./../../../secret/config.js')
   .CARVIS_HELPER_API_KEY : process.env.CARVIS_HELPER_API_KEY;
+const CARVIS_HELPER_API = !process.env.PROD ? require('./../../../secret/config.js')
+  .CARVIS_HELPER_API : process.env.CARVIS_HELPER_API;
 
 export const addRide = function (req, res) {
   Ride.create(req.body)
@@ -67,7 +69,9 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
           rideId: rideId
         };
 
-        fetch('http://localhost:8888/uber/requestRide', {
+        var helperURL = CARVIS_HELPER_API + '/uber/requestRide';
+
+        fetch(helperURL, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -98,7 +102,9 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
           rideId: rideId
         };
 
-        fetch('http://localhost:8888/lyft/getCost', {
+        var helperURL = CARVIS_HELPER_API + '/lyft/getCost';
+
+        fetch(helperURL, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
