@@ -26,5 +26,5 @@ module.exports = {
 /*
 LYFT_BEARER_TOKEN currently hardcoded, needs to be updated every 86400 seconds.
 TODO: update dynamically:
--- for updating one has to use the `refreshBearerToken` function from './../src/server/utils/lyft-helper.js'.
+-- for updating one has to use the `refreshBearerToken` function from './../src/server/utils/d.js'.
 */

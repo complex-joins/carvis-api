@@ -28,19 +28,19 @@ export default function(app) {
 
   app.delete('/dev/users/:userid', hasValidAPIToken, deleteUser);
 
-  app.get('/dev/rides', hasValidAPIToken, getAllRideData);
+  // app.get('/dev/rides', hasValidAPIToken, getAllRideData);
+  //
+  // app.get('/rides/user/:userid', hasValidAPIToken, getRidesForUser);
+  //
+  // app.put('/rides/:rideid', hasValidAPIToken, updateRide);
+  //
+  // app.post('/rides', hasValidAPIToken, addRide);
+  //
+  // app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);
 
-  app.get('/rides/user/:userid', hasValidAPIToken, getRidesForUser);
+  // app.post('/alexa/launch', alexa.handleLaunch);
 
-  app.put('/rides/:rideid', hasValidAPIToken, updateRide);
-
-  app.post('/rides', hasValidAPIToken, addRide);
-
-  app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);
-
-  app.post('/alexa/launch', alexa.handleLaunch);
-
-  app.post('/alexa/estimate', alexa.getEstimate);
+  // app.post('/alexa/estimate', alexa.getEstimate);
 
   // app.post('/signin', requireSignin, Authentication.signin);
   // app.post('/signup', Authentication.signup);
