@@ -133,13 +133,16 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
 };
 
 export const shareRideETA = (req, res) => {
+  // note: how does rideId, origin, token, vendor get passed to this method?
   let rideId = req.params.rideid;
   let number = req.body.number;
   let message = req.body.message || "You can track my Lyft via this link: ";
-
-  let helperURL = CARVIS_HELPER_API + '/lyft/shareETA';
+  let token = req.body.token;
+  let vendor = req.body.vendor || 'Lyft';
+  let helperURL = vendor === 'Lyft' ? CARVIS_HELPER_API + '/lyft/shareETA' : CARVIS_HELPER_API + '/uber/shareETA';
   let body = {
-    rideId: rideId
+    rideId: rideId,
+    token: token
   };
 
   fetch(helperURL, {
@@ -163,8 +166,41 @@ export const shareRideETA = (req, res) => {
     .catch(err => {
       console.warn('err lyft shareETA', err);
     });
+};
 
+export const cancelRide = (req, res) => {
+  // note: how does rideId, origin, token, vendor get passed to this method? 
+  let rideId = req.params.rideid;
+  let origin = req.body.origin;
+  let token = req.body.token;
+  let vendor = req.body.vendor || 'Lyft';
+  let helperURL = vendor === 'Lyft' ? CARVIS_HELPER_API + '/lyft/cancelRide' : CARVIS_HELPER_API + '/uber/cancelRide';
+  let body = {
+    origin: origin,
+    token: token
+  };
 
+  fetch(helperURL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': CARVIS_HELPER_API_KEY
+      },
+      body: JSON.stringify(body)
+    })
+    .then(response => {
+      return response.json();
+    })
+    .then(data => {
+      console.log('success lyft shareETA', data);
+
+      let URLmessage = message + data.shareUrl;
+      createMessage(number, URLmessage);
+      res.json();
+    })
+    .catch(err => {
+      console.warn('err lyft shareETA', err);
+    });
 };
 
 export const getRidesForUser = (req, res) => {

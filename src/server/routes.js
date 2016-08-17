@@ -40,6 +40,8 @@ export default function (app) {
 
   app.post('/rides/shareETA/:rideid', hasValidAPIToken, shareRideETA);
 
+  app.post('/rides/cancelRide/:rideid', hasValidAPIToken, shareRideETA);
+
   app.post('/alexa/launch', alexa.handleLaunch);
 
   app.post('/alexa/estimate', alexa.getEstimate);
