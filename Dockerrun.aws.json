@@ -1,13 +1,5 @@
 {
   "AWSEBDockerrunVersion": 2,
-  "volumes": [
-    {
-      "name": "node-app-template",
-      "host": {
-        "sourcePath": "/var/app/current/app"
-      }
-    }
-  ],
   "containerDefinitions": [
     {
       "name": "carvis-api",
