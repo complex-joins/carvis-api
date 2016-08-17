@@ -2,7 +2,12 @@ import { Ride } from '../../db/Ride';
 import { User } from '../../db/User';
 import fetch from 'node-fetch';
 
-const config = require('./../../../secret/config.js');
+const CARVIS_API_KEY = !process.env.PROD ? require('./../../../secret/config.js')
+  .CARVIS_API_KEY : process.env.CARVIS_API_KEY;
+const CARVIS_API = !process.env.PROD ? require('./../../../secret/config.js')
+  .CARVIS_API : process.env.CARVIS_API;
+const CARVIS_HELPER_API_KEY = !process.env.PROD ? require('./../../../secret/config.js')
+  .CARVIS_HELPER_API_KEY : process.env.CARVIS_HELPER_API_KEY;
 
 export const addRide = function (req, res) {
   Ride.create(req.body)
@@ -27,7 +32,7 @@ export const addRide = function (req, res) {
       // carvisUserId -- to query the user table for tokens etc.
       let userId = ride.userId;
 
-      let dbURL = 'http://' + config.CARVIS_API + '/users/' + userId;
+      let dbURL = 'http://' + CARVIS_API + '/users/' + userId;
       // let dbURL = 'http://localhost:8080/users/' + userId;
       console.log('pre db get', vendor, userId, dbURL, rideId);
 
@@ -43,7 +48,7 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'x-access-token': config.CARVIS_API_KEY
+        'x-access-token': CARVIS_API_KEY
       }
     })
     .then(res => {
@@ -66,7 +71,7 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'x-access-token': config.CARVIS_HELPER_API_KEY
+              'x-access-token': CARVIS_HELPER_API_KEY
             },
             body: JSON.stringify(body)
           })
@@ -97,7 +102,7 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'x-access-token': config.CARVIS_HELPER_API_KEY
+              'x-access-token': CARVIS_HELPER_API_KEY
             },
             body: JSON.stringify(body)
           })
