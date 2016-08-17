@@ -1,5 +1,6 @@
-var twilioCredentials = JSON.parse(process.env.twilioCredentials) || require('../../../secret/config.js').twilioCredentials;
-var client = require('twilio')(twilioCredentials.accountSid, twilioCredentials.authToken);
+const twilioCredentials = JSON.parse(process.env.twilioCredentials) || require('../../../secret/config.js')
+  .twilioCredentials;
+const client = require('twilio')(twilioCredentials.accountSid, twilioCredentials.authToken);
 
 // NOTE: Twilio will only work with approved numbers on the free trial account, for now Chris' number is approved.
 // NOTE: a test notice is included in all messages until we load $$$ to Twilio.
@@ -7,12 +8,15 @@ var client = require('twilio')(twilioCredentials.accountSid, twilioCredentials.a
 // Twilio SMS send to be invoked via a client side form, which upon click sends a POST request to our server on the '/message' path with a body of { number: targetPhoneNumber, message: intendedMessage }
 
 // Twilio Functions
-function createMessage(number, message) {
+export const createMessage(req, res) => {
+  let number = req.body.number;
+  let message = req.body.message;
+
   client.messages.create({
     to: number,
     from: "+19495417437",
     body: message
-  }, function (err, message) {
+  }, (err, message) => {
     // The HTTP request to Twilio will run asynchronously. This callback
     // function will be called when a response is received from Twilio
     // The "error" variable will contain error information, if any.
@@ -28,5 +32,3 @@ function createMessage(number, message) {
     }
   });
 }
-
-module.exports = createMessage;

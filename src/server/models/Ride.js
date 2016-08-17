@@ -1,11 +1,10 @@
 import { Ride } from '../../db/Ride';
 import { User } from '../../db/User';
+import fetch from 'node-fetch';
 
-var fetch = require('node-fetch');
 var config = require('./../../../secret/config.js');
-var lyfthelper = require('./../utils/lyft-helper.js');
-var uberhelper = require('./../utils/uber-helper.js');
-
+// var lyfthelper = require('./../utils/lyft-helper.js');
+// var uberhelper = require('./../utils/uber-helper.js');
 
 export const addRide = function (req, res) {
   Ride.create(req.body)
@@ -30,8 +29,8 @@ export const addRide = function (req, res) {
       // carvisUserId -- to query the user table for tokens etc.
       let userId = ride.userId;
 
-      // let dbURL = 'http://' + config.CARVIS_API + '/users/' + userId;
-      let dbURL = 'http://localhost:8080/users/' + userId;
+      let dbURL = 'http://' + config.CARVIS_API + '/users/' + userId;
+      // let dbURL = 'http://localhost:8080/users/' + userId;
       console.log('pre db get', vendor, userId, dbURL, rideId);
 
       return getUserAndRequestRide(dbURL, origin, destination, partySize, rideId, vendor)
@@ -40,7 +39,7 @@ export const addRide = function (req, res) {
       .json(err)); // add catch for errors.
 };
 
-const getUserAndRequestRide = function (dbURL, origin, destination, partySize, rideId, vendor) {
+const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, vendor) => {
 
   fetch(dbURL, {
       method: 'GET',
@@ -49,52 +48,56 @@ const getUserAndRequestRide = function (dbURL, origin, destination, partySize, r
         'x-access-token': config.CARVIS_API_KEY
       }
     })
-    .then(function (res) {
+    .then(res => {
       return res.json();
     })
-    .then(function (data) {
+    .then(data => {
       data = data[0];
 
       if (vendor === 'Uber') {
         let token = data.uberToken;
+
+        // TODO: fetch() POST to the helper API server '/uber/requestRide'
         uberhelper.confirmPickup(origin, token, destination, rideId);
 
       } else if (vendor === 'Lyft') {
         let lyftPaymentInfo = data.lyftPaymentInfo;
         let lyftToken = data.lyftToken;
+
+        // TODO: fetch() POST to the helper API server '/lyft/getCost'
         lyfthelper.getCost(lyftToken, origin, destination, lyftPaymentInfo, partySize, rideId);
 
       } else {
         console.warn('not a valid vendor - check stacktrace');
       }
     })
-    .catch(function (err) {
+    .catch(err => {
       console.warn('error fetching user from db', err);
     });
 };
 
-export const getRidesForUser = function (req, res) {
+export const getRidesForUser = (req, res) => {
   Ride.find({ userId: req.params.userid })
     .then((rides) => res.json(rides))
     .catch((err) => res.status(400)
       .json(err));
 };
 
-export const updateRide = function (req, res) {
+export const updateRide = (req, res) => {
   Ride.update({ id: req.params.rideid }, req.body)
     .then((ride) => res.json(ride))
     .catch((err) => res.status(400)
       .json(err));
 };
 
-export const getAllRideData = function (req, res) {
+export const getAllRideData = (req, res) => {
   Ride.findAll()
     .then((rides) => res.json(rides))
     .catch((err) => res.status(400)
       .json(err));
 };
 
-export const deleteRide = function (req, res) {
+export const deleteRide = (req, res) => {
   Ride.delete({ id: req.params.rideid })
     .then((ride) => res.json(ride))
     .catch((err) => res.status(400)

@@ -13,9 +13,9 @@ https://www.npmjs.com/package/haversine
 * @param {number} count Number of points to generate.
 * @return {array} Array of Objects with lat and lng attributes.
 */
-function generateRandomPoints(center, radius, count) {
-  var points = [];
-  for (var i = 0; i < count; i++) {
+export const generateRandomPoints(center, radius, count) => {
+  let points = [];
+  for (let i = 0; i < count; i++) {
     points.push(generateRandomPoint(center, radius));
   }
   return points;
@@ -29,29 +29,24 @@ function generateRandomPoints(center, radius, count) {
  * @return {Object} The generated random points as JS object with lat and lng attributes.
  */
 
-function generateRandomPoint(center, radius) {
-  var x0 = center.lng;
-  var y0 = center.lat;
+export const generateRandomPoint(center, radius) => {
+  let x0 = center.lng;
+  let y0 = center.lat;
   // Convert Radius from meters to degrees.
-  var rd = radius / 111300;
+  let rd = radius / 111300;
 
-  var u = Math.random();
-  var v = Math.random();
+  let u = Math.random();
+  let v = Math.random();
 
-  var w = rd * Math.sqrt(u);
-  var t = 2 * Math.PI * v;
-  var x = w * Math.cos(t);
-  var y = w * Math.sin(t);
+  let w = rd * Math.sqrt(u);
+  let t = 2 * Math.PI * v;
+  let x = w * Math.cos(t);
+  let y = w * Math.sin(t);
 
-  var xp = x / Math.cos(y0);
+  let xp = x / Math.cos(y0);
 
-  var alt = Math.random() * 70 + 10; // plausible SF altitude.
+  let alt = Math.random() * 70 + 10; // plausible SF altitude.
 
   // Resulting point.
   return { 'lat': y + y0, 'lng': xp + x0, 'alt': alt };
-}
-
-module.exports = {
-  generateRandomPoints: generateRandomPoints, // generates array of points.
-  generateRandomPoint: generateRandomPoint // generates single point.
 }
