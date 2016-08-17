@@ -75,3 +75,4 @@ Temporary Items
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+carvis-api/secret/config.js
