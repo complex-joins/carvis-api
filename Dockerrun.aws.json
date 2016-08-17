@@ -4,6 +4,8 @@
     {
       "name": "carvis-api",
       "image": "alexcstark/carvis-api",
+      "essential": true,
+      "memory": 128,
       "portMappings": [
         {
           "hostPort": 80,
