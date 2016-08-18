@@ -7,19 +7,20 @@ script:
 - npm run build
 - npm test
 deploy:
-  matrix:
-  - provider: elasticbeanstalk
-    app: carvis
-    env: carvis-api
-    bucket_name: elasticbeanstalk-us-west-1-193171401169
-    region: us-west-1
+  provider: elasticbeanstalk
+  app: carvis
+  env: carvis-1
+  bucket_name: elasticbeanstalk-us-west-1-193171401169
+  region: us-west-1
   secret_access_key:
     secure: tVAu6GB6LeekqeMXFt+A0JUtf4l6qFb3wwW3zIOuaATyqLGgI4SxlaGoeGdN19Aqtk/PD8qoqBgtZrwsi1toTPsdAdj4iFe+2ZLzltSTOosjdzBCp2/OhylVdiMebcS/vkF8RmIG8kgxj0nBEEYlBFo92JOZ2O9cGONxMHUVc3cVqu5YUiyCwqSimdtgH9DuMkNEyWX3vqIOhyZNh1bEmU9zN0G/5OEKsZ0MsPxCEDdMAtFR3GGnr1+g/qAs+Khmphp8EXwczY9FOUvhFfbA2XLVMoWpJyL7+MglDHWSMNJwAAvZ0nEI8dEdv71SI/DJlFX6UKoOYg0m7IDizlfhia0Hwj203iOGgXuOV1kgQWPHChzqXPeT7y7+BSt0qmH1GCDELpqQfel8bhht8BC6/9aoBbMv7VrFmi6BwZEpYXNHE1Ipl1ZL992VfkEDTL7iXofwzYXbtUDcoWnJ9x3Xd4OQlQgASRmtjyDh21arI8mi4BbH1OCEHPL+MgI1R5RcUseG1Dy93bM37cucDk3A6OvnXMYoIC524SvNzo3GZOXmy5DRdjbqekBXXvUy9w13KO48cocO6qrG26HyQzlvljtLfGr+CqVBRx0JPwRA8vk3T14v4A3YRcW1v3PiJ9gN5JlHumvKYgjbf/wfvoud1tRqdLr4XNcPLvq2E72p9Mw=
   access_key_id:
     secure: nCo0hVGreg8j9eubbSh7SJYh8nhF+iTnsCkLOdnvX5cTT2+4aCgqSRjfdjnV15a86tf8WXStQm6wgZBb6wWzBQylixv4O/drSwH2z9yXVlzhqzTwbSnkZZD73o32z7Kk7TaxggNjDnpDCxBuRHiej4KYiS0m8tOEHg4ZbjhKBx1eI4x1qtv2mf401ycmuEL+sFEfEvjujCeyo95JQYIe92cyrT8zSxRpfIVtdAZQJPiblKsQgD/tIEOZ7KSoE0/JEOo/mShNR7U+rT0Qw1xmsjh727RFAvZ4D8+QwkYuQ3Yn93SpVq6cgb4LnQY8RbGVYr9oT2XkVMTxl91mcxlnimIao/RUJXKy8XKcjJ3J5k4H+VwrzOSo1iSWz4zGR5jO/I7XGPDgVb7/bAGs/WMz+1a95uaRbfO6vmERVu3YKAjvATaCLPBLzCQxt/w72IHU2poRi5TsMbipeQXtFZ/s3a4jfDGLkMv653n4bgYypZW1Evz29uGnBdqq4NFCTpSe8RRG56rvGalD7OGaGNhy5FKb/v7b+/pvy0Kl+/hIg5Bob6gWEBH/NPTkMgfAfgnboRDR1pi26nTM04TjPsGVF45DX0VWAUAf/fCVJ+r79Ec5yk1NbDeODSJ6GKMYY/CkY++kBqD8v0q8j2JKCTbdbLgDOY3OuRMUXC/bD8OHWj0=
+  skip_cleanup: true
   on:
     repo: complex-joins/carvis-api
     branch: staging
+
 env:
   global:
     secure: KRcV+DIo2TwTIAmJHbp3okoRvNu4l33cjFr9dGldJIWlvMaNOnCpqpQOn1NuK5AroimObFvg+3jYjT8Qf3RPm6dvAsgH7Jwxg+Tl/KvHf15luhGJu//3YbOb07RlDkGiF7XSgck9iUrOOnJKYFGkWTH2zoa4SVAMzPB9FjXeKXSS64MVIQEQIgHpviShlH/++9XzhHNklBEHMxWPqpiq8+MdIBa5Zz+seSVYcJS25u7ACkPcvLgTp5SA2gBP+e0J6tkMf8bPF6e39kQ3P8YB0E9c9GLW+WK9oSDOYFcxHnkUbYjg87UuddT55gp7TMIJlT4xvcgPN+/RBB7bdkGsWCbJgg18Qy3xAUGVdMHwQAjEQYPyH8kWZvuCYKMuTwx8xMsRQnvSulmHml3p92agRgl1wwPJfzLUM8cVAr8ZHtGHugouGs327LpxsVDKVb24vjkzFMHuMCRJ9ZTpxxjCHBRgidh9yGj3v/gvk7S/pX/fb/XvafT4iyjXYAWf1VXsVgT96rsRR1hgvAqIaGAng3I6GZOyxp3gPp4fztqEyRimSNCtyNCfx+eP6MRtRIoTWLlyJkr/OLRTOH8ZvNgwaNZnycLImRkbH1Vwmpq5ZekOtNpRRczV0555b1f6dWrMI6iqfRFsqp8JoJtCljmT6b+4vWr0rdQD3qw0ey20v9o=
