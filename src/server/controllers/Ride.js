@@ -1,15 +1,12 @@
-import { Ride } from '../../db/Ride';
-import { User } from '../../db/User';
+import { Ride } from '../models/Ride';
+import { User } from '../models/User';
 import { createMessage } from './../utils/twilioHelper';
 import fetch from 'node-fetch';
 
-const CARVIS_API = process.env.CARVIS_API || 'localhost:8080';
-const CARVIS_API_KEY = process.env.CARVIS_API_KEY || require('./../../../secret/config.js')
-  .CARVIS_API_KEY;
-const CARVIS_HELPER_API = process.env.CARVIS_HELPER_API || require('./../../../secret/config.js')
-  .CARVIS_HELPER_API;
-const CARVIS_HELPER_API_KEY = process.env.CARVIS_HELPER_API_KEY || require('./../../../secret/config.js')
-  .CARVIS_HELPER_API_KEY;
+const CARVIS_API = process.env.CARVIS_API;
+const CARVIS_API_KEY = process.env.CARVIS_API_KEY;
+const CARVIS_HELPER_API = process.env.CARVIS_HELPER_API;
+const CARVIS_HELPER_API_KEY = process.env.CARVIS_HELPER_API_KEY;
 
 export const addRide = function (req, res) {
   Ride.create(req.body)

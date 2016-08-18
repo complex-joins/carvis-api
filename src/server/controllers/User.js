@@ -1,4 +1,4 @@
-import { User } from '../../db/User';
+import { User } from '../models/User';
 
 export const getUserDashboardData = (req, res) => {
   User.find({id: req.params.userid})

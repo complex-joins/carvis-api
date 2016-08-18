@@ -1,4 +1,4 @@
-import db from '../db/db';
+import db from '../../db/db';
 
 export const UserSchema = function (user) {
   user.increments('id')
@@ -53,8 +53,7 @@ export const UserSchema = function (user) {
 
 export const User = db.model('users', {
   secureFields: {
-    password: process.env.USER_ENCRYPT || require('../../secret/config')
-      .USER_ENCRYPT,
+    password: process.env.USER_ENCRYPT,
     fields: ['lyftToken', 'lyftPaymentInfo', 'uberPassword', 'uberToken', 'password', 'alexaUserId']
   }
 });
