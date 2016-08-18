@@ -1,106 +1,37 @@
-// import { Ride } from '../../db/Ride';
-// import { User } from '../../db/User';
-//
-// var fetch = require('node-fetch');
-// var config = require('/../../secret/config.js');
-// // var lyfthelper = require('./../utils/lyft-helper.js');
-// // var uberhelper = require('./../utils/uber-helper.js');
-//
-//
-// export const addRide = function (req, res) {
-//   Ride.create(req.body)
-//     .then((ride) => {
-//       ride = ride[0];
-//       console.log(ride);
-//
-//       let vendor = ride.winner;
-//       let rideId = ride.id;
-//       let origin = {
-//         lat: ride.originLat,
-//         lng: ride.originLng,
-//         routableAddress: ride.originRoutableAddress
-//       };
-//       let destination = {
-//         lat: ride.destinationLat,
-//         lng: ride.destinationLng,
-//         routableAddress: ride.destinationRoutableAddress
-//       };
-//       let partySize = ride.partySize || 1;
-//
-//       // carvisUserId -- to query the user table for tokens etc.
-//       let userId = ride.userId;
-//
-//       // let dbURL = 'http://' + config.CARVIS_API + '/users/' + userId;
-//       let dbURL = 'http://localhost:8080/users/' + userId;
-//       console.log('pre db get', vendor, userId, dbURL, rideId);
-//
-//       return getUserAndRequestRide(dbURL, origin, destination, partySize, rideId, vendor)
-//     })
-//     .catch((err) => res.status(400)
-//       .json(err)); // add catch for errors.
-// };
-//
-// const getUserAndRequestRide = function (dbURL, origin, destination, partySize, rideId, vendor) {
-//
-//   fetch(dbURL, {
-//       method: 'GET',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'x-access-token': config.CARVIS_API_KEY
-//       }
-//     })
-//     .then(function (res) {
-//       return res.json();
-//     })
-//     .then(function (data) {
-//       // console.log('success fetching user from DB', data); // pre-decrypt.
-//       data = User.decryptModel(data[0]); // decrypt the tokens to pass to vendor
-//
-//       if (vendor === 'Uber') {
-//         let token = data.uberToken;
-//         console.log('uber token post decrypt', token);
-//         uberhelper.confirmPickup(origin, token, destination, rideId);
-//
-//       } else if (vendor === 'Lyft') {
-//         let lyftPaymentInfo = data.lyftPaymentInfo;
-//         let lyftToken = data.lyftToken;
-//         console.log('token post decrypt', lyftToken); // works!
-//
-//         lyfthelper.getCost(lyftToken, origin, destination, lyftPaymentInfo, partySize, rideId);
-//
-//       } else {
-//         console.warn('not a valid vendor - check stacktrace');
-//       }
-//     })
-//     .catch(function (err) {
-//       console.warn('error fetching user from db', err);
-//     });
-// };
-//
-// export const getRidesForUser = function (req, res) {
-//   Ride.find({ userId: req.params.userid })
-//     .then((rides) => res.json(rides))
-//     .catch((err) => res.status(400)
-//       .json(err));
-// };
-//
-// export const updateRide = function (req, res) {
-//   Ride.update({ id: req.params.rideid }, req.body)
-//     .then((ride) => res.json(ride))
-//     .catch((err) => res.status(400)
-//       .json(err));
-// };
-//
-// export const getAllRideData = function (req, res) {
-//   Ride.findAll()
-//     .then((rides) => res.json(rides))
-//     .catch((err) => res.status(400)
-//       .json(err));
-// };
-//
-// export const deleteRide = function (req, res) {
-//   Ride.delete({ id: req.params.rideid })
-//     .then((ride) => res.json(ride))
-//     .catch((err) => res.status(400)
-//       .json(err));
-// };
+import db from '../db/db';
+
+export const RideSchema = function (ride) {
+  ride.increments('id')
+    .primary();
+  ride.timestamp('created_at')
+    .defaultTo(db.knex.fn.now());
+  ride.integer('userId'); // foreign key for the User table |-> carvis ID
+
+  // default: 'estimate' - on booked: 'booked' - on cancel: 'cancelled'
+  ride.string('rideStatus', 255);
+
+  // the origin and destination of the ride - set before estimations
+  ride.string('originLat', 255);
+  ride.string('originLng', 255);
+  ride.string('originRoutableAddress', 255);
+  ride.string('destinationLat', 255);
+  ride.string('destinationLng', 255);
+  ride.string('destinationRoutableAddress', 255);
+
+  // below is returned on the public estimate calls
+  ride.string('winningVendorRideType', 255); // ex: 'pool', 'line', etc.
+  ride.string('lyftEstimatedFare', 255); // dollars and cents
+  ride.string('lyftEstimatedETA', 100); // minutes
+  ride.string('uberEstimatedFare', 255);
+  ride.string('uberEstimatedETA', 100);
+  ride.string('winner', 255); // the vendor we book with - ex. 'Uber'
+  ride.string('partySize', 1); // either 1 or 2. -- int ?
+
+  // below is returned on the request-ride calls
+  ride.string('eta', 255); // actual ETA of the specific booked car
+  ride.string('vendorRideId', 255); // vendor string to reference cancellations
+  ride.string('vendorRideToken', 255); // vendor string to reference cancellations -- UBER specific
+  ride.string('tripDuration', 255); // duration of the ride origin to destination - returned by vendor on confirmation of request-ride
+};
+
+export const Ride = db.model('rides');
