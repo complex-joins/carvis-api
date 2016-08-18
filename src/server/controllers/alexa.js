@@ -35,10 +35,12 @@ exports.getEstimate = function(req, res) {
   console.log('Alexa thinks my origin is', origin);
 
   // find the DESTINATION slot that is populated in this request
-  var destinationQuery = _.filter(slots, function (slotValue, slotKey) {
+  var destinationSlots = _.filter(slots, function (slotValue, slotKey) {
     return (slotValue.value && slotValue.value.length > 0 && slotKey.includes('DESTINATION'));
-  })[0].value;
-  var destination = { query: destinationQuery };
+  });
+  var destination = (destinationSlots.length) 
+    ? { query: destinationSlots[0].value } 
+    : {};
   console.log('Alexa thinks my destination is', destination);
 
   var prompt, reprompt;
