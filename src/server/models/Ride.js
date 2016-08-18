@@ -2,7 +2,8 @@ import { Ride } from '../../db/Ride';
 import { User } from '../../db/User';
 
 var fetch = require('node-fetch');
-var config = require('./../../../secret/config.js');
+var CARVIS_API = process.env.CARVIS_API || 'localhost:8080';
+var CARVIS_API_KEY = process.env.CARVIS_API_KEY || require('./../../../secret/config.js').CARVIS_API_KEY;
 var lyfthelper = require('./../utils/lyft-helper.js');
 var uberhelper = require('./../utils/uber-helper.js');
 
@@ -30,8 +31,7 @@ export const addRide = function (req, res) {
       // carvisUserId -- to query the user table for tokens etc.
       let userId = ride.userId;
 
-      // let dbURL = 'http://' + config.CARVIS_API + '/users/' + userId;
-      let dbURL = 'http://localhost:8080/users/' + userId;
+      let dbURL = 'http://' + CARVIS_API + '/users/' + userId;
       console.log('pre db get', vendor, userId, dbURL, rideId);
 
       return getUserAndRequestRide(dbURL, origin, destination, partySize, rideId, vendor)
@@ -46,7 +46,7 @@ const getUserAndRequestRide = function (dbURL, origin, destination, partySize, r
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'x-access-token': config.CARVIS_API_KEY
+        'x-access-token': CARVIS_API_KEY
       }
     })
     .then(function (res) {
