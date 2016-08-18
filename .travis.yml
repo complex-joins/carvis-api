@@ -10,7 +10,7 @@ deploy:
   matrix:
   - provider: elasticbeanstalk
     app: carvis
-    env: carvis-api
+    env: carvis-1
     bucket_name: elasticbeanstalk-us-west-1-193171401169
     region: us-west-1
   secret_access_key:
