@@ -1,4 +1,4 @@
-const twilioCredentials = JSON.parse(process.env.twilioCredentials) || require('../../../secret/config.js')
+const twilioCredentials = process.env.twilioCredentials ? JSON.parse(process.env.twilioCredentials) : require('../../../secret/config.js')
   .twilioCredentials;
 const client = require('twilio')(twilioCredentials.accountSid, twilioCredentials.authToken);
 
