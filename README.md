@@ -9,11 +9,9 @@ For example, you can say: `CARVIS, find me the cheapest ride to Hack Reactor`.
 
 Built by `@alexcstark`, `@cpruijsen`, `@daredia`, `@JasonArkens17` as our final project `@hackreactor` .
 
-##Stack:
-Built using Node, Express, Passport, [StorkSQL](https://www.npmjs.com/package/storkSQL)
+##Stack:0 Built using Node, Express, Passport, [StorkSQL](https://www.npmjs.com/package/storkSQL)
 
-##Deployment:
-Docker, AWS EC2, Build tools: NPM scripting, Webpack, ESlint. Testing: TravisCI, Mocha, Chai.
+##Deployment:0 Docker, AWS EC2, Build tools: NPM scripting, Webpack, ESlint. Testing: TravisCI, Mocha, Chai.
 
 ##APIs:
 Uber, Lyft, Google Places, Twilio.
