@@ -25,7 +25,7 @@
         }
       ]
     },
-    {
+    { 
       "name": "carvis-api",
       "image": "carvis/carvis-helper",
       "essential": true,
