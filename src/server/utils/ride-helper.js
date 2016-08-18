@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var fetch = require('node-fetch');
 fetch.Promise = require('bluebird');
-var placesCall = require('./place-helper'); // invoked as placesCall()
+var placesCall = require('./place-helper'); // invoked as placesCall();
 
 if (!process.env.PROD) {
   // TODO: update lyftToken dynamically - see config.js

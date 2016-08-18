@@ -1,2 +1,1 @@
-// secret/config.js
-
+// dummy file to populate secret folder

@@ -4,7 +4,6 @@ import { User } from '../../db/User';
 var fetch = require('node-fetch');
 var CARVIS_API = process.env.CARVIS_API || require('./../../../secret/config.js').CARVIS_API;
 var CARVIS_API_KEY = process.env.CARVIS_API_KEY || require('./../../../secret/config.js').CARVIS_API_KEY;
-console.log('after requiring in models/Ride.js');
 var lyfthelper = require('./../utils/lyft-helper.js');
 var uberhelper = require('./../utils/uber-helper.js');
 
