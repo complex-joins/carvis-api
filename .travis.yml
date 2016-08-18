@@ -6,3 +6,16 @@ install:
 script:
 - npm run build
 - npm test
+deploy:
+    - provider: elasticbeanstalk
+      app: carvis # Elastic Beanstalk app name
+      env: carvis-api # Elastic Beanstalk env name
+      bucket_name: elasticbeanstalk-us-west-1-193171401169 # S3 bucket used by Elastic Beanstalk
+      region: us-west-1
+      access_key_id: "AKIAJTUKSCLSLIGDCGXQ"
+      secret_access_key: "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"
+      on:
+          repo: complex-joins/carvis-api # Deploy only using my user repo for now
+          branch: staging
+          # deploy only if particular jobs in the job matrix passes, not any
+          # condition: $FUNSIZE_S3_UPLOAD_BUCKET = mozilla-releng-funsize-travis
