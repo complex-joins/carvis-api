@@ -3,8 +3,7 @@ import { login, confirmPickup } from './../utils/uberPrivateMethods.js';
 const baseURL = 'https://cn-sjc1.uber.com';
 const APItoken = !process.env.PROD ? require('./../../../secret/config.js')
   .CARVIS_API_KEY : process.env.CARVIS_API_KEY;
-const APIserver = !process.env.PROD ? require('../../../secret/config.js')
-  .CARVIS_API : process.env.CARVIS_API;
+const APIserver = process.env.CARVIS_API || 'localhost:8080';
 
 export const uberLogin = (req, res) => {
   let username = req.body.username;
@@ -28,7 +27,6 @@ export const uberLogin = (req, res) => {
 
       // POST THE USER DATA TO OUR RELATIONAL DATABASE
       let dbpostURL = 'http://' + APIserver + '/users/updateOrCreate';
-      //let dbpostURL = 'http://localhost:8080/users/updateOrCreate';
 
       fetch(dbpostURL, {
           method: 'POST',
@@ -105,7 +103,6 @@ export const uberConfirmPickup = (req, res) => {
       console.log('uber confirmPickup data', data);
       let response = confirmPickup.responseMethod(data);
       let dbpostURL = 'http://' + APIserver + '/rides/' + rideId;
-      //let dbpostURL = 'http://localhost:8080/rides/' + rideId;
 
       // once we receive the request-ride confirmation response
       // we update the DB record for that ride with eta and vendorRideId

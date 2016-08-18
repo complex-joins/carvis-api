@@ -5,8 +5,7 @@ const auth = !process.env.PROD ? require('./../../../secret/config.js')
   .LYFT_USER_ID : process.env.LYFT_USER_ID;
 const APItoken = !process.env.PROD ? require('./../../../secret/config.js')
   .CARVIS_API_KEY : process.env.CARVIS_API_KEY;
-const APIserver = !process.env.PROD ? require('./../../../secret/config.js')
-  .CARVIS_API : process.env.CARVIS_API;
+const APIserver = process.env.CARVIS_API || 'localhost:8080';
 const baseURL = 'https://api.lyft.com/v1/';
 
 export const lyftRefreshBearerToken = (req, res) => {
@@ -88,8 +87,7 @@ export const lyftPhoneCodeAuth = (req, res) => {
       let response = phoneCodeAuth.responseMethod(data, userId);
 
       // POST THE USER DATA TO OUR RELATIONAL DATABASE
-      // let dbpostURL = 'http://' + APIserver + '/users/updateOrCreate';
-      let dbpostURL = 'http://localhost:8080/users/updateOrCreate';
+      let dbpostURL = 'http://' + APIserver + '/users/updateOrCreate';
 
       fetch(dbpostURL, {
           method: 'POST',
@@ -177,9 +175,7 @@ export const lyftRequestRide = (req, res) => {
     .then(data => {
       console.log('successful requestRide post LYFT', data);
       let response = requestRide.responseMethod(data, tripDuration);
-
-      // let dbpostURL = 'http://' + APIserver + '/rides/' + rideId;
-      let dbpostURL = 'http://localhost:8080/rides/' + rideId;
+      let dbpostURL = 'http://' + APIserver + '/rides/' + rideId;
 
       // once we receive the request-ride confirmation response
       // we update the DB record for that ride with eta and vendorRideId
@@ -227,9 +223,7 @@ export const lyftCancelRide = (req, res) => {
     .then(data => {
       console.log('successful cancelRide PUT LYFT', data);
       let response = cancelRide.responseMethod(data);
-
-      // let dbpostURL = 'http://' + APIserver + '/rides/' + rideId;
-      let dbpostURL = 'http://localhost:8080/rides/' + rideId;
+      let dbpostURL = 'http://' + APIserver + '/rides/' + rideId;
 
       // once we receive the request-ride confirmation response
       // we update the DB record for that ride with eta and vendorRideId
@@ -257,8 +251,6 @@ export const lyftCancelRide = (req, res) => {
     });
 };
 
-// NOTE: this only returns a URL -- sharing of URL should be done on response
-// we could use our twilio integration for this.
 export const lyftShareETA = (req, res) => {
   let rideId = req.body.rideId;
 
