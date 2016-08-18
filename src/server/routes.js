@@ -1,6 +1,5 @@
-import {getRidesForUser, addRide, updateRide, getAllRideData, deleteRide} from './models/Ride';
-import {getUserDashboardData, updateUserData, createUser,
-        getAllUserData, findOrCreateUser, updateOrCreateUser, deleteUser } from './models/User';
+import { getRidesForUser, addRide, updateRide, getAllRideData, deleteRide, shareRideETA } from './models/Ride';
+import { getUserDashboardData, updateUserData, createUser, getAllUserData, findOrCreateUser, updateOrCreateUser, deleteUser } from './models/User';
 // import passport from 'passport';
 // import passportService from './services/passport';
 import { rawUserData } from './models/User';
@@ -8,10 +7,11 @@ import Authentication from './controllers/authentication';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 import alexa from './controllers/alexa';
 
-export default function(app) {
-  // TODO:0 only let the user with that ID find users (middleware);
+export default function (app) {
+  // TODO only let the user with that ID find users (middleware);
   app.get('/', (req, res) => {
-    res.status(200).send('Welcome to the Carvis API.');
+    res.status(200)
+      .send('Welcome to the Carvis API.');
   });
 
   app.get('/users/:userid', hasValidAPIToken, getUserDashboardData);
@@ -40,7 +40,23 @@ export default function(app) {
 
   // app.post('/alexa/launch', alexa.handleLaunch);
 
+<<<<<<< HEAD
   // app.post('/alexa/estimate', alexa.getEstimate);
+=======
+  app.put('/rides/:rideid', hasValidAPIToken, updateRide);
+
+  app.post('/rides', hasValidAPIToken, addRide);
+
+  app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);
+
+  app.post('/rides/shareETA/:rideid', hasValidAPIToken, shareRideETA);
+
+  app.post('/rides/cancelRide/:rideid', hasValidAPIToken, shareRideETA);
+
+  app.post('/alexa/launch', alexa.handleLaunch);
+
+  app.post('/alexa/estimate', alexa.getEstimate);
+>>>>>>> 58f3f83b3867e64509fde944d2fe96881f97aa68
 
   // app.post('/signin', requireSignin, Authentication.signin);
   // app.post('/signup', Authentication.signup);

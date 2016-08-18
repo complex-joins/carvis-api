@@ -1,7 +1,7 @@
 var _ = require('lodash');
 // var rideHelper = require('../utils/ride-helper');
 
-var fakeoutMode = false; // when true, CARVIS will tell you about taxi fares, not uber and lyft estimates
+var fakeoutMode = process.env.FAKEOUT || false; // when true, CARVIS will tell you about taxi fares, not uber and lyft estimates
 var config = {};
 
 if (fakeoutMode) {
@@ -31,24 +31,26 @@ exports.getEstimate = function(req, res) {
   var originArray = _.filter(slots, function (slotValue, slotKey) {
     return (slotValue.value && slotValue.value.length > 0 && slotKey.includes('ORIGIN'));
   });
-  var origin = (originArray.length) ? { query: originArray[0].value } : {};
+  var origin = (originArray.length) ? { query: originArray[0].value } : null;
   console.log('Alexa thinks my origin is', origin);
 
   // find the DESTINATION slot that is populated in this request
-  var destinationQuery = _.filter(slots, function (slotValue, slotKey) {
+  var destinationSlots = _.filter(slots, function (slotValue, slotKey) {
     return (slotValue.value && slotValue.value.length > 0 && slotKey.includes('DESTINATION'));
-  })[0].value;
-  var destination = { query: destinationQuery };
+  });
+  var destination = (destinationSlots.length) 
+    ? { query: destinationSlots[0].value } 
+    : null;
   console.log('Alexa thinks my destination is', destination);
 
   var prompt, reprompt;
 
-  if (_.isEmpty(mode) || _.isEmpty(destination)) {
+  if ( !mode || !destination || (fakeoutMode && !origin) ) {
     prompt = 'I didn\'t catch that. Please try again';
     reprompt = config.reprompt;
     res.json({ prompt: prompt, reprompt: reprompt });
   } else {
-    if (origin.query) {
+    if (origin) {
       // get origin.descrip and origin.coords for origin that was passed in
       rideHelper.placesCall(origin.query, function (descrip, coords) {
         origin.descrip = descrip;
@@ -71,8 +73,10 @@ exports.getEstimate = function(req, res) {
     } else {
       // set origin properties to default values
       // TODO: get origin from User table once alexa auth is implemented
-      origin.descrip = 'Casa de Shez';
-      origin.coords = [37.7773563, -122.3968629]; // Shez's house
+      origin = {
+        descrip: 'Casa de Shez',
+        coords: [37.7773563, -122.3968629] // Shez's house
+      };
     }
 
     rideHelper.placesCall(destination.query, function (descrip, coords) {

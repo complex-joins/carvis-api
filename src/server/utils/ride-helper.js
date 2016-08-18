@@ -3,8 +3,16 @@ var fetch = require('node-fetch');
 fetch.Promise = require('bluebird');
 var placesCall = require('./place-helper'); // invoked as placesCall();
 
+<<<<<<< HEAD
 var lyftToken = process.env.LYFT_BEARER_TOKEN;
 var uberToken = process.env.UBER_SERVER_TOKEN;
+=======
+// TODO: update lyftToken dynamically - see config.js  
+var lyftToken = process.env.LYFT_BEARER_TOKEN || require('../../../secret/config')
+  .LYFT_BEARER_TOKEN;
+var uberToken = process.env.UBER_SERVER_TOKEN || require('../../../secret/config')
+  .UBER_SERVER_TOKEN;
+>>>>>>> 58f3f83b3867e64509fde944d2fe96881f97aa68
 
 var getEstimate = function (requestType, start, dest, cb) {
   var uberURL = 'https://api.uber.com/v1/';
