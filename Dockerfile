@@ -12,5 +12,5 @@ WORKDIR /opt/app
 # Bundle app source
 ADD . /opt/app
 
-EXPOSE 8000
+EXPOSE 8080
 CMD [ "npm", "start" ]

@@ -28,6 +28,7 @@ var placesCall = function(place, cb, nearbyLoc) {
   });
 
   fetch(url).then( function(res) {
+    console.log('inside .then to fetch for google places');
     return res.json();
   }).then( function(data) {
     console.log('data in response from google places api:', data);

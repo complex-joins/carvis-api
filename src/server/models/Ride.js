@@ -5,12 +5,11 @@ import fetch from 'node-fetch';
 
 const CARVIS_API_KEY = !process.env.PROD ? require('./../../../secret/config.js')
   .CARVIS_API_KEY : process.env.CARVIS_API_KEY;
-const CARVIS_API = !process.env.PROD ? require('./../../../secret/config.js')
-  .CARVIS_API : process.env.CARVIS_API;
-const CARVIS_HELPER_API_KEY = !process.env.PROD ? require('./../../../secret/config.js')
-  .CARVIS_HELPER_API_KEY : process.env.CARVIS_HELPER_API_KEY;
-const CARVIS_HELPER_API = !process.env.PROD ? require('./../../../secret/config.js')
-  .CARVIS_HELPER_API : process.env.CARVIS_HELPER_API;
+var CARVIS_API = process.env.CARVIS_API || 'localhost:8080';
+var CARVIS_API_KEY = process.env.CARVIS_API_KEY || require('./../../../secret/config.js')
+  .CARVIS_API_KEY;
+const CARVIS_HELPER_API = process.env.CARVIS_HELPER_API || require('./../../../secret/config.js')
+  .CARVIS_HELPER_API;
 
 export const addRide = function (req, res) {
   Ride.create(req.body)
@@ -36,7 +35,6 @@ export const addRide = function (req, res) {
       let userId = ride.userId;
 
       let dbURL = 'http://' + CARVIS_API + '/users/' + userId;
-      // let dbURL = 'http://localhost:8080/users/' + userId;
       console.log('pre db get', vendor, userId, dbURL, rideId);
 
       return getUserAndRequestRide(dbURL, origin, destination, partySize, rideId, vendor)
@@ -169,7 +167,7 @@ export const shareRideETA = (req, res) => {
 };
 
 export const cancelRide = (req, res) => {
-  // note: how does rideId, origin, token, vendor get passed to this method? 
+  // note: how does rideId, origin, token, vendor get passed to this method?
   let rideId = req.params.rideid;
   let origin = req.body.origin;
   let token = req.body.token;

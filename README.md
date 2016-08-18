@@ -1,6 +1,9 @@
-[![Build Status](https://travis-ci.org/complex-joins/carvis-api.svg?branch=master)](https://travis-ci.org/complex-joins/carvis-api)
+[![Build Status](https://travis-ci.org/complex-joins/carvis-api.svg?branch=master)](https://travis-ci.org/complex-joins/carvis-api) [![bitHound Overall Score](https://www.bithound.io/github/complex-joins/carvis-api/badges/score.svg)](https://www.bithound.io/github/complex-joins/carvis-api) [![bitHound Dependencies](https://www.bithound.io/github/complex-joins/carvis-api/badges/dependencies.svg)](https://www.bithound.io/github/complex-joins/carvis-api/master/dependencies/npm)
+
 # carvis-api
-Pithy project description
+
+With CARVIS you can order the cheapest or fastest car available, from your Amazon Alexa device and our web client. 
+For example, you can say: `CARVIS, find me the cheapest ride to Hack Reactor`.
 
 ##Team
 
@@ -30,6 +33,40 @@ Uber, Lyft, Google Places, Twilio.
 * `docker:deploy`: Builds and pushes docker image to Docker Hub
 * `test`: Runs Mocha tests
 * `start`: Builds and starts server on localhost or ENV.port
+
+### Routes 
+
+All routes require the appropriate API token.
+
+  `app.get('/users/:userid', hasValidAPIToken, getUserDashboardData);`
+  
+  `app.get('/dev/users', hasValidAPIToken, getAllUserData);`
+  
+  `app.post('/dev/users', hasValidAPIToken, createUser);`
+  
+  `app.post('/auth/users', hasValidAPIToken, findOrCreateUser);`
+  
+  `app.post('/users/updateOrCreate', hasValidAPIToken, updateOrCreateUser);`
+  
+  `app.put('/users/:userid', hasValidAPIToken, updateUserData);`
+  
+  `app.delete('/dev/users/:userid', hasValidAPIToken, deleteUser);`
+  
+  `app.get('/dev/users/raw', hasValidAPIToken, rawUserData);`
+
+  `app.get('/dev/rides', hasValidAPIToken, getAllRideData);`
+  
+  `app.get('/rides/user/:userid', hasValidAPIToken, getRidesForUser);`
+  
+  `app.put('/rides/:rideid', hasValidAPIToken, updateRide);`
+  
+  `app.post('/rides', hasValidAPIToken, addRide);`
+  
+  `app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);`
+
+  `app.post('/alexa/launch', alexa.handleLaunch);`
+  
+  `app.post('/alexa/estimate', alexa.getEstimate);`
 
 ##Moving Forward
 
