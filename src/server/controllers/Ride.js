@@ -31,7 +31,7 @@ export const addRide = function (req, res) {
       // carvisUserId -- to query the user table for tokens etc.
       let userId = ride.userId;
 
-      let dbURL = 'http://' + CARVIS_API + '/users/' + userId;
+      let dbURL = 'http://' + CARVIS_API + '/users/' + userId; //TODO calling our API from within our API
       console.log('pre db get', vendor, userId, dbURL, rideId);
 
       return getUserAndRequestRide(dbURL, origin, destination, partySize, rideId, vendor)
