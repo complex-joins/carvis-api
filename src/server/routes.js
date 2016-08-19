@@ -1,8 +1,12 @@
-import { getRidesForUser, addRide, updateRide, getAllRideData, deleteRide, shareRideETA } from './models/Ride';
-import { getUserDashboardData, updateUserData, createUser, getAllUserData, findOrCreateUser, updateOrCreateUser, deleteUser } from './models/User';
+import { getRidesForUser, addRide, updateRide, getAllRideData, deleteRide, shareRideETA } from './controllers/Ride';
+import {
+  getUserDashboardData, updateUserData, createUser,
+  getAllUserData, findOrCreateUser, updateOrCreateUser,
+  deleteUser, rawUserData
+} from './controllers/User';
+
 // import passport from 'passport';
 // import passportService from './services/passport';
-import { rawUserData } from './models/User';
 import Authentication from './controllers/authentication';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 import alexa from './controllers/alexa';
@@ -27,10 +31,6 @@ export default function (app) {
   app.put('/users/:userid', hasValidAPIToken, updateUserData);
 
   app.delete('/dev/users/:userid', hasValidAPIToken, deleteUser);
-
-  app.get('/dev/rides', hasValidAPIToken, getAllRideData);
-
-  app.get('/rides/user/:userid', hasValidAPIToken, getRidesForUser);
 
   app.put('/rides/:rideid', hasValidAPIToken, updateRide);
 

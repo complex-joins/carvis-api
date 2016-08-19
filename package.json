@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:server": "babel ./src/server -d ./dist/server --presets es2015,stage-2,es2016 --copy-files",
-    "build:db": "babel ./src/db -d ./dist/db --presets es2015,stage-2,es2016 --copy-files",
+    "build:server": "babel ./src/server -d ./dist/server --presets es2015,stage-2,es2016 --plugins transform-inline-environment-variables --copy-files",
+    "build:db": "babel ./src/db -d ./dist/db --presets es2015,stage-2,es2016 --plugins transform-inline-environment-variables --copy-files",
     "build": "npm run build:db; npm run build:server",
     "reset:db": "babel-node ./utils/wipeDB.js",
     "setup": "node ./tools/resolveGitIgnored.js;",
@@ -50,10 +50,11 @@
     "pg": "^6.1.0",
     "redis": "^2.6.2",
     "shelljs": "^0.7.3",
-    "storkSQL": "^0.1.20",
+    "storkSQL": "^0.1.21",
     "twilio": "^2.9.2"
   },
   "devDependencies": {
+    "babel-plugin-transform-inline-environment-variables": "^6.8.0",
     "chai": "^3.5.0",
     "mocha": "^3.0.2",
     "morgan": "^1.7.0",

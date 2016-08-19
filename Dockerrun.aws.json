@@ -1,0 +1,41 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "carvis-api",
+      "image": "carvis/carvis-api",
+      "essential": true,
+      "memory": 128,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 8080
+        }
+      ]
+    },
+    {
+      "name": "carvis-api",
+      "image": "carvis/carvis-web",
+      "essential": true,
+      "memory": 128,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 8000
+        }
+      ]
+    },
+    { 
+      "name": "carvis-api",
+      "image": "carvis/carvis-helper",
+      "essential": true,
+      "memory": 128,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 8888
+        }
+      ]
+    }
+  ]
+}
