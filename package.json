@@ -48,6 +48,7 @@
     "passport-jwt": "^2.1.0",
     "passport-local": "^1.0.0",
     "pg": "^6.1.0",
+    "redis": "^2.6.2",
     "shelljs": "^0.7.3",
     "storkSQL": "^0.1.20",
     "twilio": "^2.9.2"
