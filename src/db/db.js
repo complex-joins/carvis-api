@@ -1,7 +1,3 @@
 import Stork from 'storkSQL';
-const DB_CONFIG_OBJ = (process.env.DB_CONFIG_JSON) 
-  ? JSON.parse(process.env.DB_CONFIG_JSON) 
-  : require('../../secret/config').DB_CONFIG_OBJ;
-
-const dbConnection = new Stork(DB_CONFIG_OBJ, 'pg');
+const dbConnection = new Stork(JSON.parse(process.env.DB_CONFIG_OBJ_JSON), 'pg');
 export default dbConnection;

@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var rideHelper = require('../utils/ride-helper');
+// var rideHelper = require('../utils/ride-helper');
 
 var fakeoutMode = process.env.FAKEOUT || false; // when true, CARVIS will tell you about taxi fares, not uber and lyft estimates
 var config = {};
@@ -20,7 +20,7 @@ exports.handleLaunch = function(req, res) {
   // return res.status(422).send({ error: 'You must provide email and password'});
 };
 
-exports.getEstimate = function(req, res) {  
+exports.getEstimate = function(req, res) {
   var slots = req.body.data.request.intent.slots;
   console.log('slots:', slots);
 
@@ -63,9 +63,9 @@ exports.getEstimate = function(req, res) {
               res.json({ prompt: prompt });
             } else {
               rideHelper.addRide(winner, userId, origin, destination, function() {
-                // TODO: update alexa response based on ride status (i.e., once we know it has been ordered)              
+                // TODO: update alexa response based on ride status (i.e., once we know it has been ordered)
                 res.json({ prompt: prompt });
-              });  
+              });
             }
           });
         }
@@ -90,9 +90,9 @@ exports.getEstimate = function(req, res) {
             res.json({ prompt: prompt });
           } else {
             rideHelper.addRide(winner, userId, origin, destination, function() {
-              // TODO: update alexa response based on ride status (i.e., once we know it has been ordered)              
+              // TODO: update alexa response based on ride status (i.e., once we know it has been ordered)
               res.json({ prompt: prompt });
-            });  
+            });
           }
         });
       }
