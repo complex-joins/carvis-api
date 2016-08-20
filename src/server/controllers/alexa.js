@@ -32,7 +32,7 @@ exports.getEstimate = function(req, res) {
     return (slotValue.value && slotValue.value.length > 0 && slotKey.includes('ORIGIN'));
   });
   var origin = (originArray.length) ? { query: originArray[0].value } : null;
-  console.log('Alexa thinks my origin is', origin);
+  console.log('Alexa thinks the origin passed in is', origin);
 
   // find the DESTINATION slot that is populated in this request
   var destinationSlots = _.filter(slots, function (slotValue, slotKey) {
@@ -53,6 +53,11 @@ exports.getEstimate = function(req, res) {
     if (origin) {
       // get origin.descrip and origin.coords for origin that was passed in
       rideHelper.placesCall(origin.query, function (descrip, coords) {
+        // if descrip is empty, alexa will reply appropriately
+        if (!descrip) {
+          res.json({ prompt: `I wasn\'t able to find the location, ${origin.query}. Please try again` });
+        }
+
         origin.descrip = descrip;
         origin.coords = coords;
         if (destination.descrip) {
@@ -80,6 +85,11 @@ exports.getEstimate = function(req, res) {
     }
 
     rideHelper.placesCall(destination.query, function (descrip, coords) {
+      // if descrip is empty, alexa will reply appropriately
+      if (!descrip) {
+        res.json({ prompt: `I wasn\'t able to find the location, ${destination.query}. Please try again` });
+      }
+
       destination.descrip = descrip;
       destination.coords = coords;
       if (origin.descrip) {
