@@ -10,8 +10,10 @@ const client = redis.createClient(CARVIS_CACHE_PORT, CARVIS_CACHE);
 
 // this sets the Redis server as an LRU cache with 400MB space.
 // elasticcache micro has 555MB, but leaving some space for safety ?
-client.config("SET", "maxmemory", "400mb");
-client.config("SET", "maxmemory-policy", "allkeys-lru");
+if (!process.env.TRAVIS) {
+  client.config("SET", "maxmemory", "400mb");
+  client.config("SET", "maxmemory-policy", "allkeys-lru");
+}
 
 // function to create a hash or set a new key:value on an existing hash
 // hashName -- ie. userId (use carvis userId)
