@@ -56,6 +56,7 @@ exports.getEstimate = function(req, res) {
         // if descrip is empty, alexa will reply appropriately
         if (!descrip) {
           res.json({ prompt: `I wasn\'t able to find the location, ${origin.query}. Please try again` });
+          return;
         }
 
         origin.descrip = descrip;
@@ -88,6 +89,7 @@ exports.getEstimate = function(req, res) {
       // if descrip is empty, alexa will reply appropriately
       if (!descrip) {
         res.json({ prompt: `I wasn\'t able to find the location, ${destination.query}. Please try again` });
+        return;
       }
 
       destination.descrip = descrip;
