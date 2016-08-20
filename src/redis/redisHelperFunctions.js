@@ -75,6 +75,22 @@ export const redisSetKey = (keyName, value, cb) => {
   });
 };
 
+// function to set a flat key  with expire 
+export const redisSetKeyWithExpire = (keyName, expire, value, cb) => {
+  client.setex(keyName, expire, value, (err, res) => {
+    if (err) {
+      console.warn('redis error setting key', keyName);
+    } else {
+      console.log('redis success setting', keyName, 'expire', expire, res);
+      if (cb) {
+        return cb(res);
+      } else {
+        return res;
+      }
+    }
+  });
+};
+
 // function to get a flat key:value -- ie. externalAPIToken:<token>
 export const redisGetKey = (keyName) => {
   client.get(keyName, (err, res) => {
