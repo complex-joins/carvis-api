@@ -19,16 +19,14 @@ if (fakeoutMode) {
 
 exports.handleLaunch = function(req, res) {
   //call to the DB with alexaID
-  User.find({alexaID: req.params.alexaID})
-  .then((user) => user.length === 0 ? res.json({}) : User.decryptModel(user[0]))
-  .catch((err) => res.status(400).json(err))
+  User.find({alexaUserId: req.params.alexaUserId})
+  .then((user) => user.length === 0 ? {} : User.decryptModel(user[0]))
   .then((data) => {
-    config.userID = data.userID
+    config.carvisUserID = data.userId || 1717;
     return config;
   })
   .then((data) => {res.json(data);})
-
-  // return res.status(422).send({ error: 'You must provide email and password'});
+  .catch((err) => res.status(400).json(err))
 };
 
 exports.getEstimate = function(req, res) {
