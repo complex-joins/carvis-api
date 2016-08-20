@@ -2,6 +2,7 @@ import { Ride } from '../models/Ride';
 import { User } from '../models/User';
 import { createMessage } from './../utils/twilioHelper';
 import fetch from 'node-fetch';
+import { redisHashGetAll } from './../../redis/redisHelperFunctions';
 
 const CARVIS_API = process.env.CARVIS_API;
 const CARVIS_API_KEY = process.env.CARVIS_API_KEY;
@@ -30,12 +31,36 @@ export const addRide = function (req, res) {
 
       // carvisUserId -- to query the user table for tokens etc.
       let userId = ride.userId;
+      let user = redisHashGetAll(userId /*, cb*/ ); // redis query for user.
+      console.log('user on redis getall', user);
 
-      // TODO: Redis retrieve user -- if not found, do DB query.
-      let dbURL = 'http://' + CARVIS_API + '/users/' + userId;
-      console.log('pre db get', vendor, userId, dbURL, rideId);
+      if (user) {
+        if (vendor === 'Uber') {
+          let body = {
+            origin: origin,
+            token: user.uberToken,
+            destination: destination,
+            rideId: rideId
+          };
+          return helperAPIQuery(body, vendor);
 
-      return getUserAndRequestRideDB(dbURL, origin, destination, partySize, rideId, vendor);
+        } else if (vendor === 'Lyft') {
+          let body = {
+            lyftPaymentInfo: user.lyftPaymentInfo,
+            lyftToken: user.lyftToken,
+            origin: origin,
+            partySize: partySize,
+            destination: destination,
+            rideId: rideId
+          };
+          return helperAPIQuery(body, vendor);
+        }
+      } else { // only invoked if we don't have the user in Redis at the moment
+        let dbURL = 'http://' + CARVIS_API + '/users/' + userId;
+        console.log('pre db get', vendor, userId, dbURL, rideId);
+
+        return getUserAndRequestRideDB(dbURL, origin, destination, partySize, rideId, vendor);
+      }
     })
     .catch((err) => res.status(400)
       .json(err)); // add catch for errors.
@@ -57,21 +82,18 @@ const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, rideId, 
       data = data[0];
 
       if (vendor === 'Uber') {
-        let token = data.uberToken;
         let body = {
           origin: origin,
-          token: token,
+          token: data.uberToken,
           destination: destination,
           rideId: rideId
         };
         return helperAPIQuery(body, vendor);
 
       } else if (vendor === 'Lyft') {
-        let lyftPaymentInfo = data.lyftPaymentInfo;
-        let lyftToken = data.lyftToken;
         let body = {
-          lyftPaymentInfo: lyftPaymentInfo,
-          lyftToken: lyftToken,
+          lyftPaymentInfo: data.lyftPaymentInfo,
+          lyftToken: data.lyftToken,
           origin: origin,
           partySize: partySize,
           destination: destination,
@@ -186,6 +208,7 @@ export const cancelRide = (req, res) => {
     });
 };
 
+// TODO: redis Rides
 export const getRidesForUser = (req, res) => {
   Ride.find({ userId: req.params.userid })
     .then((rides) => res.json(rides))

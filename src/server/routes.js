@@ -1,9 +1,6 @@
 import { getRidesForUser, addRide, updateRide, getAllRideData, deleteRide, shareRideETA } from './controllers/Ride';
-import {
-  getUserDashboardData, updateUserData, createUser,
-  getAllUserData, findOrCreateUser, updateOrCreateUser,
-  deleteUser, rawUserData
-} from './controllers/User';
+import { getUserDashboardData, updateUserData, createUser, getAllUserData, findOrCreateUser, updateOrCreateUser, deleteUser, rawUserData } from './controllers/User';
+import { updateLyftToken } from './controllers/Internal';
 
 // import passport from 'passport';
 // import passportService from './services/passport';
@@ -45,6 +42,8 @@ export default function (app) {
   app.post('/alexa/launch', alexa.handleLaunch);
 
   app.post('/alexa/estimate', alexa.getEstimate);
+
+  app.post('/internal/lyftBearerToken', hasValidAPIToken, updateLyftToken);
 
   // app.post('/signin', requireSignin, Authentication.signin);
   // app.post('/signup', Authentication.signup);

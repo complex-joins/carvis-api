@@ -8,16 +8,18 @@ client.config("SET", "maxmemory", "400mb");
 client.config("SET", "maxmemory-policy", "allkeys-lru");
 
 // function to create a hash or set a new key:value on an existing hash
-// hashName -- ie. userId
+// hashName -- ie. userId (use carvis userId)
 export const redisSetHash = (hashName, keyValArray, cb) => {
   client.hmset(hashName, keyValArray, (err, res) => {
     if (err) {
       console.warn('redis error creating', hashName, err);
     } else {
       console.log('redis success creating', hashName, res);
-      // if (cb) {
-      //   cb(res);
-      // }
+      if (cb) {
+        return cb(res);
+      } else {
+        return res;
+      }
     }
   });
 };
@@ -30,9 +32,11 @@ export const redisHashGetAll = (hashName, cb) => {
       console.warn('redis error fetching', hashName, err);
     } else {
       console.log('redis success fetching', hashName, res);
-      // if (cb) {
-      //   cb(res);
-      // }
+      if (cb) {
+        return cb(res);
+      } else {
+        return res;
+      }
     }
   });
 };
@@ -45,9 +49,11 @@ export const redisHashGetOne = (hashName, keyName, cb) => {
       console.warn('redis error fetching', keyName, 'from', hashName, err);
     } else {
       console.log('redis success fetching', keyName, 'from', hashName, res);
-      // if (cb) {
-      //   cb(res);
-      // }
+      if (cb) {
+        return cb(res);
+      } else {
+        return res;
+      }
     }
   });
 };
@@ -59,9 +65,11 @@ export const redisSetKey = (keyName, value, cb) => {
       console.warn('redis error setting key', keyName);
     } else {
       console.log('redis success setting', keyName, res);
-      // if (cb) {
-      //   cb(res);
-      // }
+      if (cb) {
+        return cb(res);
+      } else {
+        return res;
+      }
     }
   });
 };
@@ -73,9 +81,11 @@ export const redisGetKey = (keyName) => {
       console.warn('redis error getting key', keyName);
     } else {
       console.log('redis success getting', keyName, res);
-      // if (cb) {
-      //   cb(res);
-      // }
+      if (cb) {
+        return cb(res);
+      } else {
+        return res;
+      }
     }
   });
 };
