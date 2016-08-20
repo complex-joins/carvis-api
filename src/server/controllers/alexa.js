@@ -1,5 +1,5 @@
 var _ = require('lodash');
-// var rideHelper = require('../utils/ride-helper');
+var rideHelper = require('../utils/ride-helper');
 
 var fakeoutMode = JSON.parse(process.env.FAKEOUT) || false; // when true, CARVIS will tell you about taxi fares, not uber and lyft estimates
 var config = {};
