@@ -1,11 +1,13 @@
 // import bluebird from 'bluebird';
 // bluebird.promisifyAll(require('redis')); // ie. client.getAsync()
 
-// to have Travis test redis, we need fakeredis
-const redis = JSON.parse(process.env.TRAVIS) ?
+// to have Travis test redis, we need fakeredis - bit of a hack.
+const checkTravis = process.env.TRAVIS ? JSON.parse(process.env.TRAVIS) : false;
+const redis = checkTravis ?
   require('fakeredis') : require('redis');
+
 const CARVIS_CACHE_PORT = process.env.CARVIS_CACHE_PORT || 6379;
-const CARVIS_CACHE = process.env.CARVIS_CACHE || null;
+const CARVIS_CACHE = process.env.CARVIS_CACHE || '127.0.0.1';
 const client = redis.createClient(CARVIS_CACHE_PORT, CARVIS_CACHE);
 
 // this sets the Redis server as an LRU cache with 400MB space.
@@ -17,6 +19,7 @@ if (!process.env.TRAVIS) {
 
 // function to create a hash or set a new key:value on an existing hash
 // hashName -- ie. userId (use carvis userId)
+// keyValArray should be formatted [key, value, key, value]
 export const redisSetHash = (hashName, keyValArray, cb) => {
   client.hmset(hashName, keyValArray, (err, res) => {
     if (err) {
