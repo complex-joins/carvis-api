@@ -1,7 +1,13 @@
 // import bluebird from 'bluebird';
 // bluebird.promisifyAll(require('redis')); // ie. client.getAsync()
-import redis from 'redis';
-const client = redis.createClient();
+
+// to have Travis test redis, we need fakeredis
+JSON.parse(process.env.TRAVIS) ?
+  import fakeredis from 'fakeredis' : import redis from 'redis';
+const redis = redis || fakeredis;
+const CARVIS_CACHE_PORT = process.env.CARVIS_CACHE_PORT || 'fake';
+const CARVIS_CACHE = process.env.CARVIS_CACHE || 'fake';
+const client = redis.createClient(CARVIS_CACHE_PORT, CARVIS_CACHE);
 
 // this sets the Redis server as an LRU cache with 400MB space.
 // elasticcache micro has 555MB, but leaving some space for safety ?
@@ -75,7 +81,7 @@ export const redisSetKey = (keyName, value, cb) => {
   });
 };
 
-// function to set a flat key  with expire 
+// function to set a flat key  with expire
 export const redisSetKeyWithExpire = (keyName, expire, value, cb) => {
   client.setex(keyName, expire, value, (err, res) => {
     if (err) {
