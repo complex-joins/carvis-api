@@ -31,18 +31,19 @@ export const addRide = function (req, res) {
       // carvisUserId -- to query the user table for tokens etc.
       let userId = ride.userId;
 
+      // TODO: Redis retrieve user -- if not found, do DB query.
       let dbURL = 'http://' + CARVIS_API + '/users/' + userId;
       console.log('pre db get', vendor, userId, dbURL, rideId);
 
-      return getUserAndRequestRide(dbURL, origin, destination, partySize, rideId, vendor)
+      return getUserAndRequestRideDB(dbURL, origin, destination, partySize, rideId, vendor);
     })
     .catch((err) => res.status(400)
       .json(err)); // add catch for errors.
 };
 
-const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, vendor) => {
+const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, rideId, vendor) => {
 
-  fetch(dbURL, {
+  return fetch(dbURL, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -57,38 +58,17 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
 
       if (vendor === 'Uber') {
         let token = data.uberToken;
-
         let body = {
           origin: origin,
           token: token,
           destination: destination,
           rideId: rideId
         };
-
-        let helperURL = CARVIS_HELPER_API + '/uber/requestRide';
-
-        fetch(helperURL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-access-token': CARVIS_HELPER_API_KEY
-            },
-            body: JSON.stringify(body)
-          })
-          .then(res => {
-            return res.json();
-          })
-          .then(data => {
-            console.log('success lyft phone auth', data);
-          })
-          .catch(err => {
-            console.warn('err lyft phone auth', err);
-          });
+        return helperAPIQuery(body, vendor);
 
       } else if (vendor === 'Lyft') {
         let lyftPaymentInfo = data.lyftPaymentInfo;
         let lyftToken = data.lyftToken;
-
         let body = {
           lyftPaymentInfo: lyftPaymentInfo,
           lyftToken: lyftToken,
@@ -97,26 +77,7 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
           destination: destination,
           rideId: rideId
         };
-
-        let helperURL = CARVIS_HELPER_API + '/lyft/getCost';
-
-        fetch(helperURL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-access-token': CARVIS_HELPER_API_KEY
-            },
-            body: JSON.stringify(body)
-          })
-          .then(res => {
-            return res.json();
-          })
-          .then(data => {
-            console.log('success lyft phone auth', data);
-          })
-          .catch(err => {
-            console.warn('err lyft phone auth', err);
-          });
+        return helperAPIQuery(body, vendor);
 
       } else {
         console.warn('not a valid vendor - check stacktrace');
@@ -124,6 +85,33 @@ const getUserAndRequestRide = (dbURL, origin, destination, partySize, rideId, ve
     })
     .catch(err => {
       console.warn('error fetching user from db', err);
+    });
+};
+
+const helperAPIQuery = (body, vendor) => {
+  if (vendor === 'Lyft') {
+    let helperURL = CARVIS_HELPER_API + '/lyft/getCost';
+  } else {
+    let helperURL = CARVIS_HELPER_API + '/uber/requestRide';
+  }
+
+  return fetch(helperURL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': CARVIS_HELPER_API_KEY
+      },
+      body: JSON.stringify(body)
+    })
+    .then(res => {
+      return res.json();
+      // response from order ride -- need to store ride reference data to Redis?
+    })
+    .then(data => {
+      console.log('success lyft phone auth', data);
+    })
+    .catch(err => {
+      console.warn('err lyft phone auth', err);
     });
 };
 
