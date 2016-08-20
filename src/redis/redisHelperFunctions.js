@@ -1,5 +1,6 @@
-const bluebird = require("bluebird");
-bluebird.promisifyAll(require('redis')); // ie. client.getAsync()
+// import bluebird from 'bluebird';
+// bluebird.promisifyAll(require('redis')); // ie. client.getAsync()
+import redis from 'redis';
 const client = redis.createClient();
 
 // this sets the Redis server as an LRU cache with 400MB space.
