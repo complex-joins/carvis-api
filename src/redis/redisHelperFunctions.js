@@ -2,11 +2,10 @@
 // bluebird.promisifyAll(require('redis')); // ie. client.getAsync()
 
 // to have Travis test redis, we need fakeredis
-JSON.parse(process.env.TRAVIS) ?
-  import fakeredis from 'fakeredis' : import redis from 'redis';
-const redis = redis || fakeredis;
-const CARVIS_CACHE_PORT = process.env.CARVIS_CACHE_PORT || 'fake';
-const CARVIS_CACHE = process.env.CARVIS_CACHE || 'fake';
+const redis = JSON.parse(process.env.TRAVIS) ?
+  require('fakeredis') : require('redis');
+const CARVIS_CACHE_PORT = process.env.CARVIS_CACHE_PORT || 6379;
+const CARVIS_CACHE = process.env.CARVIS_CACHE || null;
 const client = redis.createClient(CARVIS_CACHE_PORT, CARVIS_CACHE);
 
 // this sets the Redis server as an LRU cache with 400MB space.
