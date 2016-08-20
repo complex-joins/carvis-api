@@ -1,5 +1,7 @@
 var _ = require('lodash');
-// var rideHelper = require('../utils/ride-helper');
+import { Ride } from '../models/Ride';
+import { User } from '../models/User';
+var rideHelper = require('../utils/ride-helper');
 
 var fakeoutMode = JSON.parse(process.env.FAKEOUT) || false; // when true, CARVIS will tell you about taxi fares, not uber and lyft estimates
 var config = {};
@@ -16,7 +18,16 @@ if (fakeoutMode) {
 }
 
 exports.handleLaunch = function(req, res) {
-  res.json(config);
+  //call to the DB with alexaID
+  User.find({alexaID: req.params.alexaID})
+  .then((user) => user.length === 0 ? res.json({}) : User.decryptModel(user[0]))
+  .catch((err) => res.status(400).json(err))
+  .then((data) => {
+    config.userID = data.userID
+    return config;
+  })
+  .then((data) => {res.json(data);})
+
   // return res.status(422).send({ error: 'You must provide email and password'});
 };
 
@@ -38,8 +49,8 @@ exports.getEstimate = function(req, res) {
   var destinationSlots = _.filter(slots, function (slotValue, slotKey) {
     return (slotValue.value && slotValue.value.length > 0 && slotKey.includes('DESTINATION'));
   });
-  var destination = (destinationSlots.length) 
-    ? { query: destinationSlots[0].value } 
+  var destination = (destinationSlots.length)
+    ? { query: destinationSlots[0].value }
     : null;
   console.log('Alexa thinks my destination is', destination);
 
