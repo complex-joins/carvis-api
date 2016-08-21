@@ -205,13 +205,6 @@ var formatAnswer = function (winner, mode, originDescrip, destDescrip, staging) 
   mode = mode.includes('cheap') ? 'cheapest' : 'fastest';
   var winnerEstimate, answer;
 
-  if (!winner) {
-    answer = 'There are no rides available to ${destDescrip}. Please try again.';
-    return _.template(answer)({
-      destDescrip: destDescrip
-    });
-  }
-
   // convert estimate to $ or minutes
   if (mode === 'fastest') {
     var minutes = Math.floor(winner.estimate / 60);
