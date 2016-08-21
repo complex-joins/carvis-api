@@ -64,6 +64,11 @@ exports.getEstimate = function(req, res) {
         if (destination.descrip) {
           // make getEstimate call since destination.descrip async call resolved first
           rideHelper.getEstimate(mode, origin.coords, destination.coords, function (winner) {
+            if (!winner) {
+              res.json({ prompt: `There are no rides available from ${origin.descrip} to ${destination.descrip}. Please try again.` });
+              return;
+            }
+
             prompt = rideHelper.formatAnswer(winner, mode, origin.descrip, destination.descrip, fakeoutMode);
             if (fakeoutMode) { // no need to post ride to the db
               res.json({ prompt: prompt });
@@ -97,6 +102,11 @@ exports.getEstimate = function(req, res) {
       if (origin.descrip) {
         // make getEstimate call since originDescrip async call resolved first
         rideHelper.getEstimate(mode, origin.coords, destination.coords, function (winner) {
+          if (!winner) {
+            res.json({ prompt: `There are no rides available from ${origin.descrip} to ${destination.descrip}. Please try again.` });
+            return;
+          }
+
           prompt = rideHelper.formatAnswer(winner, mode, origin.descrip, destination.descrip, fakeoutMode);
           if (fakeoutMode) { // no need to post ride to the db
             res.json({ prompt: prompt });
