@@ -38,8 +38,8 @@ exports.getEstimate = function(req, res) {
   var destinationSlots = _.filter(slots, function (slotValue, slotKey) {
     return (slotValue.value && slotValue.value.length > 0 && slotKey.includes('DESTINATION'));
   });
-  var destination = (destinationSlots.length) 
-    ? { query: destinationSlots[0].value } 
+  var destination = (destinationSlots.length)
+    ? { query: destinationSlots[0].value }
     : null;
   console.log('Alexa thinks my destination is', destination);
 
@@ -120,4 +120,8 @@ exports.getEstimate = function(req, res) {
       }
     }, origin.coords);
   }
+};
+
+exports.cancelRide = function(req, res) {
+
 };
