@@ -1,6 +1,6 @@
 import db from '../src/db/db';
-import {RideSchema} from '../src/db/Ride';
-import {UserSchema} from '../src/db/User';
+import {RideSchema} from '../src/server/models/Ride';
+import {UserSchema} from '../src/server/models/User';
 
 const resetDb = async function() {
   await db.dropTableIfExists('users');
