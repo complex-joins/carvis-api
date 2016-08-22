@@ -146,6 +146,35 @@ describe('API server', function () {
           })
           .catch((err) => done(err));
       });
+
+      it('should handle an Alexa estimate intent request for an unrecognized location', function (done) {
+        let body = { data: { request: { intent: { slots: { DESTINATION: { value: 'ass FO airport' }, MODE: { value: 'cheapest' } } } } } };
+        axios.post(`http://localhost:${PORT}/alexa/estimate`, body, {
+            headers: { 'Content-Type': 'application/json' }
+          })
+          .then((res) => {
+            assert.equal(res.status, 200, 'did not return 200', res.status);
+            expect(res.data.prompt)
+              .to.exist;
+            done();
+          })
+          .catch((err) => done(err));
+      });
+
+      it('should handle an Alexa estimate intent request that returns no valid estimates', function (done) {
+        let body = { data: { request: { intent: { slots: { DESTINATION: { value: 'antarctica' }, MODE: { value: 'cheapest' } } } } } };
+        axios.post(`http://localhost:${PORT}/alexa/estimate`, body, {
+            headers: { 'Content-Type': 'application/json' }
+          })
+          .then((res) => {
+            assert.equal(res.status, 200, 'did not return 200', res.status);
+            expect(res.data.prompt)
+              .to.exist;
+            done();
+          })
+          .catch((err) => done(err));
+      });
+
     });
 
     describe('Test Redis Helpers', function () {
@@ -217,8 +246,6 @@ describe('API server', function () {
         done();
       });
 
-
-      // end of redis tests
     });
 
     // describe ...
