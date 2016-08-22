@@ -32,7 +32,7 @@ export const addRide = function (req, res) {
       // carvisUserId -- to query the user table for tokens etc.
       let userId = ride.userId;
       let user = redisHashGetAll(userId /*, cb*/ ); // redis query for user.
-      console.log('user on redis getall', user);
+      console.log('user on redis getall addRide', user);
 
       if (user) {
         if (vendor === 'Uber') {
