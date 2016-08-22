@@ -123,5 +123,6 @@ exports.getEstimate = function(req, res) {
 };
 
 exports.cancelRide = function(req, res) {
-
+  console.log('cancelRide req', req);
+  res.json({prompt: 'Canceling your ride...'});
 };
