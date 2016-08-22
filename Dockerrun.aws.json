@@ -12,18 +12,6 @@
           "containerPort": 8080
         }
       ]
-    },
-    {
-      "name": "carvis-helper",
-      "image": "carvis/carvis-helper",
-      "essential": true,
-      "memory": 128,
-      "portMappings": [
-        {
-          "hostPort": 80,
-          "containerPort": 8888
-        }
-      ]
     }
   ]
 }
