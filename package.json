@@ -9,7 +9,8 @@
     "build": "npm run build:db; npm run build:server",
     "reset:db": "babel-node ./utils/wipeDB.js",
     "setup": "node ./tools/resolveGitIgnored.js;",
-    "docker:deploy": "npm run build; docker build -t alexcstark/carvis-api .; docker push alexcstark/carvis-api",
+    "docker:deploy": "npm run build; docker build -t carvis/carvis-api .; docker push carvis/carvis-api",
+    "deploy": "npm run docker:deploy; eb deploy",
     "test": "mocha --compilers js:babel-core/register ./tests/index.js",
     "start": "npm run build; node ./dist/server/index.js"
   },
