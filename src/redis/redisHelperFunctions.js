@@ -3,7 +3,7 @@ import bluebird from 'bluebird';
 // to have Travis test redis, we need fakeredis - bit of a hack.
 const checkTravis = process.env.TRAVIS ? JSON.parse(process.env.TRAVIS) : false;
 const redis = checkTravis ?
-  require('fakeredis') : bluebird.promisifyAll(require('redis'));
+  bluebird.promisifyAll(require('fakeredis')) : bluebird.promisifyAll(require('redis'));
 
 const CARVIS_CACHE_PORT = process.env.CARVIS_CACHE_PORT || 6379;
 const CARVIS_CACHE = process.env.CARVIS_CACHE || '127.0.0.1';
