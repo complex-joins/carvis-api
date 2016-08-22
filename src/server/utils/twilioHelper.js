@@ -1,4 +1,4 @@
-const twilioCredentials = JSON.parse(process.env.TWILIO_CREDENTIALS_JSON);
+const twilioCredentials = JSON.parse(process.env.TWILIO_CREDENTIALS_OBJ_JSON);
 const TWILIO_SID = twilioCredentials.accountSid;
 const TWILIO_TOKEN = twilioCredentials.authToken;
 const client = require('twilio')(TWILIO_SID, TWILIO_TOKEN);

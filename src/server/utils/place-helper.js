@@ -25,6 +25,12 @@ var placesCall = function(place, cb, nearbyLoc) {
   fetch(url).then( function(res) {
     return res.json();
   }).then( function(data) {
+    // if no predictions found, break out
+    if (!data.predictions.length) {
+      cb(null, null);
+      return;
+    }
+    
     var placeDesc = data.predictions[0].description;
     console.log('Place found:', placeDesc);
     // TODO: filter out place results with distance from home > 100 miles
@@ -44,10 +50,10 @@ var placesCall = function(place, cb, nearbyLoc) {
       // ie. "48 Pirrama Road, Pyrmont NSW, Australia"
       cb(placeDesc, [placeLat, placeLong]);
     }).catch( function(err) {
-      console.log('error on place detail', err);
+      console.log('error on place detail', err, '\nplace:', place);
     });
   }).catch(function(err) {
-    console.log('err in places', err);
+    console.log('err in places:', err, '\nplace:', place, '\nurl', url);
   });
 };
 

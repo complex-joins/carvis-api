@@ -7,6 +7,7 @@ const server = require('./testServer');
 const User = require('../src/server/models/User');
 
 let currentListeningServer;
+let PORT = 8080;
 
 let testUserId;
 let testCount;
@@ -14,7 +15,7 @@ let testCount;
 describe('API server', function () {
   this.timeout(15000);
   before(function () {
-    currentListeningServer = server.default.listen(3030);
+    currentListeningServer = server.default.listen(PORT);
   });
 
   after(function () {
@@ -23,7 +24,7 @@ describe('API server', function () {
 
   describe('Check basic build', function () {
     it('should return 200', function (done) {
-      axios.get('http://localhost:3030/')
+      axios.get(`http://localhost:${PORT}/`)
       .then((res) => {
         assert.equal(res.status, 200, 'did not return 200', res.status);
         done();
@@ -33,7 +34,7 @@ describe('API server', function () {
     describe('Check restful routes', function () {
 
       it('should get all users when presented with the API access token', function (done) {
-        axios.get('http://localhost:3030/dev/users', {
+        axios.get(`http://localhost:${PORT}/dev/users`, {
           headers: {'x-access-token': process.env.CARVIS_API_KEY}
         })
         .then((res) => {
@@ -45,7 +46,7 @@ describe('API server', function () {
       });
 
       it('should allow a developer to add a user when presented with the right access token', function (done) {
-        axios.post('http://localhost:3030/dev/users', {email: `test${testCount}`, password: 'test', lyftToken: '23jlkjd39'}, {
+        axios.post(`http://localhost:${PORT}/dev/users`, {email: `test${testCount}`, password: 'test', lyftToken: '23jlkjd39'}, {
           headers: {'x-access-token': process.env.CARVIS_API_KEY }
         })
         .then((res) => {
@@ -57,7 +58,7 @@ describe('API server', function () {
       });
 
       it('return the correct data for users posted to the DB', function (done) {
-        axios.get(`http://localhost:3030/users/${testUserId}`, {
+        axios.get(`http://localhost:${PORT}/users/${testUserId}`, {
           headers: {'x-access-token': process.env.CARVIS_API_KEY }
         })
         .then((res) => {
@@ -70,7 +71,7 @@ describe('API server', function () {
       });
 
       it('should allow users to update their information', function (done) {
-        axios.put(`http://localhost:3030/users/${testUserId}`, {email: 'test${testUserId}second@gmail.com', password: 'newtest'},
+        axios.put(`http://localhost:${PORT}/users/${testUserId}`, {email: 'test${testUserId}second@gmail.com', password: 'newtest'},
         { headers: {'x-access-token': process.env.CARVIS_API_KEY }
         })
         .then((res) => {
@@ -82,7 +83,7 @@ describe('API server', function () {
 
 
       it('should delete the user created by the developer', function (done) {
-        axios.delete(`http://localhost:3030/dev/users/${testUserId}`, {
+        axios.delete(`http://localhost:${PORT}/dev/users/${testUserId}`, {
           headers: {'x-access-token': process.env.CARVIS_API_KEY }
         })
         .then((res) => {
@@ -92,13 +93,13 @@ describe('API server', function () {
       });
 
       it('should properly update or create', function (done) {
-        axios.post(`http://localhost:3030/users/updateOrCreate`, {email: 'newuser@gmial.com', password: 'yo', lyftToken: 'yellow'}, {
+        axios.post(`http://localhost:${PORT}/users/updateOrCreate`, {email: 'newuser@gmial.com', password: 'yo', lyftToken: 'yellow'}, {
           headers: {'x-access-token': process.env.CARVIS_API_KEY }
         })
         .then((res) => {
           assert.equal(res.status, 200, 'did not return 200', res.status);
           expect(res.data.lyftToken).to.equal('yellow');
-          return axios.post(`http://localhost:3030/users/updateOrCreate`, {email: 'newuser@gmial.com', password: 'yo', lyftToken: 'blue'}, {
+          return axios.post(`http://localhost:${PORT}/users/updateOrCreate`, {email: 'newuser@gmial.com', password: 'yo', lyftToken: 'blue'}, {
             headers: {'x-access-token': process.env.CARVIS_API_KEY }
           });
         })
@@ -110,6 +111,58 @@ describe('API server', function () {
         .catch((err) => done(err));
       });
 
+      it('should return the correct data for an Alexa launch intent request', function (done) {
+        axios.post(`http://localhost:${PORT}/alexa/launch`,
+        { headers: { 'Content-Type': 'application/json' }
+        })
+        .then((res) => {
+          assert.equal(res.status, 200, 'did not return 200', res.status);
+          expect(res.data.prompt).to.exist;
+          done();
+        })
+        .catch((err) => done(err));
+      });
+
+      it('should return the correct data for an Alexa estimate intent request', function (done) {
+        let body = {data: { request: {intent: {slots: {DESTINATION: {value: 'hack reactor' }, MODE: {value: 'cheapest' }}}}}};
+        axios.post(`http://localhost:${PORT}/alexa/estimate`, body,
+        { headers: { 'Content-Type': 'application/json' }
+        })
+        .then((res) => {
+          assert.equal(res.status, 200, 'did not return 200', res.status);
+          expect(res.data.prompt).to.exist;
+          done();
+        })
+        .catch((err) => done(err));
+      });
+
+      it('should handle an Alexa estimate intent request for an unrecognized location', function (done) {
+        let body = {data: { request: {intent: {slots: {DESTINATION: {value: 'ass FO airport' }, MODE: {value: 'cheapest' }}}}}};
+        axios.post(`http://localhost:${PORT}/alexa/estimate`, body,
+        { headers: { 'Content-Type': 'application/json' }
+        })
+        .then((res) => {
+          assert.equal(res.status, 200, 'did not return 200', res.status);
+          expect(res.data.prompt).to.exist;
+          done();
+        })
+        .catch((err) => done(err));
+      });
+
+      it('should handle an Alexa estimate intent request that returns no valid estimates', function (done) {
+        let body = {data: { request: {intent: {slots: {DESTINATION: {value: 'antarctica' }, MODE: {value: 'cheapest' }}}}}};
+        axios.post(`http://localhost:${PORT}/alexa/estimate`, body,
+        { headers: { 'Content-Type': 'application/json' }
+        })
+        .then((res) => {
+          assert.equal(res.status, 200, 'did not return 200', res.status);
+          expect(res.data.prompt).to.exist;
+          done();
+        })
+        .catch((err) => done(err));
+      });
+
+      
     });
   });
 });
