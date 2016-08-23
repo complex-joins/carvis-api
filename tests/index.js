@@ -197,10 +197,12 @@ describe('API server', function () {
       it('should set a key with expiration', function (done) {
         redisSetKeyWithExpire('testAnotherKey', 1, 'anotherTestValue', function () {
           redisGetKey('testAnotherKey', function (res) {
+            // test the setting / getting of the key
             expect(res)
               .to.equal('anotherTestValue');
           });
 
+          // test the expiration
           setTimeout(() => {
             redisGetKey('testAnotherKey', function (res) {
               expect(res)
@@ -247,11 +249,15 @@ describe('API server', function () {
         });
       });
 
-      // could be separated into two tests.
+      // note: could be separated into two tests.
       it('should update lyftBearerToken, and fetch it', function (done) {
+        // fetch redis key - expect 'veryTrue' (from prev. test)
+        expect(redisGetKey('lyftBearerToken'))
+          .to.equal('veryTrue');
+        // change lyftBearerToken from 'veryTrue' to 'true'
         let req = { body: { token: "true" } };
         updateLyftToken(req);
-
+        // fetch that token via the endpoint
         var apiURL = `http://localhost:${PORT}/internal/lyftBearerToken`
         fetch(apiURL, {
             method: 'GET',
@@ -265,6 +271,7 @@ describe('API server', function () {
           })
           .then(data => {
             console.log(data);
+            // expect the new token 'true'
             expect(data)
               .to.equal('true');
             done();
@@ -277,6 +284,7 @@ describe('API server', function () {
         let body = {
           email: 'someuser@gmail.com' + Math.random()
         };
+        // create a new user with random email
         fetch(apiURL, {
             method: 'POST',
             headers: {
@@ -290,6 +298,7 @@ describe('API server', function () {
           })
           .then(data => {
             console.log(data);
+            // fetch the new user, find the same email (in Redis)
             redisHashGetOne(data[0].id, 'email', function (res) {
               expect(res)
                 .to.equal(body.email);
@@ -304,6 +313,7 @@ describe('API server', function () {
         let body = {
           email: 'TESTSAREBADMMMMMKAY2@gmail.com' + Math.random()
         };
+        // update an existing user with a new random email
         fetch(apiURL, {
             method: 'PUT',
             headers: {
@@ -317,6 +327,7 @@ describe('API server', function () {
           })
           .then(data => {
             console.log(data);
+            // fetch the existing user, find new random email (in Redis)
             redisHashGetOne(data[0].id, 'email', function (res) {
               expect(res)
                 .to.equal(body.email);
@@ -326,10 +337,11 @@ describe('API server', function () {
           .catch(err => console.warn('error fetch', err));
       });
 
-      // NOTE: issue right now with API key - might be Lyft or Helper.
       it('should do an integration test with the helper API', function (done) {
+        // get the current lyftToken
         let token = redisGetKey('lyftBearerToken');
 
+        // call the helper API to refresh the lyftBearerToken
         let helperURL = process.env.CARVIS_HELPER_API + '/lyft/refreshBearerToken';
         fetch(helperURL, {
             method: 'GET',
@@ -344,6 +356,7 @@ describe('API server', function () {
           .then(data => {
             console.log('success refreshToken', data);
             setTimeout(() => {
+              // fetch the new token - compare to not be equal to the old one
               expect(redisGetKey('lyftBearerToken'))
                 .not.to.equal(token);
               done();

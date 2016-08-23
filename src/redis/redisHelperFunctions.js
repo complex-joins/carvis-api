@@ -106,3 +106,7 @@ export const redisGetKey = (keyName, cb) => {
     .catch(err => console.warn('redis error getting key', keyName));
 };
 export const redisGetKeyAsync = bluebird.promisify(redisGetKey);
+
+export const redisIncrementKeyValue = keyName => {
+  client.incr(keyName);
+};

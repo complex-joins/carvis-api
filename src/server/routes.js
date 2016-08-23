@@ -1,11 +1,13 @@
 import { getRidesForUser, addRide, updateRide, getAllRideData, deleteRide, shareRideETA } from './controllers/Ride';
 import { getUserDashboardData, updateUserData, createUser, getAllUserData, findOrCreateUser, updateOrCreateUser, deleteUser, rawUserData } from './controllers/User';
 import { getLyftToken, updateLyftToken } from './controllers/Internal';
+import { createNewDeveloperKey } from './controllers/DeveloperAPI';
 
 // import passport from 'passport';
 // import passportService from './services/passport';
 import Authentication from './controllers/authentication';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
+import hasValidDevAPIToken from './server-configuration/hasValidDevAPIToken';
 import alexa from './controllers/alexa';
 
 export default function (app) {
@@ -45,6 +47,9 @@ export default function (app) {
 
   app.get('/internal/lyftBearerToken', hasValidAPIToken, getLyftToken);
   app.post('/internal/lyftBearerToken', hasValidAPIToken, updateLyftToken);
+
+  app.get('developer/createToken', hasValidDevAPIToken, createNewDeveloperKey);
+  // add dev routes for popular methods
 
   // app.post('/signin', requireSignin, Authentication.signin);
   // app.post('/signup', Authentication.signup);
