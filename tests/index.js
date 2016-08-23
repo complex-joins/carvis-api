@@ -14,7 +14,6 @@ import { createNewDeveloperKey } from './../src/server/controllers/DeveloperAPI'
 import hasValidDevAPIToken from './../src/server/server-configuration/hasValidDevAPIToken';
 import { getLyftBearerToken } from './../src/server/utils/ride-helper';
 
-
 let currentListeningServer;
 let PORT = 8080;
 let testUserId;
@@ -426,6 +425,11 @@ describe('API server', function () {
       // });
       //
       // it('should increment key value when using DeveloperAPI', function (done) {
+      //   // TODO:
+      //   done();
+      // });
+
+      // it('should return 404 if key used >99 times', function (done) {
       //   // TODO:
       //   done();
       // });

@@ -20,7 +20,7 @@ export const handleLaunch = (req, res) => {
   // return res.status(422).send({ error: 'You must provide email and password'});
 };
 
-export const getEstimate = (req, res) => {
+export const AlexaGetEstimate = (req, res) => {
   let slots = req.body.data.request.intent.slots;
   console.log('slots:', slots);
 

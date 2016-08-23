@@ -8,7 +8,7 @@ import { createNewDeveloperKey } from './controllers/DeveloperAPI';
 import Authentication from './controllers/authentication';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 import hasValidDevAPIToken from './server-configuration/hasValidDevAPIToken';
-import { handleLaunch, getEstimate } from './controllers/alexa';
+import { handleLaunch, AlexaGetEstimate } from './controllers/alexa';
 
 export default function (app) {
   // TODO only let the user with that ID find users (middleware);
@@ -43,9 +43,9 @@ export default function (app) {
 
   app.post('/rides/cancelRide/:userid', hasValidAPIToken, shareRideETA);
 
-  app.post('/alexa/launch', alexa.handleLaunch);
+  app.post('/alexa/launch', handleLaunch);
 
-  app.post('/alexa/estimate', alexa.getEstimate);
+  app.post('/alexa/estimate', AlexaGetEstimate);
 
   app.get('/internal/lyftBearerToken', hasValidAPIToken, getLyftToken);
 
