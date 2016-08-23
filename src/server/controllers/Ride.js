@@ -110,6 +110,7 @@ const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, rideId, 
     });
 };
 
+// TODO: add redis check for cost signature Uber
 const helperAPIQuery = (body, vendor) => {
   if (vendor === 'Lyft') {
     let helperURL = CARVIS_HELPER_API + '/lyft/getCost';

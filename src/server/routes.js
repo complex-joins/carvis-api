@@ -8,7 +8,7 @@ import { createNewDeveloperKey } from './controllers/DeveloperAPI';
 import Authentication from './controllers/authentication';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 import hasValidDevAPIToken from './server-configuration/hasValidDevAPIToken';
-import alexa from './controllers/alexa';
+import { handleLaunch, getEstimate } from './controllers/alexa';
 
 export default function (app) {
   // TODO only let the user with that ID find users (middleware);
