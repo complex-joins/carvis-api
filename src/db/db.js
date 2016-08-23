@@ -1,6 +1,6 @@
 import Stork from 'storkSQL';
 let DB_CONFIG;
-if (process.env.AWS) {
+if (JSON.parse(process.env.AWS)) {
   DB_CONFIG = {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
