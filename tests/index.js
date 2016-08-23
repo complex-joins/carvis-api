@@ -177,7 +177,6 @@ describe('API server', function () {
     });
 
     describe('Test Redis Helpers', function () {
-
       it('should get and set a flat value', function (done) {
         redisSetKey('testKey', 'testValue');
         redisGetKey('testKey', function (res) {
@@ -187,7 +186,6 @@ describe('API server', function () {
         done();
       });
 
-
       it('should get a flat value', function (done) {
         redisGetKey('testKey', function (res) {
           expect(res)
@@ -196,8 +194,6 @@ describe('API server', function () {
         done();
       });
 
-      // returns value within the expiration, not after
-      // can you have 2 expect within an it ... ?
       it('should set a key with expiration', function (done) {
         redisSetKeyWithExpire('testAnotherKey', 1, 'anotherTestValue', function () {
           redisGetKey('testAnotherKey', function (res) {
@@ -233,7 +229,6 @@ describe('API server', function () {
         done();
       });
 
-      // test updateLyftToken, getLyftToken, refreshToken
       it('should getLyftToken', function (done) {
         redisSetKeyWithExpire('lyftBearerToken', 1, 'true', function (res) {
           expect(getLyftToken())
@@ -242,10 +237,8 @@ describe('API server', function () {
         done();
       });
 
-      it('should updateLyftToken then get', function (done) {
-        // set initial
+      it('should set and get lyftBearerToken', function (done) {
         redisSetKeyWithExpire('lyftBearerToken', 1, 'veryTrue', function (res) {
-          // check the initial key setting
           redisGetKey('lyftBearerToken', function (res) {
             expect(res)
               .to.equal('veryTrue');
@@ -254,12 +247,11 @@ describe('API server', function () {
         });
       });
 
-      it('should update then fetch - integration', function (done) {
-        // update
+      // could be separated into two tests.
+      it('should update lyftBearerToken, and fetch it', function (done) {
         let req = { body: { token: "true" } };
         updateLyftToken(req);
 
-        // check the get - async
         var apiURL = `http://localhost:${PORT}/internal/lyftBearerToken`
         fetch(apiURL, {
             method: 'GET',
@@ -280,8 +272,7 @@ describe('API server', function () {
           .catch(err => console.warn('error fetch', err));
       });
 
-      it('should add a user to redis', function (done) {
-        // app.post('/dev/users', hasValidAPIToken, createUser);
+      it('should add a user to redis on creating a user', function (done) {
         var apiURL = `http://localhost:${PORT}/dev/users`
         let body = {
           email: 'someuser@gmail.com' + Math.random()
@@ -308,8 +299,7 @@ describe('API server', function () {
           .catch(err => console.warn('error fetch', err));
       });
 
-      it('should update an existing user', function (done) {
-        // app.post('/dev/users', hasValidAPIToken, createUser);
+      it('should update a user and find the update in Redis', function (done) {
         var apiURL = `http://localhost:${PORT}/users/22`
         let body = {
           email: 'TESTSAREBADMMMMMKAY2@gmail.com' + Math.random()
@@ -334,6 +324,35 @@ describe('API server', function () {
             });
           })
           .catch(err => console.warn('error fetch', err));
+      });
+
+      // NOTE: issue right now with API key - might be Lyft or Helper.
+      it('should do an integration test with the helper API', function (done) {
+        let token = redisGetKey('lyftBearerToken');
+
+        let helperURL = process.env.CARVIS_HELPER_API + '/lyft/refreshBearerToken';
+        fetch(helperURL, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': process.env.CARVIS_HELPER_API_KEY
+            }
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then(data => {
+            console.log('success refreshToken', data);
+            setTimeout(() => {
+              expect(redisGetKey('lyftBearerToken'))
+                .not.to.equal(token);
+              done();
+            }, 5000);
+          })
+          .catch(err => {
+            console.warn('error refreshing token', err);
+          });
+
       });
 
     });
