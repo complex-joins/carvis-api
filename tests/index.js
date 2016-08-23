@@ -12,6 +12,8 @@ import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKe
 import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/controllers/Internal';
 import { createNewDeveloperKey } from './../src/server/controllers/DeveloperAPI';
 import hasValidDevAPIToken from './../src/server/server-configuration/hasValidDevAPIToken';
+import { getLyftBearerToken } from './../src/server/utils/ride-helper';
+
 
 let currentListeningServer;
 let PORT = 8080;
@@ -121,6 +123,8 @@ describe('API server', function () {
           .catch((err) => done(err));
       });
 
+      // ========== alexa tests =============== //
+
       it('should return the correct data for an Alexa launch intent request', function (done) {
         axios.post(`http://localhost:${PORT}/alexa/launch`, {
             headers: { 'Content-Type': 'application/json' }
@@ -176,6 +180,14 @@ describe('API server', function () {
           .catch((err) => done(err));
       });
 
+      it('should get a new lyftToken!', function (done) {
+        getLyftBearerToken(function (token) {
+          expect(token)
+            .to.be.ok;
+          done();
+        });
+      });
+      // ============= end of alexa tests ============== //
     });
 
     describe('Test Redis Helpers', function () {
@@ -399,8 +411,8 @@ describe('API server', function () {
             // test for proper uuid-v4, which is 36 length
             expect(data)
               .to.have.length.above(35);
-            redisGetKey(data, function (token) {
-              expect(token)
+            redisGetKey(data, function (keyCount) {
+              expect(keyCount)
                 .to.be.above(0);
               done();
             });
@@ -419,6 +431,7 @@ describe('API server', function () {
       // });
 
     });
+    // TODO: integration tests for Ride.js and Redis / DB associated.
 
     // describe ... other tests
   });

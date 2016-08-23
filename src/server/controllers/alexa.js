@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var rideHelper = require('../utils/ride-helper');
+import { placesCall, formatAnswer, getEstimate, addRide } from '../utils/ride-helper';
 
 var fakeoutMode = JSON.parse(process.env.FAKEOUT) || false; // when true, CARVIS will tell you about taxi fares, not uber and lyft estimates
 var config = {};
@@ -15,12 +15,12 @@ if (fakeoutMode) {
   config.helpSpeech += 'To begin, tell me to book the cheapest or fastest car, and where you want to go';
 }
 
-exports.handleLaunch = function(req, res) {
+exports.handleLaunch = function (req, res) {
   res.json(config);
   // return res.status(422).send({ error: 'You must provide email and password'});
 };
 
-exports.getEstimate = function(req, res) {
+exports.getEstimate = function (req, res) {
   var slots = req.body.data.request.intent.slots;
   console.log('slots:', slots);
 
@@ -38,21 +38,21 @@ exports.getEstimate = function(req, res) {
   var destinationSlots = _.filter(slots, function (slotValue, slotKey) {
     return (slotValue.value && slotValue.value.length > 0 && slotKey.includes('DESTINATION'));
   });
-  var destination = (destinationSlots.length) 
-    ? { query: destinationSlots[0].value } 
-    : null;
+  var destination = (destinationSlots.length) ?
+    { query: destinationSlots[0].value } :
+    null;
   console.log('Alexa thinks my destination is', destination);
 
   var prompt, reprompt;
 
-  if ( !mode || !destination || (fakeoutMode && !origin) ) {
+  if (!mode || !destination || (fakeoutMode && !origin)) {
     prompt = 'I didn\'t catch that. Please try again';
     reprompt = config.reprompt;
     res.json({ prompt: prompt, reprompt: reprompt });
   } else {
     if (origin) {
       // get origin.descrip and origin.coords for origin that was passed in
-      rideHelper.placesCall(origin.query, function (descrip, coords) {
+      placesCall(origin.query, function (descrip, coords) {
         // if descrip is empty, alexa will reply appropriately
         if (!descrip) {
           res.json({ prompt: `I wasn\'t able to find the location, ${origin.query}. Please try again` });
@@ -63,17 +63,17 @@ exports.getEstimate = function(req, res) {
         origin.coords = coords;
         if (destination.descrip) {
           // make getEstimate call since destination.descrip async call resolved first
-          rideHelper.getEstimate(mode, origin.coords, destination.coords, function (winner) {
+          getEstimate(mode, origin.coords, destination.coords, function (winner) {
             if (!winner) {
               res.json({ prompt: `There are no rides available from ${origin.descrip} to ${destination.descrip}. Please try again.` });
               return;
             }
 
-            prompt = rideHelper.formatAnswer(winner, mode, origin.descrip, destination.descrip, fakeoutMode);
+            prompt = formatAnswer(winner, mode, origin.descrip, destination.descrip, fakeoutMode);
             if (fakeoutMode) { // no need to post ride to the db
               res.json({ prompt: prompt });
             } else {
-              rideHelper.addRide(winner, userId, origin, destination, function() {
+              addRide(winner, userId, origin, destination, function () {
                 // TODO: update alexa response based on ride status (i.e., once we know it has been ordered)
                 res.json({ prompt: prompt });
               });
@@ -90,7 +90,7 @@ exports.getEstimate = function(req, res) {
       };
     }
 
-    rideHelper.placesCall(destination.query, function (descrip, coords) {
+    placesCall(destination.query, function (descrip, coords) {
       // if descrip is empty, alexa will reply appropriately
       if (!descrip) {
         res.json({ prompt: `I wasn\'t able to find the location, ${destination.query}. Please try again` });
@@ -101,17 +101,17 @@ exports.getEstimate = function(req, res) {
       destination.coords = coords;
       if (origin.descrip) {
         // make getEstimate call since originDescrip async call resolved first
-        rideHelper.getEstimate(mode, origin.coords, destination.coords, function (winner) {
+        getEstimate(mode, origin.coords, destination.coords, function (winner) {
           if (!winner) {
             res.json({ prompt: `There are no rides available from ${origin.descrip} to ${destination.descrip}. Please try again.` });
             return;
           }
 
-          prompt = rideHelper.formatAnswer(winner, mode, origin.descrip, destination.descrip, fakeoutMode);
+          prompt = formatAnswer(winner, mode, origin.descrip, destination.descrip, fakeoutMode);
           if (fakeoutMode) { // no need to post ride to the db
             res.json({ prompt: prompt });
           } else {
-            rideHelper.addRide(winner, userId, origin, destination, function() {
+            addRide(winner, userId, origin, destination, function () {
               // TODO: update alexa response based on ride status (i.e., once we know it has been ordered)
               res.json({ prompt: prompt });
             });
