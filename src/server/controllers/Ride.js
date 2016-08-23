@@ -9,9 +9,6 @@ const CARVIS_API_KEY = process.env.CARVIS_API_KEY;
 const CARVIS_HELPER_API = process.env.CARVIS_HELPER_API;
 const CARVIS_HELPER_API_KEY = process.env.CARVIS_HELPER_API_KEY;
 
-// TODO: add redis cache of userId:ride expire 300 seconds, value: rideId.
-// can be retrieved by redisGetKey(userId:ride) within 5 mins.
-
 export const addRide = function (req, res) {
   Ride.create(req.body)
     .then((ride) => {
@@ -142,15 +139,20 @@ const helperAPIQuery = (body, vendor) => {
 export const shareRideETA = (req, res) => {
   // note: how does rideId, origin, token, vendor get passed to this method?
   let userId = req.params.userid;
-  let rideId = req.params.rideid;
-  let number = req.body.number;
+  let vendorKey = `${userId}:vendor`;
+  let rideKey = `${userId}:ride`;
+
+  let vendorRideId = req.body.vendorRideId || redisGetKey(rideKey);
+  let vendor = req.body.vendor || redisGetKey(vendorKey);
+  let token = req.body.token || vendor === 'Uber' ? redisHashGetOne(userId, 'uberToken') : redisHashGetOne(userId, 'lyftToken');
+
+  let number = req.body.number; // number to send to
   let message = req.body.message || "You can track my Lyft via this link: ";
-  let token = req.body.token;
-  let vendor = req.body.vendor || 'Lyft';
+
   let helperURL = vendor === 'Lyft' ? CARVIS_HELPER_API + '/lyft/shareETA' : CARVIS_HELPER_API + '/uber/shareETA';
 
   let body = {
-    rideId: rideId, // NOTE: needs to be vendorRideId.
+    rideId: vendorRideId,
     token: token
   };
 
