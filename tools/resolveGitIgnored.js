@@ -19,6 +19,8 @@ fileDirectory.forEach((file) => {
   fs.createReadStream(currentFile).pipe(fs.createWriteStream(path.join(__dirname, `/../${filePath}`)));
 });
 
+
+
 function makePrivateDirsIfNeeded() {
   let searchDir = path.join(__dirname, '/../../');
   let thisDir = path.join(__dirname, '/../');
