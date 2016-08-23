@@ -12,7 +12,7 @@ import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKe
 import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/controllers/Internal';
 
 let currentListeningServer;
-let PORT = 8880;
+let PORT = 8080;
 
 let testUserId;
 let testCount;
@@ -262,7 +262,7 @@ describe('API server', function () {
         updateLyftToken(req);
 
         // check the get - async
-        var apiURL = 'http://localhost:8080/internal/lyftBearerToken'
+        var apiURL = `http://localhost:${PORT}/internal/lyftBearerToken`
         fetch(apiURL, {
             method: 'GET',
             headers: {
