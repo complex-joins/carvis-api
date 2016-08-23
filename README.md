@@ -70,6 +70,10 @@ All routes require the appropriate API token.
 
   `app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);`
 
+  `app.post('/rides/shareETA/:rideid', hasValidAPIToken, shareRideETA);`
+
+  `app.post('/rides/cancelRide/:userid', hasValidAPIToken, shareRideETA);`
+
   `app.post('/alexa/launch', alexa.handleLaunch);`
 
   `app.post('/alexa/estimate', alexa.getEstimate);`
@@ -77,6 +81,8 @@ All routes require the appropriate API token.
   `app.get('/internal/lyftBearerToken', hasValidAPIToken, getLyftToken);`
 
   `app.post('/internal/lyftBearerToken', hasValidAPIToken, updateLyftToken);`
+
+  `app.get('/developer/createToken', hasValidAPIToken, createNewDeveloperKey);`
 
 ##Moving Forward
 

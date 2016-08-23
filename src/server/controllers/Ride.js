@@ -2,7 +2,7 @@ import { Ride } from '../models/Ride';
 import { User } from '../models/User';
 import { createMessage } from './../utils/twilioHelper';
 import fetch from 'node-fetch';
-import { redisHashGetAll, redisSetKeyWithExpire, redisGetKey } from './../../redis/redisHelperFunctions';
+import { redisHashGetAll, redisSetKeyWithExpire, redisGetKey, redisHashGetOne } from './../../redis/redisHelperFunctions';
 
 const CARVIS_API = process.env.CARVIS_API;
 const CARVIS_API_KEY = process.env.CARVIS_API_KEY;
@@ -141,14 +141,16 @@ const helperAPIQuery = (body, vendor) => {
 
 export const shareRideETA = (req, res) => {
   // note: how does rideId, origin, token, vendor get passed to this method?
+  let userId = req.params.userid;
   let rideId = req.params.rideid;
   let number = req.body.number;
   let message = req.body.message || "You can track my Lyft via this link: ";
   let token = req.body.token;
   let vendor = req.body.vendor || 'Lyft';
   let helperURL = vendor === 'Lyft' ? CARVIS_HELPER_API + '/lyft/shareETA' : CARVIS_HELPER_API + '/uber/shareETA';
+
   let body = {
-    rideId: rideId,
+    rideId: rideId, // NOTE: needs to be vendorRideId.
     token: token
   };
 
@@ -175,16 +177,27 @@ export const shareRideETA = (req, res) => {
     });
 };
 
+// TODO: improve and add Uber.
 export const cancelRide = (req, res) => {
-  // note: how does rideId, origin, token, vendor get passed to this method?
-  let rideId = req.params.rideid;
-  let origin = req.body.origin;
-  let token = req.body.token;
-  let vendor = req.body.vendor || 'Lyft';
+  let userId = req.params.userId;
+  let rideKey = `${userId}:ride`;
+  let vendorKey = `${userId}:vendor`;
+  let carvisRideKey = `${userId}:carvisRide`;
+  let vendorRideId = req.body.vendorRideId || redisGetKey(rideKey);
+  let carvisRideId = req.body.rideId || redisGetKey(carvisRideKey);
+  let vendor = req.body.vendor || redisGetKey(vendorKey);
+  let origin = req.body.origin; // how is this passed -- redis also?
+
+  // todo: check required params uberCancel
+  let token = req.body.token || vendor === 'Uber' ? redisHashGetOne(userId, 'uberToken') : redisHashGetOne(userId, 'lyftToken');
+
   let helperURL = vendor === 'Lyft' ? CARVIS_HELPER_API + '/lyft/cancelRide' : CARVIS_HELPER_API + '/uber/cancelRide';
+
   let body = {
-    origin: origin,
-    token: token
+    userLocation: origin,
+    token: token,
+    carvisRideId: carvisRideId,
+    vendorRideId: vendorRideId
   };
 
   fetch(helperURL, {
@@ -199,14 +212,12 @@ export const cancelRide = (req, res) => {
       return response.json();
     })
     .then(data => {
-      console.log('success lyft shareETA', data);
-
-      let URLmessage = message + data.shareUrl;
-      createMessage(number, URLmessage);
-      res.json();
+      console.log('success lyft cancelRide', data);
+      // update DB is handled by the helper API.
+      // no response needed here.
     })
     .catch(err => {
-      console.warn('err lyft shareETA', err);
+      console.warn('err lyft cancelRide', err);
     });
 };
 
@@ -218,15 +229,21 @@ export const getRidesForUser = (req, res) => {
 };
 
 export const updateRide = (req, res) => {
-  let rideId = req.params.rideid;
+  let carvisRideId = req.params.rideid;
+  let lyftRideId = req.body.lyftRideId || null;
+  let vendor = lyftRideId ? 'Lyft' : 'Uber';
+
+  let carvisRideKey = `${userId}:carvisRide`;
   let rideKey = `${userId}:ride`;
   let vendorKey = `${userId}:vendor`;
-  // in later functions one needs to do two calls to Redis to get
-  // the token and vendor -> to cancel and shareRideETA
-  redisSetKeyWithExpire(rideKey, 300, rideId);
+
+  // in later functions one needs to do calls to Redis to get
+  // the token, vendorRideId, rideId and vendor -> to cancel and shareRideETA
+  redisSetKeyWithExpire(carvisRideKey, 300, carvisRideId);
+  redisSetKeyWithExpire(rideKey, 300, lyftRideId);
   redisSetKeyWithExpire(vendorKey, 300, vendor);
 
-  Ride.update({ id: rideId }, req.body)
+  Ride.update({ id: carvisRideId }, req.body)
     .then((ride) => res.json(ride))
     .catch((err) => res.status(400)
       .json(err));
