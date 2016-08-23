@@ -1,4 +1,4 @@
-import bluebird from 'bluebird';
+import bluebird from 'bluebird'; // promisify everything for async!
 
 // to have Travis test redis, we need fakeredis - bit of a hack.
 const checkTravis = process.env.TRAVIS ? JSON.parse(process.env.TRAVIS) : false;
@@ -31,6 +31,7 @@ export const redisSetHash = (hashName, keyValArray, cb) => {
     })
     .catch(err => console.warn('redis error creating', hashName, err));
 };
+export const redisSetHashAsync = bluebird.promisify(redisSetHash);
 
 // function to get all key:value pairs from a hash
 // hashName -- ie. userId
@@ -46,6 +47,7 @@ export const redisHashGetAll = (hashName, cb) => {
     })
     .catch(err => console.warn('redis error fetching', hashName, err));
 };
+export const redisHashGetAllAsync = bluebird.promisify(redisHashGetAll);
 
 // function to get a specific key:value from a hash
 // hashName -- ie. userId || keyName -- ie. 'lyftToken'
@@ -61,6 +63,7 @@ export const redisHashGetOne = (hashName, keyName, cb) => {
     })
     .catch(err => console.warn('redis error fetching', keyName, 'from', hashName, err));
 };
+export const redisHashGetOneAsync = bluebird.promisify(redisHashGetOne);
 
 // function to set a flat key -- ie. externalAPIToken:<token> | value.
 export const redisSetKey = (keyName, value, cb) => {
@@ -75,6 +78,7 @@ export const redisSetKey = (keyName, value, cb) => {
     })
     .catch(err => console.warn('redis error setting key', keyName));
 };
+export const redisSetKeyAsync = bluebird.promisify(redisSetKey);
 
 // function to set a flat key  with expire
 export const redisSetKeyWithExpire = (keyName, expire, value, cb) => {
@@ -89,10 +93,11 @@ export const redisSetKeyWithExpire = (keyName, expire, value, cb) => {
     })
     .catch(err => console.warn('redis error setting key', keyName));
 };
+export const redisSetKeyWithExpireAsync = bluebird.promisify(redisSetKeyWithExpire);
 
 // function to get a flat key:value -- ie. externalAPIToken:<token>
 export const redisGetKey = (keyName, cb) => {
-  client.getAsync(keyName)
+  return client.getAsync(keyName)
     .then(res => {
       console.log('redis success getting', keyName, res);
       if (cb) {
@@ -103,3 +108,4 @@ export const redisGetKey = (keyName, cb) => {
     })
     .catch(err => console.warn('redis error getting key', keyName));
 };
+export const redisGetKeyAsync = bluebird.promisify(redisGetKey);

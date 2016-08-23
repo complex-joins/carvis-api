@@ -1,4 +1,4 @@
-import { redisGetKey, redisSetKeyWithExpire } from './../../redis/redisHelperFunctions';
+import { redisGetKey, redisGetKeyAsync, redisSetKeyWithExpire, redisSetKeyWithExpireAsync } from './../../redis/redisHelperFunctions';
 import fetch from 'node-fetch';
 const CARVIS_HELPER_API = process.env.CARVIS_HELPER_API;
 const CARVIS_HELPER_API_KEY = process.env.CARVIS_HELPER_API_KEY;
@@ -11,23 +11,26 @@ const CARVIS_HELPER_API_KEY = process.env.CARVIS_HELPER_API_KEY;
 
 export const updateLyftToken = (req, res) => {
   let token = req.body.token;
-  redisSetKeyWithExpire('lyftBearerToken', 84600, token /*, cb*/ );
+  console.log('updateLyftToken', token);
 
   // refresh call to the helper API on expire time -- this will on success do a post to this API / function again (making it recursive at interval)
   // setTimeout is milliseconds, redis expire is seconds - this is ~1 day.
   setTimeout(refreshToken, 84600000);
+  redisSetKeyWithExpire('lyftBearerToken', 84600, token /*, cb*/ );
 };
 
 export const getLyftToken = (req, res) => {
-  let token = redisGetKey('lyftBearerToken', /*, cb*/ );
-  if (!token) {
-    // wait a reasonable amount of time to query redis again for the token
-    setTimeout(getLyftToken, 500);
-    // call the helper API to query Lyft for a token
-    refreshToken();
-  } else {
-    return token; // change to res.send() ?
-  }
+  redisGetKey('lyftBearerToken', function (token) {
+    console.log('got key', token);
+    if (token) {
+      res.json(token);
+    } else {
+      // wait a reasonable amount of time to query redis again for the token
+      setTimeout(getLyftToken, 500);
+      // call the helper API to query Lyft for a token
+      refreshToken();
+    }
+  });
 };
 
 const refreshToken = () => {

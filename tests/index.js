@@ -3,6 +3,7 @@ const assert = require('chai')
 const expect = require('chai')
   .expect;
 const axios = require('axios');
+import fetch from 'node-fetch';
 const request = require('supertest');
 const server = require('./testServer');
 
@@ -11,7 +12,7 @@ import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKe
 import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/controllers/Internal';
 
 let currentListeningServer;
-let PORT = 8080;
+let PORT = 8880;
 
 let testUserId;
 let testCount;
@@ -221,8 +222,7 @@ describe('API server', function () {
         redisSetHash('testHash', ['key1', 'val1', 'key2', 'val2']);
         redisHashGetAll('testHash', function (res) {
           expect(res)
-            .to.equal({ 'key1': 'val1', 'key2': 'val2' });
-
+            .to.deep.equal({ 'key1': 'val1', 'key2': 'val2' });
         });
         done();
       });
@@ -237,13 +237,49 @@ describe('API server', function () {
 
       // test updateLyftToken, getLyftToken, refreshToken
       it('should getLyftToken', function (done) {
-        // expect(getLyftToken())
-        //   .not.to.equal('true'); // check api tokens!
         redisSetKeyWithExpire('lyftBearerToken', 1, 'true', function (res) {
           expect(getLyftToken())
             .to.equal('true');
         });
         done();
+      });
+
+      it('should updateLyftToken then get', function (done) {
+        // set initial
+        redisSetKeyWithExpire('lyftBearerToken', 1, 'veryTrue', function (res) {
+          // check the initial key setting
+          redisGetKey('lyftBearerToken', function (res) {
+            expect(res)
+              .to.equal('veryTrue');
+            done();
+          });
+        });
+      });
+
+      it('should update then fetch - integration', function (done) {
+        // update
+        let req = { body: { token: "true" } };
+        updateLyftToken(req);
+
+        // check the get - async
+        var apiURL = 'http://localhost:8080/internal/lyftBearerToken'
+        fetch(apiURL, {
+            method: 'GET',
+            headers: {
+              'x-access-token': process.env.CARVIS_API_KEY,
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then(data => {
+            console.log(data);
+            expect(data)
+              .to.equal('true');
+            done();
+          })
+          .catch(err => console.warn('error fetch', err));
       });
 
     });
