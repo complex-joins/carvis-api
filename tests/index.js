@@ -12,8 +12,7 @@ import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKe
 import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/controllers/Internal';
 
 let currentListeningServer;
-let PORT = 8080;
-
+let PORT = 8880;
 let testUserId;
 let testCount;
 
@@ -88,7 +87,6 @@ describe('API server', function () {
           })
           .catch((err) => done(err));
       });
-
 
       it('should delete the user created by the developer', function (done) {
         axios.delete(`http://localhost:${PORT}/dev/users/${testUserId}`, {
