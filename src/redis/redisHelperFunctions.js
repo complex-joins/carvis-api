@@ -3,7 +3,7 @@ import bluebird from 'bluebird'; // promisify everything for async!
 const redis = bluebird.promisifyAll(require('redis'));
 
 const CARVIS_CACHE_PORT = process.env.CARVIS_CACHE_PORT || 6379;
-const CARVIS_CACHE = process.env.CARVIS_CACHE || 'localhost';
+const CARVIS_CACHE = process.env.CARVIS_CACHE || '127.0.0.1';
 const client = redis.createClient(CARVIS_CACHE_PORT, CARVIS_CACHE);
 
 // this sets the Redis server as an LRU cache with 400MB space.

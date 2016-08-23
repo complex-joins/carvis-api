@@ -2,11 +2,11 @@ language: node_js
 node_js:
 - '6'
 services:
-- 'redis-server' 
+- 'redis-server'
 install:
 - npm install
 script:
-- npm run build
+- npm start
 - npm test
 deploy:
   provider: elasticbeanstalk
