@@ -2,12 +2,15 @@ import { Ride } from '../models/Ride';
 import { User } from '../models/User';
 import { createMessage } from './../utils/twilioHelper';
 import fetch from 'node-fetch';
-import { redisHashGetAll } from './../../redis/redisHelperFunctions';
+import { redisHashGetAll, redisSetKeyWithExpire, redisGetKey } from './../../redis/redisHelperFunctions';
 
 const CARVIS_API = process.env.CARVIS_API;
 const CARVIS_API_KEY = process.env.CARVIS_API_KEY;
 const CARVIS_HELPER_API = process.env.CARVIS_HELPER_API;
 const CARVIS_HELPER_API_KEY = process.env.CARVIS_HELPER_API_KEY;
+
+// TODO: add redis cache of userId:ride expire 300 seconds, value: rideId.
+// can be retrieved by redisGetKey(userId:ride) within 5 mins.
 
 export const addRide = function (req, res) {
   Ride.create(req.body)
@@ -127,13 +130,12 @@ const helperAPIQuery = (body, vendor) => {
     })
     .then(res => {
       return res.json();
-      // response from order ride -- need to store ride reference data to Redis?
     })
     .then(data => {
-      console.log('success lyft phone auth', data);
+      console.log('success request ride', data);
     })
     .catch(err => {
-      console.warn('err lyft phone auth', err);
+      console.warn('err request ride', err);
     });
 };
 
@@ -208,7 +210,6 @@ export const cancelRide = (req, res) => {
     });
 };
 
-// TODO: redis Rides
 export const getRidesForUser = (req, res) => {
   Ride.find({ userId: req.params.userid })
     .then((rides) => res.json(rides))
@@ -217,7 +218,15 @@ export const getRidesForUser = (req, res) => {
 };
 
 export const updateRide = (req, res) => {
-  Ride.update({ id: req.params.rideid }, req.body)
+  let rideId = req.params.rideid;
+  let rideKey = `${userId}:ride`;
+  let vendorKey = `${userId}:vendor`;
+  // in later functions one needs to do two calls to Redis to get
+  // the token and vendor -> to cancel and shareRideETA
+  redisSetKeyWithExpire(rideKey, 300, rideId);
+  redisSetKeyWithExpire(vendorKey, 300, vendor);
+
+  Ride.update({ id: rideId }, req.body)
     .then((ride) => res.json(ride))
     .catch((err) => res.status(400)
       .json(err));
