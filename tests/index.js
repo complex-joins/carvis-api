@@ -310,9 +310,9 @@ describe('API server', function () {
 
       it('should update an existing user', function (done) {
         // app.post('/dev/users', hasValidAPIToken, createUser);
-        var apiURL = `http://localhost:${PORT}/users/8`
+        var apiURL = `http://localhost:${PORT}/users/22`
         let body = {
-          email: 'TESTSAREBADMMMMMKAY@gmail.com'
+          email: 'TESTSAREBADMMMMMKAY2@gmail.com' + Math.random()
         };
         fetch(apiURL, {
             method: 'PUT',

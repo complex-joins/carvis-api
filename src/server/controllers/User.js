@@ -19,21 +19,18 @@ export const getUserDashboardData = (req, res) => {
 
 export const updateUserData = (req, res) => {
   let userId = req.params.userid;
-  var user = redisHashGetAll(userId);
-  if (user) {
-    let redisKeyValArray = [];
-    for (let key in user[0]) {
-      redisKeyValArray.push(key);
-      redisKeyValArray.push(user[0][key]);
-    }
-    redisSetHash(userId, redisKeyValArray /*, cb*/ );
-  } else {
-    // update, not updateOrCreate -- so DB update and have DB manage error
-    User.update({ id: userId }, req.body)
-      .then((user) => user.length === 0 ? res.json({}) : res.json(user))
-      .catch((err) => res.status(400)
-        .json(err));
+  let redisKeyValArray = [];
+  let newKeys = Object.keys(req.body);
+  for (let i = 0, len = newKeys.length; i < len; i++) {
+    redisKeyValArray.push(newKeys[i]);
+    redisKeyValArray.push(req.body[newKeys[i]]);
   }
+  console.log('redisKeyValArray', userId, redisKeyValArray);
+  redisSetHash(userId, redisKeyValArray);
+  User.update({ id: userId }, req.body)
+    .then((user) => user.length === 0 ? res.json({}) : res.json(user))
+    .catch((err) => res.status(400)
+      .json(err));
 };
 
 export const createUser = (req, res) => {
