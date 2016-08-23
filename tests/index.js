@@ -8,7 +8,7 @@ const request = require('supertest');
 const server = require('./testServer');
 
 const User = require('../src/server/models/User');
-import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey } from './../src/redis/redisHelperFunctions';
+import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey, redisHashGetOneAsync } from './../src/redis/redisHelperFunctions';
 import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/controllers/Internal';
 
 let currentListeningServer;
@@ -279,6 +279,35 @@ describe('API server', function () {
           })
           .catch(err => console.warn('error fetch', err));
       });
+
+      it('should add a user to redis', function (done) {
+        // app.post('/dev/users', hasValidAPIToken, createUser);
+        var apiURL = `http://localhost:${PORT}/dev/users`
+        let body = {
+          email: 'someuser@gmail.com' + Math.random()
+        };
+        fetch(apiURL, {
+            method: 'POST',
+            headers: {
+              'x-access-token': process.env.CARVIS_API_KEY,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then(data => {
+            console.log(data);
+            redisHashGetOne(data[0].id, 'email', function (res) {
+              expect(res)
+                .to.equal(body.email);
+              done();
+            });
+          })
+          .catch(err => console.warn('error fetch', err));
+      });
+
 
     });
 

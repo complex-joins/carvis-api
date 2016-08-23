@@ -41,14 +41,14 @@ export const createUser = (req, res) => {
   User.create(req.body)
     .then((user) => {
       // add user to redis only after successful DB add
-      let userId = user.id; // Carvis userId
+      let userId = user[0].id; // Carvis userId
+      console.log(user[0]);
       let redisKeyValArray = [];
-      for (let key in req.body) {
+      for (let key in user[0]) {
         redisKeyValArray.push(key);
-        redisKeyValArray.push(req.body.key);
+        redisKeyValArray.push(user[0][key]);
       }
-      redisSetHash(userId, redisKeyValArray /*, cb*/ );
-      // res.json() to return
+      redisSetHash(userId, redisKeyValArray);
       user.length === 0 ? res.json({}) : res.json(user);
     })
     .catch((err) => res.status(400)
@@ -61,7 +61,6 @@ export const getAllUserData = (req, res) => {
     .catch((err) => res.status(400)
       .json(err));
 };
-
 
 // note: if not found in redis, and not in db, it is created in DB, however, on that action we don't also add to Redis (todo?)
 export const findOrCreateUser = (req, res) => {
