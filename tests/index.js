@@ -352,11 +352,11 @@ describe('API server', function () {
           .catch(err => {
             console.warn('error refreshing token', err);
           });
-
       });
 
+      // more tests within Redis.
     });
 
-    // describe ...
+    // describe ... other tests
   });
 });
