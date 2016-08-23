@@ -12,7 +12,7 @@ import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKe
 import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/controllers/Internal';
 
 let currentListeningServer;
-let PORT = 8880;
+let PORT = 8080;
 let testUserId;
 let testCount;
 

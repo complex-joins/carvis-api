@@ -1,4 +1,7 @@
 language: node_js
+cache:
+  directories:
+    - node_modules
 node_js:
 - '6'
 services:
@@ -6,7 +9,7 @@ services:
 install:
 - npm install
 script:
-- npm start
+- npm run build
 - npm test
 deploy:
   provider: elasticbeanstalk
