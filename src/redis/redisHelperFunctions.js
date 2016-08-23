@@ -1,12 +1,9 @@
 import bluebird from 'bluebird'; // promisify everything for async!
 
-// to have Travis test redis, we need fakeredis - bit of a hack.
-const checkTravis = process.env.TRAVIS ? JSON.parse(process.env.TRAVIS) : false;
-const redis = checkTravis ?
-  bluebird.promisifyAll(require('fakeredis')) : bluebird.promisifyAll(require('redis'));
+const redis = bluebird.promisifyAll(require('redis'));
 
 const CARVIS_CACHE_PORT = process.env.CARVIS_CACHE_PORT || 6379;
-const CARVIS_CACHE = process.env.CARVIS_CACHE || '127.0.0.1';
+const CARVIS_CACHE = process.env.CARVIS_CACHE || 'localhost';
 const client = redis.createClient(CARVIS_CACHE_PORT, CARVIS_CACHE);
 
 // this sets the Redis server as an LRU cache with 400MB space.
