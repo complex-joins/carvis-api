@@ -39,7 +39,7 @@ export default function (app) {
 
   app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);
 
-  app.post('/rides/shareETA/:rideid', hasValidAPIToken, shareRideETA);
+  app.post('/rides/shareETA/:userid', hasValidAPIToken, shareRideETA);
 
   app.post('/rides/cancelRide/:userid', hasValidAPIToken, shareRideETA);
 

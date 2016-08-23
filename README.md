@@ -44,6 +44,7 @@ This runs the npm build script, sets up the local server and local redis cache f
 
 All routes require the appropriate API token.
 
+  User routes:
   `app.get('/users/:userid', hasValidAPIToken, getUserDashboardData);`
 
   `app.get('/dev/users', hasValidAPIToken, getAllUserData);`
@@ -60,6 +61,7 @@ All routes require the appropriate API token.
 
   `app.get('/dev/users/raw', hasValidAPIToken, rawUserData);`
 
+  Ride routes:
   `app.get('/dev/rides', hasValidAPIToken, getAllRideData);`
 
   `app.get('/rides/user/:userid', hasValidAPIToken, getRidesForUser);`
@@ -70,19 +72,26 @@ All routes require the appropriate API token.
 
   `app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);`
 
-  `app.post('/rides/shareETA/:rideid', hasValidAPIToken, shareRideETA);`
+  `app.post('/rides/shareETA/:userid', hasValidAPIToken, shareRideETA);`
 
   `app.post('/rides/cancelRide/:userid', hasValidAPIToken, shareRideETA);`
 
+  Alexa routes:
   `app.post('/alexa/launch', alexa.handleLaunch);`
 
   `app.post('/alexa/estimate', alexa.getEstimate);`
 
+  Internal routes:
+  - refresh or obtain the lyft Bearer Token for public API access
   `app.get('/internal/lyftBearerToken', hasValidAPIToken, getLyftToken);`
 
   `app.post('/internal/lyftBearerToken', hasValidAPIToken, updateLyftToken);`
 
+  - create a new developer key - for external API access
   `app.get('/developer/createToken', hasValidAPIToken, createNewDeveloperKey);`
+
+### Public Developer API:
+    - routes to be posted here.
 
 ##Moving Forward
 
