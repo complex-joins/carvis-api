@@ -1,5 +1,5 @@
-import { redisSetKeyWithExpireAsync, redisIncrementKeyValue } from './../../redis/redisHelperFunctions';
-import { uuid } from 'uuid-v4';
+import { redisSetKeyWithExpire, redisIncrementKeyValue } from './../../redis/redisHelperFunctions';
+import uuid from 'uuid-v4';
 
 // the below functions are used to create an API token with limited validity - for external developers.
 
@@ -8,14 +8,11 @@ import { uuid } from 'uuid-v4';
 
 export const createNewDeveloperKey = (req, res) => {
   // generate a unique id for the new key
-  var newKey = uuid();
+  let newKey = uuid();
+  console.log('new dev api key', newKey);
+
   // set a 3 day expiration on the key
-  redisSetKeyWithExpireAsync(newKey, 259200, 0)
-    .then(() => {
-      // return the new key to the client -- this is their API key
-      res.json(newKey);
-    })
-    .catch(err => {
-      console.warn('error setting developer key redis', err);
-    });
+  return redisSetKeyWithExpire(newKey, 259200, 1, token => {
+    res.json(newKey);
+  });
 };

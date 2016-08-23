@@ -8,8 +8,10 @@ const request = require('supertest');
 const server = require('./testServer');
 
 const User = require('../src/server/models/User');
-import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey, redisHashGetOneAsync } from './../src/redis/redisHelperFunctions';
+import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey, redisIncrementKeyValue, redisHashGetOneAsync } from './../src/redis/redisHelperFunctions';
 import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/controllers/Internal';
+import { createNewDeveloperKey } from './../src/server/controllers/DeveloperAPI';
+import hasValidDevAPIToken from './../src/server/server-configuration/hasValidDevAPIToken';
 
 let currentListeningServer;
 let PORT = 8080;
@@ -250,13 +252,21 @@ describe('API server', function () {
       });
 
       // note: could be separated into two tests.
-      it('should update lyftBearerToken, and fetch it', function (done) {
-        // fetch redis key - expect 'veryTrue' (from prev. test)
-        expect(redisGetKey('lyftBearerToken'))
-          .to.equal('veryTrue');
+      it('should update lyftBearerToken', function (done) {
+
         // change lyftBearerToken from 'veryTrue' to 'true'
         let req = { body: { token: "true" } };
         updateLyftToken(req);
+
+        // fetch redis key - expect 'veryTrue' (from prev. test)
+        redisGetKey('lyftBearerToken', function (token) {
+          expect(token)
+            .to.equal('true');
+          done();
+        });
+      });
+
+      it('should fetch the lyftBearerToken', function (done) {
         // fetch that token via the endpoint
         var apiURL = `http://localhost:${PORT}/internal/lyftBearerToken`
         fetch(apiURL, {
@@ -326,7 +336,7 @@ describe('API server', function () {
             return res.json();
           })
           .then(data => {
-            console.log(data);
+            console.log('success update user', data);
             // fetch the existing user, find new random email (in Redis)
             redisHashGetOne(data[0].id, 'email', function (res) {
               expect(res)
@@ -366,8 +376,48 @@ describe('API server', function () {
             console.warn('error refreshing token', err);
           });
       });
-
       // more tests within Redis.
+    });
+
+    describe('Test Developer API', function () {
+      it('should create a new key', function (done) {
+        var apiURL = `http://localhost:${PORT}/developer/createToken`
+
+        // get a new developer API key
+        fetch(apiURL, {
+            method: 'GET',
+            headers: {
+              'x-access-token': process.env.CARVIS_API_KEY,
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then(data => {
+            console.log('success create new dev key', data);
+            // test for proper uuid-v4, which is 36 length
+            expect(data)
+              .to.have.length.above(35);
+            redisGetKey(data, function (token) {
+              expect(token)
+                .to.be.above(0);
+              done();
+            });
+          })
+          .catch(err => console.warn('error fetch', err));
+      });
+
+      // it('should validate using that new key', function (done) {
+      //   // TODO:
+      //   done();
+      // });
+      //
+      // it('should increment key value when using DeveloperAPI', function (done) {
+      //   // TODO:
+      //   done();
+      // });
+
     });
 
     // describe ... other tests

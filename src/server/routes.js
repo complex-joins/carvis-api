@@ -17,13 +17,15 @@ export default function (app) {
       .send('Welcome to the Carvis API.');
   });
 
-  app.get('/users/:userid', hasValidAPIToken, getUserDashboardData);
-
   app.get('/dev/users', hasValidAPIToken, getAllUserData);
 
   app.post('/dev/users', hasValidAPIToken, createUser);
 
+  app.get('/dev/users/raw', hasValidAPIToken, rawUserData);
+
   app.post('/auth/users', hasValidAPIToken, findOrCreateUser);
+
+  app.get('/users/:userid', hasValidAPIToken, getUserDashboardData);
 
   app.post('/users/updateOrCreate', hasValidAPIToken, updateOrCreateUser);
 
@@ -46,15 +48,14 @@ export default function (app) {
   app.post('/alexa/estimate', alexa.getEstimate);
 
   app.get('/internal/lyftBearerToken', hasValidAPIToken, getLyftToken);
-  app.post('/internal/lyftBearerToken', hasValidAPIToken, updateLyftToken);
 
-  app.get('developer/createToken', hasValidDevAPIToken, createNewDeveloperKey);
-  // add dev routes for popular methods
+  app.post('/internal/lyftBearerToken', hasValidAPIToken, updateLyftToken);
 
   // app.post('/signin', requireSignin, Authentication.signin);
   // app.post('/signup', Authentication.signup);
 
-  app.get('/dev/users/raw', hasValidAPIToken, rawUserData);
-
-
+  app.get('/developer/createToken', hasValidAPIToken, createNewDeveloperKey);
+  // app.post('developer/lyftPhoneAuth', hasValidDevAPIToken, /*phoneAuth*/ );
+  // app.post('developer/lyftPhoneCodeAuth', hasValidDevAPIToken, /*phoneAuth*/ );
+  // TODO: add dev routes for popular methods
 }
