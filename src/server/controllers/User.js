@@ -19,13 +19,12 @@ export const getUserDashboardData = (req, res) => {
 
 export const updateUserData = (req, res) => {
   let userId = req.params.userid;
-  var user = redisHashGetAll(userId /*, cb*/ );
-
+  var user = redisHashGetAll(userId);
   if (user) {
     let redisKeyValArray = [];
-    for (let key in req.body) {
+    for (let key in user[0]) {
       redisKeyValArray.push(key);
-      redisKeyValArray.push(req.body.key);
+      redisKeyValArray.push(user[0][key]);
     }
     redisSetHash(userId, redisKeyValArray /*, cb*/ );
   } else {

@@ -308,6 +308,33 @@ describe('API server', function () {
           .catch(err => console.warn('error fetch', err));
       });
 
+      it('should update an existing user', function (done) {
+        // app.post('/dev/users', hasValidAPIToken, createUser);
+        var apiURL = `http://localhost:${PORT}/users/8`
+        let body = {
+          email: 'TESTSAREBADMMMMMKAY@gmail.com'
+        };
+        fetch(apiURL, {
+            method: 'PUT',
+            headers: {
+              'x-access-token': process.env.CARVIS_API_KEY,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then(data => {
+            console.log(data);
+            redisHashGetOne(data[0].id, 'email', function (res) {
+              expect(res)
+                .to.equal(body.email);
+              done();
+            });
+          })
+          .catch(err => console.warn('error fetch', err));
+      });
 
     });
 
