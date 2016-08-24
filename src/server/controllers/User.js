@@ -1,6 +1,7 @@
 import { User } from '../models/User';
 import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey } from './../../redis/redisHelperFunctions';
 import _ from 'lodash';
+
 export const getUserDashboardData = (req, res) => {
   let userId = req.params.userid;
   var user = redisHashGetAll(userId /*, cb*/ );
