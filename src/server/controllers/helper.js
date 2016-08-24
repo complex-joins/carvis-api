@@ -81,5 +81,5 @@ export const uberLogin = (req, res) => {
 export const testKey = (req, res) => {
   let count = req.body.count;
   console.log('another one', count);
-  // res.json({ message: 'another one' + count });
+  res.json({ message: 'another one' + count });
 };

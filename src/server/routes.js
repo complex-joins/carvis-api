@@ -9,7 +9,7 @@ import Authentication from './controllers/authentication';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 import hasValidDevAPIToken from './server-configuration/hasValidDevAPIToken';
 import { handleLaunch, AlexaGetEstimate } from './controllers/alexa';
-import { lyftPhoneAuth, lyftPhoneCodeAuth, uberLogin, testKey } from './controllers/helper';
+import { lyftPhoneAuth, lyftPhoneCodeAuth, uberLogin, testKey, getEstimate, placesCall, addRideAsync } from './controllers/helper';
 
 export default function (app) {
   // TODO: only let the user with that ID find users (middleware);
@@ -35,6 +35,15 @@ export default function (app) {
   app.post('/rides/shareETA/:userid', hasValidAPIToken, shareRideETA);
   app.post('/rides/cancelRide/:userid', hasValidAPIToken, shareRideETA);
 
+  // ===== addRide, getEstimate and placesCall web routes ===== //
+
+  // // getEstimate - web
+  app.post('/web/estimate', hasValidAPIToken, getEstimate);
+  // // placesCall - web
+  app.post('/web/places', hasValidAPIToken, placesCall);
+  // // addRide - on web invoked via a button, not in flow from getEstimate
+  addRide app.post('/web/addRide', hasValidAPIToken, addRideAsync);
+
   // ===== alexa routes ===== //
   app.post('/alexa/launch', handleLaunch);
   app.post('/alexa/estimate', AlexaGetEstimate);
@@ -56,14 +65,17 @@ export default function (app) {
   // ===== developer api routes ===== //
   // external developer tokens
   app.get('/developer/createToken', hasValidAPIToken, createNewDeveloperKey);
+  // route used for testing dev keys - will increment the usage and log count
+  app.post('/developer/testMyKey', hasValidDevAPIToken, testKey);
   // routes that enable external devs to incorporate uber/lyft login into their apps (creates relevant records in our database)
   app.post('/developer/lyftPhoneAuth', hasValidDevAPIToken, lyftPhoneAuth);
   app.post('/developer/lyftPhoneCodeAuth', hasValidDevAPIToken, lyftPhoneCodeAuth);
   app.post('/developer/uberLogin', hasValidDevAPIToken, uberLogin);
-  app.post('/developer/testMyKey', hasValidDevAPIToken, testKey);
+  // getEstimate app.post('/developer/estimate', hasValidDevAPIToken, getEstimate);
+  // note: could even require third parties to supply their own API key...
+  // placesCall app.post('/developer/places', hasValidDevAPIToken, placesCall)
+  // addRide app.post('/rides', hasValidAPIToken, addRideAsync);
+
   // more routes
-
-
-
   // ===== ... the end ... ===== //
 }
