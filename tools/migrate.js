@@ -7,5 +7,6 @@ let tables = [
   {name: 'users', schema: UserSchema}
 ];
 
+
 db.migrate(tables)
 .then(() => console.log('migration complete'));
