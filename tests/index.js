@@ -330,7 +330,7 @@ describe('API server', function () {
       });
 
       it('should update a user and find the update in Redis', function (done) {
-        var apiURL = `http://localhost:${PORT}/users/22`
+        var apiURL = `http://localhost:${PORT}/users/1`
         let body = {
           email: 'TESTSAREBADMMMMMKAY2@gmail.com' + Math.random()
         };
@@ -436,6 +436,15 @@ describe('API server', function () {
 
     });
     // TODO: integration tests for Ride.js and Redis / DB associated.
+
+    describe('places-redis tests', function () {
+      it('should not query places if redis has a hash with the query name', function (done) {
+
+        // TODO:
+
+        done();
+      });
+    });
 
     // describe ... other tests
   });
