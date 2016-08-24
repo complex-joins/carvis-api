@@ -31,8 +31,15 @@ export const findOrCreateUser = (req, res) => {
 };
 
 export const updateOrCreateUser = (req, res) => {
-  let firstParam = Object.keys(req.body)[0];
-  User.updateOrCreate({[firstParam]: req.body[firstParam]}, req.body)
+  const uniqueFields = ['email', 'uberEmail', 'lyftPhoneNumber', 'alexaUserId', 'id'];
+  const findObj = _(uniqueFields).reduce((findObj, val, key) => {
+    if (uniqueFields.indexOf(key) >= 0 && findObj[key] !== null) {
+      findObj[key] = val;
+    }
+    return findObj;
+  }, {});
+  
+  User.updateOrCreate(findObj)
   .then((user) => {
     return user.length === 0 ? res.json({}) : res.json(User.decryptModel(user[0]));
   })
