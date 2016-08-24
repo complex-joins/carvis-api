@@ -25,10 +25,10 @@ export const getLyftToken = (req, res) => {
     if (token) {
       res.json(token);
     } else {
-      // wait a reasonable amount of time to query redis again for the token
-      setTimeout(getLyftToken, 500);
       // call the helper API to query Lyft for a token
       refreshToken();
+      // wait a reasonable amount of time to query redis again for the token
+      return setTimeout(getLyftToken, 500);
     }
   });
 };

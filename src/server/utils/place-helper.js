@@ -14,10 +14,10 @@ export const placesCall = (place, cb, nearbyLoc) => {
   let url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${place}&location=${loc}&radius=${radius}&key=${key}`;
 
   fetch(url)
-    .then(function (res) {
+    .then(res => {
       return res.json();
     })
-    .then(function (data) {
+    .then(data => {
       // if no predictions found, break out
       if (!data.predictions.length) {
         cb(null, null);

@@ -1,4 +1,4 @@
-const _ = require('lodash');
+const _ = require('lodash'); // used for _.filter
 import { formatAnswer, getEstimate, addRide } from '../utils/ride-helper';
 import { placesCall } from './../utils/place-helper';
 
@@ -29,14 +29,14 @@ export const AlexaGetEstimate = (req, res) => {
   let mode = (fakeoutMode) ? 'cheapest' : slots.MODE.value; // cheapest or fastest
 
   // find the ORIGIN slot that is populated in this request, if any
-  let originArray = _.filter(slots, function (slotValue, slotKey) {
+  let originArray = _.filter(slots, (slotValue, slotKey) => {
     return (slotValue.value && slotValue.value.length > 0 && slotKey.includes('ORIGIN'));
   });
   let origin = (originArray.length) ? { query: originArray[0].value } : null;
   console.log('Alexa thinks the origin passed in is', origin);
 
   // find the DESTINATION slot that is populated in this request
-  let destinationSlots = _.filter(slots, function (slotValue, slotKey) {
+  let destinationSlots = _.filter(slots, (slotValue, slotKey) => {
     return (slotValue.value && slotValue.value.length > 0 && slotKey.includes('DESTINATION'));
   });
   let destination = (destinationSlots.length) ? { query: destinationSlots[0].value } :
