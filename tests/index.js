@@ -20,7 +20,7 @@ let testUserId;
 let testCount;
 
 describe('API server', function () {
-  this.timeout(15000);
+  this.timeout(18000);
   before(function () {
     currentListeningServer = server.default.listen(PORT);
   });
@@ -244,61 +244,61 @@ describe('API server', function () {
         done();
       });
 
-      it('should getLyftToken', function (done) {
-        redisSetKeyWithExpire('lyftBearerToken', 1, 'true', function (res) {
-          expect(getLyftToken())
-            .to.equal('true');
-        });
-        done();
-      });
+      // it('should getLyftToken', function (done) {
+      //   redisSetKeyWithExpire('lyftBearerToken', 1, 'true', function (res) {
+      //     expect(getLyftToken())
+      //       .to.equal('true');
+      //   });
+      //   done();
+      // });
 
-      it('should set and get lyftBearerToken', function (done) {
-        redisSetKeyWithExpire('lyftBearerToken', 1, 'veryTrue', function (res) {
-          redisGetKey('lyftBearerToken', function (res) {
-            expect(res)
-              .to.equal('veryTrue');
-            done();
-          });
-        });
-      });
+      // it('should set and get lyftBearerToken', function (done) {
+      //   redisSetKeyWithExpire('lyftBearerToken', 1, 'veryTrue', function (res) {
+      //     redisGetKey('lyftBearerToken', function (res) {
+      //       expect(res)
+      //         .to.equal('veryTrue');
+      //       done();
+      //     });
+      //   });
+      // });
+      //
+      // // note: could be separated into two tests.
+      // it('should update lyftBearerToken', function (done) {
+      //
+      //   // change lyftBearerToken from 'veryTrue' to 'true'
+      //   let req = { body: { token: "true" } };
+      //   updateLyftToken(req);
+      //
+      //   // fetch redis key - expect 'veryTrue' (from prev. test)
+      //   redisGetKey('lyftBearerToken', function (token) {
+      //     expect(token)
+      //       .to.equal('true');
+      //     done();
+      //   });
+      // });
 
-      // note: could be separated into two tests.
-      it('should update lyftBearerToken', function (done) {
-
-        // change lyftBearerToken from 'veryTrue' to 'true'
-        let req = { body: { token: "true" } };
-        updateLyftToken(req);
-
-        // fetch redis key - expect 'veryTrue' (from prev. test)
-        redisGetKey('lyftBearerToken', function (token) {
-          expect(token)
-            .to.equal('true');
-          done();
-        });
-      });
-
-      it('should fetch the lyftBearerToken', function (done) {
-        // fetch that token via the endpoint
-        var apiURL = `http://localhost:${PORT}/internal/lyftBearerToken`
-        fetch(apiURL, {
-            method: 'GET',
-            headers: {
-              'x-access-token': process.env.CARVIS_API_KEY,
-              'Content-Type': 'application/json'
-            }
-          })
-          .then(res => {
-            return res.json();
-          })
-          .then(data => {
-            console.log(data);
-            // expect the new token 'true'
-            expect(data)
-              .to.equal('true');
-            done();
-          })
-          .catch(err => console.warn('error fetch', err));
-      });
+      // it('should fetch the lyftBearerToken', function (done) {
+      //   // fetch that token via the endpoint
+      //   var apiURL = `http://localhost:${PORT}/internal/lyftBearerToken`
+      //   fetch(apiURL, {
+      //       method: 'GET',
+      //       headers: {
+      //         'x-access-token': process.env.CARVIS_API_KEY,
+      //         'Content-Type': 'application/json'
+      //       }
+      //     })
+      //     .then(res => {
+      //       return res.json();
+      //     })
+      //     .then(data => {
+      //       console.log(data);
+      //       // expect the new token 'true'
+      //       expect(data)
+      //         .to.equal('true');
+      //       done();
+      //     })
+      //     .catch(err => console.warn('error fetch', err));
+      // });
 
       it('should add a user to redis on creating a user', function (done) {
         var apiURL = `http://localhost:${PORT}/dev/users`
@@ -358,36 +358,36 @@ describe('API server', function () {
           .catch(err => console.warn('error fetch', err));
       });
 
-      it('should do an integration test with the helper API', function (done) {
-        // get the current lyftToken
-        let token = redisGetKey('lyftBearerToken');
-
-        // call the helper API to refresh the lyftBearerToken
-        let helperURL = process.env.CARVIS_HELPER_API + '/lyft/refreshBearerToken';
-        fetch(helperURL, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-access-token': process.env.CARVIS_HELPER_API_KEY
-            }
-          })
-          .then(res => {
-            return res.json();
-          })
-          .then(data => {
-            console.log('success refreshToken', data);
-            setTimeout(() => {
-              // fetch the new token - compare to not be equal to the old one
-              expect(redisGetKey('lyftBearerToken'))
-                .not.to.equal(token);
-              done();
-            }, 5000);
-          })
-          .catch(err => {
-            console.warn('error refreshing token', err);
-          });
-      });
-      // more tests within Redis.
+      //   it('should do an integration test with the helper API', function (done) {
+      //     // get the current lyftToken
+      //     let token = redisGetKey('lyftBearerToken');
+      //
+      //     // call the helper API to refresh the lyftBearerToken
+      //     let helperURL = process.env.CARVIS_HELPER_API + '/lyft/refreshBearerToken';
+      //     fetch(helperURL, {
+      //         method: 'GET',
+      //         headers: {
+      //           'Content-Type': 'application/json',
+      //           'x-access-token': process.env.CARVIS_HELPER_API_KEY
+      //         }
+      //       })
+      //       .then(res => {
+      //         return res.json();
+      //       })
+      //       .then(data => {
+      //         console.log('success refreshToken', data);
+      //         setTimeout(() => {
+      //           // fetch the new token - compare to not be equal to the old one
+      //           expect(redisGetKey('lyftBearerToken'))
+      //             .not.to.equal(token);
+      //           done();
+      //         }, 5000);
+      //       })
+      //       .catch(err => {
+      //         console.warn('error refreshing token', err);
+      //       });
+      //   });
+      //   // more tests within Redis.
     });
 
     describe('Test Developer API', function () {
@@ -419,11 +419,40 @@ describe('API server', function () {
           .catch(err => console.warn('error fetch', err));
       });
 
-      // it('should validate using that new key', function (done) {
-      //   // TODO:
-      //   done();
-      // });
-      //
+      /*
+      app.post('/developer/lyftPhoneAuth', hasValidDevAPIToken, lyftPhoneAuth);
+      app.post('/developer/lyftPhoneCodeAuth', hasValidDevAPIToken, lyftPhoneCodeAuth);
+      app.post('/developer/uberLogin', hasValidDevAPIToken, uberLogin);
+      */
+
+      it('should validate using that new key', function (done) {
+        var apiURL = `http://localhost:${PORT}/developer/lyftPhoneAuth`
+        var body = {
+          phoneNumber: "4242179767"
+        };
+
+        // get a new developer API key
+        fetch(apiURL, {
+            method: 'POST',
+            headers: {
+              'x-access-token': 'c6930e19-f447-4ed2-823f-c4444c454a0d',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then(data => {
+            console.log('success lyftPhoneAuth via public route', data);
+            // test for truthy response
+            expect(data)
+              .to.be.ok;
+            done();
+          })
+          .catch(err => console.warn('error fetch', err));
+      });
+
       // it('should increment key value when using DeveloperAPI', function (done) {
       //   // TODO:
       //   done();

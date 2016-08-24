@@ -1,3 +1,7 @@
+const CARVIS_HELPER_API = process.env.CARVIS_HELPER_API;
+const CARVIS_HELPER_API_KEY = process.env.CARVIS_HELPER_API_KEY;
+import fetch from 'node-fetch';
+
 export const lyftPhoneAuth = (req, res) => {
   let phoneNumber = req.body.phoneNumber;
   console.log('phone number is ', phoneNumber);
@@ -17,12 +21,11 @@ export const lyftPhoneAuth = (req, res) => {
     })
     .then(function (data) {
       console.log('success lyft phone auth', data);
+      res.json({ message: 'on its way' });
     })
     .catch(function (err) {
       console.warn('err lyft phone auth', err);
     });
-
-  res.json({ message: 'on its way' });
 };
 
 export const lyftPhoneCodeAuth = (req, res) => {
@@ -45,12 +48,11 @@ export const lyftPhoneCodeAuth = (req, res) => {
     })
     .then(function (data) {
       console.log('success lyft phone code auth', data);
+      res.json({ message: 'yes!' });
     })
     .catch(function (err) {
       console.warn('err lyft phone code auth', err);
     });
-
-  res.json({ message: 'yes!' });
 };
 
 export const uberLogin = (req, res) => {
@@ -69,10 +71,9 @@ export const uberLogin = (req, res) => {
     })
     .then(function (data) {
       console.log('success uber login', data);
+      res.json({ message: 'on its way' });
     })
     .catch(function (err) {
       console.warn('err uber login', err);
     });
-
-  res.json({ message: 'on its way' });
 };
