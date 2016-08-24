@@ -8,7 +8,7 @@ import { createNewDeveloperKey } from './controllers/DeveloperAPI';
 import Authentication from './controllers/authentication';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 import hasValidDevAPIToken from './server-configuration/hasValidDevAPIToken';
-import { handleLaunch, AlexaGetEstimate } from './controllers/alexa';
+import { handleLaunch, AlexaGetEstimate, cancelRide } from './controllers/alexa';
 
 export default function (app) {
   // TODO only let the user with that ID find users (middleware);
@@ -47,7 +47,7 @@ export default function (app) {
 
   app.post('/alexa/estimate', AlexaGetEstimate);
 
-  app.post('/alexa/cancelRide', alexa.cancelRide);
+  app.post('/alexa/cancelRide', cancelRide);
 
 
   // app.post('/signin', requireSignin, Authentication.signin);

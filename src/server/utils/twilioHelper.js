@@ -1,5 +1,13 @@
-const TWILIO_SID = process.env.TWILIO_CREDENTIALS_OBJ_ACCOUNTSID;
-const TWILIO_TOKEN = process.env.TWILIO_CREDENTIALS_OBJ_AUTHTOKEN;
+let TWILIO_SID, TWILIO_TOKEN;
+
+if (process.env.PROD) {
+  TWILIO_SID = process.env.TWILIO_CREDENTIALS_OBJ_ACCOUNTSID;
+  TWILIO_TOKEN = process.env.TWILIO_CREDENTIALS_OBJ_AUTHTOKEN;
+} else {
+  let twilioCreds = JSON.parse(process.env.TWILIO_CREDENTIALS_OBJ_JSON);
+  TWILIO_SID = twilioCreds.accountSid;
+  TWILIO_TOKEN = twilioCreds.authToken;
+}
 const client = require('twilio')(TWILIO_SID, TWILIO_TOKEN);
 
 // NOTE: Twilio will only work with approved numbers on the free trial account, for now Chris' number is approved.
