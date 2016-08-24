@@ -1,5 +1,6 @@
 const _ = require('lodash');
-import { placesCall, formatAnswer, getEstimate, addRide } from '../utils/ride-helper';
+import { formatAnswer, getEstimate, addRide } from '../utils/ride-helper';
+import { placesCall } from './../utils/place-helper';
 
 const fakeoutMode = JSON.parse(process.env.FAKEOUT) || false; // when true, CARVIS will tell you about taxi fares, not uber and lyft estimates
 const config = {};

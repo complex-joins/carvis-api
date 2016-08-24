@@ -1,7 +1,4 @@
-const _ = require('lodash');
 const fetch = require('node-fetch');
-fetch.Promise = require('bluebird');
-export const placesCall = require('./place-helper'); // invoked as placesCall();
 
 // exporting only for testing. TODO: change hardcoded to dynamic.
 export const getLyftBearerToken = (cb) => {
