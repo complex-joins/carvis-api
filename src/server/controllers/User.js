@@ -72,7 +72,7 @@ export const findOrCreateUser = (req, res) => {
   }
 };
 
-// todo - redis.
+// TODO - redis.
 export const updateOrCreateUser = (req, res) => {
   let firstParam = Object.keys(req.body)[0];
   User.updateOrCreate({

@@ -18,9 +18,10 @@ let currentListeningServer;
 let PORT = 8080;
 let testUserId;
 let testCount;
+let keyObj = {};
 
 describe('API server', function () {
-  this.timeout(15000);
+  this.timeout(18000);
   before(function () {
     currentListeningServer = server.default.listen(PORT);
   });
@@ -330,7 +331,7 @@ describe('API server', function () {
       });
 
       it('should update a user and find the update in Redis', function (done) {
-        var apiURL = `http://localhost:${PORT}/users/22`
+        var apiURL = `http://localhost:${PORT}/users/1`
         let body = {
           email: 'TESTSAREBADMMMMMKAY2@gmail.com' + Math.random()
         };
@@ -358,41 +359,42 @@ describe('API server', function () {
           .catch(err => console.warn('error fetch', err));
       });
 
-      it('should do an integration test with the helper API', function (done) {
-        // get the current lyftToken
-        let token = redisGetKey('lyftBearerToken');
-
-        // call the helper API to refresh the lyftBearerToken
-        let helperURL = process.env.CARVIS_HELPER_API + '/lyft/refreshBearerToken';
-        fetch(helperURL, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-access-token': process.env.CARVIS_HELPER_API_KEY
-            }
-          })
-          .then(res => {
-            return res.json();
-          })
-          .then(data => {
-            console.log('success refreshToken', data);
-            setTimeout(() => {
-              // fetch the new token - compare to not be equal to the old one
-              expect(redisGetKey('lyftBearerToken'))
-                .not.to.equal(token);
-              done();
-            }, 5000);
-          })
-          .catch(err => {
-            console.warn('error refreshing token', err);
-          });
-      });
-      // more tests within Redis.
+      // NOTE: commented out whilst deployed carvis-api is down.
+      //   it('should do an integration test with the helper API', function (done) {
+      //     // get the current lyftToken
+      //     let token = redisGetKey('lyftBearerToken');
+      //
+      //     // call the helper API to refresh the lyftBearerToken
+      //     let helperURL = process.env.CARVIS_HELPER_API + '/lyft/refreshBearerToken';
+      //     fetch(helperURL, {
+      //         method: 'GET',
+      //         headers: {
+      //           'Content-Type': 'application/json',
+      //           'x-access-token': process.env.CARVIS_HELPER_API_KEY
+      //         }
+      //       })
+      //       .then(res => {
+      //         return res.json();
+      //       })
+      //       .then(data => {
+      //         console.log('success refreshToken', data);
+      //         setTimeout(() => {
+      //           // fetch the new token - compare to not be equal to the old one
+      //           expect(redisGetKey('lyftBearerToken'))
+      //             .not.to.equal(token);
+      //           done();
+      //         }, 5000);
+      //       })
+      //       .catch(err => {
+      //         console.warn('error refreshing token', err);
+      //       });
+      //   });
+      //   // more tests within Redis.
     });
 
     describe('Test Developer API', function () {
       it('should create a new key', function (done) {
-        var apiURL = `http://localhost:${PORT}/developer/createToken`
+        let apiURL = `http://localhost:${PORT}/developer/createToken`
 
         // get a new developer API key
         fetch(apiURL, {
@@ -407,6 +409,7 @@ describe('API server', function () {
           })
           .then(data => {
             console.log('success create new dev key', data);
+            keyObj.devKey = data;
             // test for proper uuid-v4, which is 36 length
             expect(data)
               .to.have.length.above(35);
@@ -419,24 +422,120 @@ describe('API server', function () {
           .catch(err => console.warn('error fetch', err));
       });
 
-      // it('should validate using that new key', function (done) {
-      //   // TODO:
-      //   done();
-      // });
-      //
+      it('should validate using that new key', function (done) {
+        let apiURL = `http://localhost:${PORT}/developer/testMyKey`
+        let body = {
+          count: 1
+        };
+
+        // get a new developer API key
+        fetch(apiURL, {
+            method: 'POST',
+            headers: {
+              'x-access-token': 'c6930e19-f447-4ed2-823f-c4444c454a0d',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then(data => {
+            console.log('success public route test', data);
+            // test for truthy response
+            expect(data)
+              .to.be.ok;
+            done();
+          })
+          .catch(err => console.warn('error public route test', err));
+      });
+
+      it('should return 404 if key used >99 times', function (done) {
+        let token = keyObj.devKey;
+        let apiURL = `http://localhost:${PORT}/developer/testMyKey`
+          // increment the key value 100 times
+        for (let i = 0; i < 100; i++) {
+          redisIncrementKeyValue(token);
+        }
+        let body = {
+          count: 1
+        };
+
+        // note: these don't return in order - sometimes the 99th fetch returns before the 98th fetch, and so the 98th fetch might have the higher redis/key usage rate - so comparison with i won't work.
+        // if one does rapid requests (machine time) redis will update fast enough to notice the rate limit between 100-200 requests, but not instantly when 100 requests is reached.
+        fetch(apiURL, {
+            method: 'POST',
+            headers: {
+              'x-access-token': token,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then(data => {
+            console.log('success rate limit test', data.message);
+            if (data.message === 'API key over rate limit, request new key') {
+              done();
+            } else {
+              // test for truthy response
+              expect(data)
+                .to.be.ok;
+              let err = 'RATE LIMITING NOT WORKING!';
+              done(err);
+            }
+          })
+          .catch(err => console.warn('error fetch', err));
+      });
+
+      // NOTE: this test runs, and passes, but is live (sends actual SMS from Lyft to your phoneNumber) - so commented out for now.
+
       // it('should increment key value when using DeveloperAPI', function (done) {
-      //   // TODO:
-      //   done();
+      //   let token = 'c6930e19-f447-4ed2-823f-c4444c454a0d';
+      //   let oldVal = redisGetKey(token);
+      //
+      //   let apiURL = `http://localhost:${PORT}/developer/lyftPhoneAuth`
+      //   let body = {
+      //     phoneNumber: "4242179767"
+      //   };
+      //
+      //   // post to the internal route, which routes to the helper API
+      //   fetch(apiURL, {
+      //       method: 'POST',
+      //       headers: {
+      //         'x-access-token': 'c6930e19-f447-4ed2-823f-c4444c454a0d',
+      //         'Content-Type': 'application/json'
+      //       },
+      //       body: JSON.stringify(body)
+      //     })
+      //     .then(res => {
+      //       return res.json();
+      //     })
+      //     .then(data => {
+      //       console.log('success lyftPhoneAuth via public route', data);
+      //       // test for truthy response
+      //       expect(data)
+      //         .to.be.ok;
+      //       redisGetKey(token, (newVal) => {
+      //         expect(newVal)
+      //           .to.be.above(oldVal);
+      //         done();
+      //       });
+      //     })
+      //     .catch(err => console.warn('error fetch', err));
       // });
 
-      // it('should return 404 if key used >99 times', function (done) {
-      //   // TODO:
-      //   done();
-      // });
+      // note: integration testing for app.post('/developer/lyftPhoneCodeAuth', hasValidDevAPIToken, lyftPhoneCodeAuth); not possible - as the code is sent by Lyft to the phoneNumber via SMS (and the phoneNumber has to be registered with them, so we can't use a Twilio number).
 
+      /*
+      app.post('/developer/uberLogin', hasValidDevAPIToken, uberLogin);
+      note: to test this we need to add uberlogin credentials to process.env.
+      */
+
+      // more tests.
     });
     // TODO: integration tests for Ride.js and Redis / DB associated.
-
     // describe ... other tests
   });
 });
