@@ -1,6 +1,6 @@
-import db from '../src/db/db';
-import {UserSchema} from '../src/server/models/User';
-import {RideSchema} from '../src/server/models/Ride';
+import db from '../dist/db/db';
+import {UserSchema} from '../dist/server/models/User';
+import {RideSchema} from '../dist/server/models/Ride';
 
 let tables = [
   {name: 'rides', schema: RideSchema},
@@ -8,4 +8,5 @@ let tables = [
 ];
 
 db.migrate(tables)
-.then(() => console.log('migration complete'));
+.then(() => console.log('migration complete'))
+.then(() => db.endConnection());
