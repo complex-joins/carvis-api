@@ -437,15 +437,6 @@ describe('API server', function () {
     });
     // TODO: integration tests for Ride.js and Redis / DB associated.
 
-    describe('places-redis tests', function () {
-      it('should not query places if redis has a hash with the query name', function (done) {
-
-        // TODO:
-
-        done();
-      });
-    });
-
     // describe ... other tests
   });
 });
