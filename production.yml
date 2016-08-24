@@ -1,0 +1,41 @@
+version: '2'
+services:
+  api:
+    image: carvis/carvis-api
+    cpu_shares: 100
+    mem_limit: 524288000
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
+      - FAKEOUT=false
+      - UBER_SERVER_TOKEN=iDAwPvrN5ISJe0WBfD45rrokOpK3jn4VByYBwsaH
+      - GOOGLE_PLACES_API_KEY=AIzaSyCz49m3id4D1GBMN5LoS57JxBdBWlGn5H4
+      - LYFT_BEARER_TOKEN=gAAAAABXtK0EcJsJjIijdYGbeOOBy1UidURwsJ
+      - LYFT_USER_ID=Wy873c35KYq1:UDTaVXmmbdfFLi4d0str_CGVHN7KDJcf
+      - TWILIO_CREDENTIALS_OBJ_ACCOUNTSID=AC16fb446cd62ee243b35c8decf6516933
+      - TWILIO_CREDENTIALS_OBJ_AUTHTOKEN=9386f7d23c425914a17f3affcab00a32
+      - USER_ENCRYPT=j457ksn5a
+      - PROD=true
+    ports:
+      - "80:8080"
+    links:
+      - pg
+      - helper
+      - redis
+  helper:
+    image: carvis/carvis-helper
+    cpu_shares: 100
+    mem_limit: 524288000
+    ports:
+      - "8888:8888"
+  pg:
+    image: postgres
+    cpu_shares: 100
+    mem_limit: 524288000
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
+  redis:
+    image: redis
+    cpu_shares: 100
+    mem_limit: 524288000

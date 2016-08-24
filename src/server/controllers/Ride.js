@@ -5,7 +5,7 @@ import fetch from 'node-fetch';
 
 const CARVIS_API = process.env.CARVIS_API_IP;
 const CARVIS_API_KEY = process.env.CARVIS_API_KEY;
-const CARVIS_HELPER_API = process.env.CARVIS_HELPER_IP;
+const CARVIS_HELPER_API = process.env.HELPER_PORT;
 const CARVIS_HELPER_API_KEY = process.env.CARVIS_HELPER_API_KEY;
 
 export const addRide = function (req, res) {
