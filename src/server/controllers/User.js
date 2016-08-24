@@ -54,9 +54,12 @@ export const createUser = (req, res) => {
 
 export const getAllUserData = (req, res) => {
   User.findAll()
-    .then((users) => users.length === 0 ? res.json({}) : res.json(User.decryptCollection(users)))
-    .catch((err) => res.status(400)
-      .json(err));
+    .then((users) => {
+      console.log('get all users');
+      console.log('test', User);
+      return users.length === 0 ? res.json({}) : res.json(User.decryptCollection(users));
+    })
+    .catch((err) => res.status(400).json(err));
 };
 
 // note: if not found in redis, and not in db, it is created in DB, however, on that action we don't also add to Redis (todo?)

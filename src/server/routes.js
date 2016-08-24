@@ -5,7 +5,7 @@ import { createNewDeveloperKey } from './controllers/DeveloperAPI';
 
 // import passport from 'passport';
 // import passportService from './services/passport';
-import Authentication from './controllers/authentication';
+// import Authentication from './controllers/authentication';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 import hasValidDevAPIToken from './server-configuration/hasValidDevAPIToken';
 import { handleLaunch, AlexaGetEstimate, cancelRide } from './controllers/alexa';
@@ -42,7 +42,7 @@ export default function (app) {
   app.post('/rides/shareETA/:userid', hasValidAPIToken, shareRideETA);
 
   app.post('/rides/cancelRide/:userid', hasValidAPIToken, shareRideETA);
-
+  //
   app.post('/alexa/launch', handleLaunch);
 
   app.post('/alexa/estimate', AlexaGetEstimate);
@@ -62,5 +62,5 @@ export default function (app) {
   app.get('/developer/createToken', hasValidAPIToken, createNewDeveloperKey);
   // app.post('developer/lyftPhoneAuth', hasValidDevAPIToken, /*phoneAuth*/ );
   // app.post('developer/lyftPhoneCodeAuth', hasValidDevAPIToken, /*phoneAuth*/ );
-  // TODO: add dev routes for popular methods
+  // : add dev routes for popular methods
 }

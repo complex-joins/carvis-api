@@ -15,6 +15,7 @@
     "deploy": "npm run docker:deploy; eb deploy",
     "migrate": "node _tools/migrate.js",
     "test": "mocha --compilers js:babel-core/register ./tests/index.js",
+    "start:dev": "npm run build:server -- -w & npm run build:db -- -w & npm run build:redis -- -w & npm run build:tools -- -w & nodemon -L ./dist/server/index.js",
     "start": "npm run build; node ./dist/server/index.js"
   },
   "repository": {
@@ -56,7 +57,7 @@
     "pg": "^6.1.0",
     "redis": "^2.6.2",
     "shelljs": "^0.7.3",
-    "storkSQL": "^0.1.27",
+    "storkSQL": "^0.1.28",
     "twilio": "^2.9.2",
     "uuid-v4": "^0.1.0"
   },

@@ -23,8 +23,8 @@ export const getLyftBearerToken = (cb) => {
 };
 
 
-const lyftToken = getLyftBearerToken();
-const uberToken = process.env.UBER_SERVER_TOKEN;
+// const lyftToken = getLyftBearerToken();
+// const uberToken = process.env.UBER_SERVER_TOKEN;
 
 export const getEstimate = (requestType, start, dest, cb) => {
   let uberURL = 'https://api.uber.com/v1/';

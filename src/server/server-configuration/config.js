@@ -15,10 +15,10 @@ export const configureServer = function (app) {
   app.use(cors());
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(session({
-    secret: 'keyboard cat',
-    resave: true,
-    saveUninitialized: true
-  }));
+  // app.use(session({
+  //   secret: 'keyboard cat',
+  //   saveUninitialized: true,
+  //   resave: true
+  // }));
   app.use(morgan('dev'));
 };

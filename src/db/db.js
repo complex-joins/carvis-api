@@ -12,6 +12,8 @@ if (process.env.PG_PORT_5432_TCP_ADDR) {
 } else {
   DB_CONFIG = JSON.parse(process.env.DB_CONFIG_OBJ_JSON);
 }
+
+console.log(DB_CONFIG);
 // if (process.env.AWS && JSON.parse(process.env.AWS)) {
 //   DB_CONFIG
 // } else {
