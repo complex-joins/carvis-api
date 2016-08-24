@@ -9,7 +9,7 @@ import Authentication from './controllers/authentication';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 import hasValidDevAPIToken from './server-configuration/hasValidDevAPIToken';
 import { handleLaunch, AlexaGetEstimate } from './controllers/alexa';
-import { lyftPhoneAuth, lyftPhoneCodeAuth, uberLogin } from './controllers/helper';
+import { lyftPhoneAuth, lyftPhoneCodeAuth, uberLogin, testKey } from './controllers/helper';
 
 export default function (app) {
   // TODO: only let the user with that ID find users (middleware);
@@ -60,7 +60,10 @@ export default function (app) {
   app.post('/developer/lyftPhoneAuth', hasValidDevAPIToken, lyftPhoneAuth);
   app.post('/developer/lyftPhoneCodeAuth', hasValidDevAPIToken, lyftPhoneCodeAuth);
   app.post('/developer/uberLogin', hasValidDevAPIToken, uberLogin);
+  app.post('/developer/testMyKey', hasValidDevAPIToken, testKey);
   // more routes
+
+
 
   // ===== ... the end ... ===== //
 }

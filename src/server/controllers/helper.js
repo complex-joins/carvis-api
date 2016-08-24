@@ -77,3 +77,9 @@ export const uberLogin = (req, res) => {
       console.warn('err uber login', err);
     });
 };
+
+export const testKey = (req, res) => {
+  let count = req.body.count;
+  console.log('another one', count);
+  // res.json({ message: 'another one' + count });
+};

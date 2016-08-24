@@ -9,8 +9,8 @@ export default function (req, res, next) {
   redisGetKey(token, (redisToken) => {
     if (redisToken) { // if not exist, will return false.
       if (redisToken < 100) {
-        redisIncrementKeyValue(token) // add 1 to the token call count
-        next();
+        // add 1 to the token call count and advance
+        redisIncrementKeyValue(token, response => next());
       } else {
         res.json({ message: 'API key over rate limit, request new key' });
       }
