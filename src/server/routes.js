@@ -1,15 +1,14 @@
 import { getRidesForUser, addRide, updateRide, getAllRideData, deleteRide, shareRideETA } from './controllers/Ride';
-import {
-  getUserDashboardData, updateUserData, createUser,
-  getAllUserData, findOrCreateUser, updateOrCreateUser,
-  deleteUser, rawUserData
-} from './controllers/User';
+import { getUserDashboardData, updateUserData, createUser, getAllUserData, findOrCreateUser, updateOrCreateUser, deleteUser, rawUserData } from './controllers/User';
+import { getLyftToken, updateLyftToken } from './controllers/Internal';
+import { createNewDeveloperKey } from './controllers/DeveloperAPI';
 
 // import passport from 'passport';
 // import passportService from './services/passport';
 import Authentication from './controllers/authentication';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
-import alexa from './controllers/alexa';
+import hasValidDevAPIToken from './server-configuration/hasValidDevAPIToken';
+import { handleLaunch, AlexaGetEstimate } from './controllers/alexa';
 
 export default function (app) {
   // TODO only let the user with that ID find users (middleware);
@@ -18,13 +17,15 @@ export default function (app) {
       .send('Welcome to the Carvis API.');
   });
 
-  app.get('/users/:userid', hasValidAPIToken, getUserDashboardData);
-
   app.get('/dev/users', hasValidAPIToken, getAllUserData);
 
   app.post('/dev/users', hasValidAPIToken, createUser);
 
+  app.get('/dev/users/raw', hasValidAPIToken, rawUserData);
+
   app.post('/auth/users', hasValidAPIToken, findOrCreateUser);
+
+  app.get('/users/:userid', hasValidAPIToken, getUserDashboardData);
 
   app.post('/users/updateOrCreate', hasValidAPIToken, updateOrCreateUser);
 
@@ -38,18 +39,23 @@ export default function (app) {
 
   app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);
 
-  app.post('/rides/shareETA/:rideid', hasValidAPIToken, shareRideETA);
+  app.post('/rides/shareETA/:userid', hasValidAPIToken, shareRideETA);
 
-  app.post('/rides/cancelRide/:rideid', hasValidAPIToken, shareRideETA);
+  app.post('/rides/cancelRide/:userid', hasValidAPIToken, shareRideETA);
 
-  app.post('/alexa/launch', alexa.handleLaunch);
+  app.post('/alexa/launch', handleLaunch);
 
-  app.post('/alexa/estimate', alexa.getEstimate);
+  app.post('/alexa/estimate', AlexaGetEstimate);
+
+  app.get('/internal/lyftBearerToken', hasValidAPIToken, getLyftToken);
+
+  app.post('/internal/lyftBearerToken', hasValidAPIToken, updateLyftToken);
 
   // app.post('/signin', requireSignin, Authentication.signin);
   // app.post('/signup', Authentication.signup);
 
-  app.get('/dev/users/raw', hasValidAPIToken, rawUserData);
-
-
+  app.get('/developer/createToken', hasValidAPIToken, createNewDeveloperKey);
+  // app.post('developer/lyftPhoneAuth', hasValidDevAPIToken, /*phoneAuth*/ );
+  // app.post('developer/lyftPhoneCodeAuth', hasValidDevAPIToken, /*phoneAuth*/ );
+  // TODO: add dev routes for popular methods
 }
