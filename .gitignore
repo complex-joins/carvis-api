@@ -5,6 +5,8 @@
 
 secret
 
+production.yml
+
 docker-compose.yml
 
 work-stash
