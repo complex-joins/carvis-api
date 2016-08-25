@@ -22,11 +22,9 @@ export const getLyftBearerToken = (cb) => {
     .catch(err => console.warn('error getting lyftBearerToken', err));
 };
 
-
-// const lyftToken = getLyftBearerToken();
-// const uberToken = process.env.UBER_SERVER_TOKEN;
-
 export const getEstimate = (requestType, start, dest, cb) => {
+  let lyftToken = getLyftBearerToken();
+  let uberToken = process.env.UBER_SERVER_TOKEN;
   let uberURL = 'https://api.uber.com/v1/';
   let lyftURL = 'https://api.lyft.com/v1/';
 

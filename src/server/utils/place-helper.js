@@ -38,7 +38,6 @@ export const placesCall = (place, cb, nearbyLoc) => {
           let placeLat = data.result.geometry.location.lat;
           let placeLong = data.result.geometry.location.lng;
           let routableAddress = data.result.formatted_address;
-          // ie. "48 Pirrama Road, Pyrmont NSW, Australia"
           cb(placeDesc, [placeLat, placeLong]);
         })
         .catch(err => {

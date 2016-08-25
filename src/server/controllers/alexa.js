@@ -90,6 +90,11 @@ export const AlexaGetEstimate = (req, res) => {
       };
     }
 
+    // destination.query is a string, such as 'hack reactor'
+    // the callback expects descrip and coordinates
+    // descrip - unsure - string
+    // origin.coords -- home location [lat, lng]
+
     placesCall(destination.query, (descrip, coords) => {
       // if descrip is empty, alexa will reply appropriately
       if (!descrip) {

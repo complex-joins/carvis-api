@@ -106,6 +106,14 @@ export const redisGetKey = (keyName, cb) => {
 };
 export const redisGetKeyAsync = bluebird.promisify(redisGetKey);
 
-export const redisIncrementKeyValue = keyName => {
-  client.incr(keyName);
+export const redisIncrementKeyValue = (keyName, cb) => {
+  return client.incrAsync(keyName)
+    .then(res => {
+      console.log('redis success increment', keyName, res);
+      if (cb) {
+        return cb(res);
+      } else {
+        return res;
+      }
+    });
 };

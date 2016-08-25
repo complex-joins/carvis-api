@@ -74,7 +74,7 @@ export const findOrCreateUser = (req, res) => {
   }
 };
 
-// todo - redis.
+// TODO - redis.
 export const updateOrCreateUser = (req, res) => {
   const uniqueFields = ['email', 'uberEmail', 'lyftPhoneNumber', 'alexaUserId', 'id'];
   const findObj = _(uniqueFields).reduce((findObj, val, key) => {
