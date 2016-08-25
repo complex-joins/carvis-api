@@ -36,12 +36,10 @@ export default function (app) {
   app.post('/rides/cancelRide/:userid', hasValidAPIToken, shareRideETA);
 
   // ===== alexa routes ===== //
-  app.post('/alexa/launch', handleLaunch);
+
   app.post('/alexa/estimate', AlexaGetEstimate);
+  app.post('/alexa/launch/:alexaUserId', handleLaunch);
 
-  app.post('/alexa/launch/:alexaUserId', alexa.handleLaunch);
-
-  app.post('/alexa/estimate', alexa.getEstimate);
   app.get('/internal/lyftBearerToken', hasValidAPIToken, getLyftToken);
   app.post('/internal/lyftBearerToken', hasValidAPIToken, updateLyftToken);
 
