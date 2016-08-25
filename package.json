@@ -53,9 +53,8 @@
     "pg": "^6.1.0",
     "redis": "^2.6.2",
     "shelljs": "^0.7.3",
-    "storkSQL": "^0.1.21",
-    "twilio": "^2.9.2",
-    "uuid-v4": "^0.1.0"
+    "storkSQL": "^0.1.28",
+    "twilio": "^2.9.2"
   },
   "devDependencies": {
     "babel-plugin-transform-inline-environment-variables": "^6.8.0",
