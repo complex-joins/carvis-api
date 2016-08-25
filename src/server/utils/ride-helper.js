@@ -182,10 +182,8 @@ export const addRide = (ride, userId, origin, destination, cb) => {
   fetch(endpoint, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
-          // TODO: add api key so that POST to /rides succeeds
-          // but caution, that will actually try to request a ride - we should spoof that on dev
-          // plus we'll need to wait for privateMethods to be available on prod (via an api)
+        'Content-Type': 'application/json',
+        'x-access-token': process.env.CARVIS_API
       },
       body: JSON.stringify(body)
     })
