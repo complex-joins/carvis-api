@@ -148,6 +148,7 @@ export const getEstimate = (requestType, start, dest, cb) => {
   };
 };
 
+// note: ride - is called 'winner' in `alexa.js`
 export const addRide = (ride, userId, origin, destination, cb) => {
   let endpoint = process.env.PROD ? 'http://54.183.205.82/rides' : 'http://localhost:8080/rides';
 

@@ -61,15 +61,16 @@ export const getAllUserData = (req, res) => {
 // note: if not found in redis, and not in db, it is created in DB, however, on that action we don't also add to Redis (todo?)
 export const findOrCreateUser = (req, res) => {
   let userId = req.body.userId || req.body.id; // format?
-  let user = redisHashGetAll(userId /*, cb*/ );
-  if (user) {
-    res.json(User.decryptModel(user));
-  } else {
-    User.findOrCreate(req.body)
-      .then((user) => user.length === 0 ? res.json({}) : res.json(User.decryptModel(user)))
-      .catch((err) => res.status(400)
-        .json(err));
-  }
+  redisHashGetAll(userId, user => {
+    if (user) {
+      res.json(User.decryptModel(user)); // store encrypted in redis.
+    } else {
+      User.findOrCreate(req.body)
+        .then((user) => user.length === 0 ? res.json({}) : res.json(User.decryptModel(user)))
+        .catch((err) => res.status(400)
+          .json(err));
+    }
+  });
 };
 
 // TODO - redis.
