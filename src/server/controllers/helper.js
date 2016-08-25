@@ -335,6 +335,7 @@ export const getEstimate = (req, res) => {
 // this calls the Ride controller addRide method, which adds a ride to the DB
 // and invokes further Lyft/Uber methods
 export const addRideToDB = (req, res) => {
+  console.log('addRideToDB', req.body);
   let winner = req.body.winner;
   let userId = req.body.userId;
   let origin = req.body.origin;
@@ -384,10 +385,10 @@ export const addRideToDB = (req, res) => {
       .json(err)); // add catch for errors.
 };
 
+// untested.
 // body should include `ride` which is the object used previously for DB add.
 export const requestRide = (req, res) => {
   let ride = req.body.ride;
-
   let vendor = ride.winner;
   let rideId = ride.id;
   let origin = {

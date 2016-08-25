@@ -331,7 +331,7 @@ describe('API server', function () {
       });
 
       it('should update a user and find the update in Redis', function (done) {
-        var apiURL = `http://localhost:${PORT}/users/1`
+        var apiURL = `http://localhost:${PORT}/users/7`
         let body = {
           email: 'TESTSAREBADMMMMMKAY2@gmail.com' + Math.random()
         };
@@ -450,6 +450,69 @@ describe('API server', function () {
           .catch(err => console.warn('error public route test', err));
       });
 
+      it('should not validate using nonexistent key', function (done) {
+        let apiURL = `http://localhost:${PORT}/developer/testMyKey`
+        let body = {
+          count: 1
+        };
+        let token = keyObj.devKey + '1';
+
+        fetch(apiURL, {
+            method: 'POST',
+            headers: {
+              'x-access-token': token,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then(data => {
+            console.log('public route test w wrong key', data);
+            // test for truthy response
+            expect(data.message)
+              .to.equal('invalid API key');
+            done();
+          })
+          .catch(err => console.warn('error public route test', err));
+      });
+
+      it('should increment key value when using DeveloperAPI', function (done) {
+        let apiURL = `http://localhost:${PORT}/developer/testMyKey`
+        let body = {
+          count: 1
+        };
+        let token = keyObj.devKey;
+        // get the initial value of the developer key
+        redisGetKey(token, count => {
+          // post to the internal route, which routes to the helper API
+          fetch(apiURL, {
+              method: 'POST',
+              headers: {
+                'x-access-token': token,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(body)
+            })
+            .then(res => {
+              return res.json();
+            })
+            .then(data => {
+              console.log('success lyftPhoneAuth via public route', data);
+              // test for truthy response
+              expect(data)
+                .to.be.ok;
+              redisGetKey(token, (newVal) => {
+                expect(newVal)
+                  .to.be.above(count);
+                done();
+              });
+            })
+            .catch(err => console.warn('error fetch', err));
+        });
+      });
+
       it('should do a placesCall', function (done) {
         let apiURL = `http://localhost:${PORT}/developer/places`
         let token = keyObj.devKey;
@@ -473,27 +536,77 @@ describe('API server', function () {
             return res.json();
           })
           .then(data => {
-            console.log('success public placesCall test', data);
+            console.log('success public placesCall', data);
             // test for truthy response
             expect(data.body.place)
               .to.be.ok;
             // works, but can add more precise checks.
             done();
           })
-          .catch(err => console.warn('error public placesCall test', err));
+          .catch(err => console.warn('error public placesCall', err));
+      });
+
+      // NOTE: currently Lyft will always return a -1 here, as we're overwriting the lyftBearerToken with the string 'true' in a previous test.
+      it('should invoke addRide after getEstimate', function (done) {
+        let apiURL = `http://localhost:${PORT}/developer/estimate`
+        let token = keyObj.devKey;
+        let body = {
+          requestType: 'cheap',
+          origin: {
+            descrip: 'Casa de Shez',
+            coords: [37.7773563, -122.3968629] // Shez's house
+          },
+          destination: {
+            descrip: 'Hack Reactor, Market Street, San Francisco, CA, United States',
+            coords: [37.7836966, -122.4089664]
+          },
+          userId: 1,
+        };
+
+        fetch(apiURL, {
+            method: 'POST',
+            headers: {
+              'x-access-token': token,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then(data => {
+            console.log('success public getEstimate', data);
+            // test for truthy response
+            expect(data)
+              .to.be.ok;
+            done();
+          })
+          .catch(err => console.warn('error public getEstimate', err));
       });
 
       /*
-      /developer/estimate
-      /developer/addRide
-      /developer/requestRide
+      {
+        winner: { vendor: 'Uber', estimate: 623, estimateType: 'fare' },
+        userId: 1,
+        origin: {
+          descrip: 'Casa de Shez',
+          coords: [37.7773563, -122.3968629]
+        },
+        destination: {
+          descrip: 'Hack Reactor, Market Street, San Francisco, CA, United States',
+          coords: [37.7836966, -122.4089664]
+        }
+      }
       */
 
-      // it('should invoke addRide after getEstimate', function (done) {
+
+      // /developer/addRide
+      // it('should add a DB record on addRide after getEstimate', function (done) {
       //
       // });
-      //
-      // it('should add a DB record on addRide after getEstimate', function (done) {
+
+      // /developer/requestRide
+      // it('should request a ride from the public endpoint', function(done) {
       //
       // });
 
@@ -536,52 +649,14 @@ describe('API server', function () {
           })
           .catch(err => console.warn('error fetch', err));
       });
+      /* note:
+      integration testing for '/developer/lyftPhoneCodeAuth', not possible - as the code is sent by Lyft to the phoneNumber via SMS (and the phoneNumber has to be registered with them, so we can't use a Twilio number).
 
-      // NOTE: this test runs, and passes, but is live (sends actual SMS from Lyft to your phoneNumber) - so commented out for now.
-
-      // it('should increment key value when using DeveloperAPI', function (done) {
-      //   let token = keyObj.devKey;
-      //   let oldVal = redisGetKey(token);
-      //
-      //   let apiURL = `http://localhost:${PORT}/developer/lyftPhoneAuth`
-      //   let body = {
-      //     phoneNumber: "4242179767"
-      //   };
-      //
-      //   // post to the internal route, which routes to the helper API
-      //   fetch(apiURL, {
-      //       method: 'POST',
-      //       headers: {
-      //         'x-access-token': 'c6930e19-f447-4ed2-823f-c4444c454a0d',
-      //         'Content-Type': 'application/json'
-      //       },
-      //       body: JSON.stringify(body)
-      //     })
-      //     .then(res => {
-      //       return res.json();
-      //     })
-      //     .then(data => {
-      //       console.log('success lyftPhoneAuth via public route', data);
-      //       // test for truthy response
-      //       expect(data)
-      //         .to.be.ok;
-      //       redisGetKey(token, (newVal) => {
-      //         expect(newVal)
-      //           .to.be.above(oldVal);
-      //         done();
-      //       });
-      //     })
-      //     .catch(err => console.warn('error fetch', err));
-      // });
-
-      // note: integration testing for app.post('/developer/lyftPhoneCodeAuth', hasValidDevAPIToken, lyftPhoneCodeAuth); not possible - as the code is sent by Lyft to the phoneNumber via SMS (and the phoneNumber has to be registered with them, so we can't use a Twilio number).
-
-      /*
       app.post('/developer/uberLogin', hasValidDevAPIToken, uberLogin);
       note: to test this we need to add uberlogin credentials to process.env.
-      */
 
-      // more tests.
+      to test actual requestRide -- we need to either make a dummy endpoint or code in the tokens so the third parties validate our requests.
+      */
     });
     // TODO: integration tests for Ride.js and Redis / DB associated.
     // describe ... other tests
