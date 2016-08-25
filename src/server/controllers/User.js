@@ -1,15 +1,13 @@
 import { User } from '../models/User';
 import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey, redisDelete } from './../../redis/redisHelperFunctions';
+import _ from 'lodash';
 
 export const getUserDashboardData = (req, res) => {
   let userId = req.params.userid;
   redisHashGetAll(userId, user => {
     if (user) {
       console.log('found user in redis, getUserDashboardData', user);
-      res.json(user);
-      // NOTE: redis returns the encrypted version.
-      // do we depend on a decrypted version anywhere?
-      // ie. lyftToken ?
+      res.json(User.decryptModel(user));
     } else {
       console.log('no redis - doing db fetch getUserDashboardData');
       User.find({ id: userId })
@@ -88,17 +86,22 @@ export const findOrCreateUser = (req, res) => {
     }
   });
 };
-
-// TODO - redis for lyft/uber signup! very important.
+// TODO: add redis.
 export const updateOrCreateUser = (req, res) => {
-  let firstParam = Object.keys(req.body)[0];
-  User.updateOrCreate({
-      [firstParam]: req.body[firstParam]
-    }, req.body)
-    .then((user) => {
+  const uniqueFields = ['email', 'uberEmail', 'lyftPhoneNumber', 'alexaUserId', 'id'];
+  const findObj = _(uniqueFields)
+    .reduce((findObj, val, key) => {
+      if (uniqueFields.indexOf(key) >= 0 && findObj[key] !== null) {
+        findObj[key] = val;
+      }
+      return findObj;
+    }, {});
+
+  User.updateOrCreate(findObj)
+    .then(user => {
       return user.length === 0 ? res.json({}) : res.json(User.decryptModel(user[0]));
     })
-    .catch((err) => res.status(400)
+    .catch(err => res.status(400)
       .json(err));
 };
 

@@ -51,7 +51,7 @@ describe('API server', function () {
     });
 
     describe('Check restful routes', function () {
-
+      // app.get('/dev/users', hasValidAPIToken, getAllUserData);
       it('should get all users when presented with the API access token', function (done) {
         axios.get(`http://localhost:${PORT}/dev/users`, {
             headers: {
@@ -66,7 +66,7 @@ describe('API server', function () {
           })
           .catch((err) => done(err));
       });
-
+      // app.post('/dev/users', hasValidAPIToken, createUser);
       it('should allow a developer to add a user when presented with the right access token', function (done) {
         axios.post(`http://localhost:${PORT}/dev/users`, { email: `test${testCount}`, password: 'test', lyftToken: '23jlkjd39' }, {
             headers: { 'x-access-token': process.env.CARVIS_API_KEY }
@@ -78,23 +78,29 @@ describe('API server', function () {
           })
           .catch((err) => done(err));
       });
-
+      // app.get('/users/:userid', hasValidAPIToken, getUserDashboardData);
       it('return the correct data for users posted to the DB', function (done) {
-        axios.get(`http://localhost:${PORT}/users/${testUserId}`, {
-            headers: { 'x-access-token': process.env.CARVIS_API_KEY }
+        let url = `http://localhost:${PORT}/users/${testUserId}`;
+        fetch(url, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': process.env.CARVIS_API_KEY
+            }
           })
-          .then((res) => {
-            expect(res.status)
-              .to.equal(200);
+          .then(res => res.json())
+          .then(data => {
+            let newPassword = data.password || data[0].password;
+            let newLyftToken = data.lyftToken || data[0].lyftToken;
             expect('test')
-              .to.equal(res.data[0].password);
+              .to.equal(newPassword);
             expect('23jlkjd39')
-              .to.equal(res.data[0].lyftToken);
+              .to.equal(newLyftToken);
             done();
           })
           .catch((err) => done(err));
       });
-
+      // app.put('/users/:userid', hasValidAPIToken, updateUserData);
       it('should allow users to update their information', function (done) {
         axios.put(`http://localhost:${PORT}/users/${testUserId}`, { email: 'test${testUserId}second@gmail.com', password: 'newtest' }, {
             headers: { 'x-access-token': process.env.CARVIS_API_KEY }
@@ -105,7 +111,7 @@ describe('API server', function () {
           })
           .catch((err) => done(err));
       });
-
+      // app.delete('/dev/users/:userid', hasValidAPIToken, deleteUser);
       it('should delete the user created by the developer', function (done) {
         axios.delete(`http://localhost:${PORT}/dev/users/${testUserId}`, {
             headers: { 'x-access-token': process.env.CARVIS_API_KEY }
@@ -115,7 +121,7 @@ describe('API server', function () {
             done();
           });
       });
-
+      // app.post('/users/updateOrCreate', hasValidAPIToken, updateOrCreateUser)
       it('should properly update or create', function (done) {
         axios.post(`http://localhost:${PORT}/users/updateOrCreate`, { email: 'newuser@gmial.com', password: 'yo', lyftToken: 'yellow' }, {
             headers: { 'x-access-token': process.env.CARVIS_API_KEY }
@@ -317,6 +323,40 @@ describe('API server', function () {
           .catch(err => console.warn('error fetch', err));
       });
 
+      // commented out until helper api - carvis api in production
+      // it('should do an integration test with the helper API', function (done) {
+      //   // get the current lyftToken
+      //   redisGetKey('lyftBearerToken', token => {
+      //     console.log('current token', token);
+      //     // call the helper API to refresh the lyftBearerToken
+      //     let helperURL = process.env.CARVIS_HELPER_API + '/lyft/refreshBearerToken';
+      //     fetch(helperURL, {
+      //         method: 'GET',
+      //         headers: {
+      //           'Content-Type': 'application/json',
+      //           'x-access-token': process.env.CARVIS_HELPER_API_KEY
+      //         }
+      //       })
+      //       .then(res => {
+      //         return res.json();
+      //       })
+      //       .then(data => {
+      //         console.log('success refreshToken', data);
+      //         setTimeout(() => {
+      //           // fetch the new token - compare to not be equal to the old one
+      //           redisGetKey('lyftBearerToken', newToken => {
+      //             expect(newToken)
+      //               .not.to.equal(token);
+      //             done();
+      //           });
+      //         }, 5000);
+      //       })
+      //       .catch(err => {
+      //         console.warn('error refreshing token', err);
+      //       });
+      //   });
+      // });
+
       it('should add a user to redis on creating a user', function (done) {
         let apiURL = `http://localhost:${PORT}/dev/users`
         let body = {
@@ -373,7 +413,7 @@ describe('API server', function () {
       });
 
       it('should update a user and find the update in Redis', function (done) {
-        let apiURL = `http://localhost:${PORT}/users/1`; // hardcoded... bad.
+        let apiURL = `http://localhost:${PORT}/users/5`; // hardcoded... bad.
         let body = {
           email: 'TESTSAREBADMMMMMKAY2@gmail.com' + Math.random()
         };
@@ -392,46 +432,15 @@ describe('API server', function () {
           .then(data => {
             console.log('success update user', data);
             // fetch the existing user, find new random email (in Redis)
-            redisHashGetOne(data[0].id, 'email', function (res) {
-              expect(res)
+            redisHashGetOne(data[0].id, 'email', newEmail => {
+              expect(newEmail)
                 .to.equal(body.email);
               done();
             });
           })
           .catch(err => console.warn('error fetch', err));
       });
-
-      // NOTE: commented out whilst deployed carvis-api is down.
-      //   it('should do an integration test with the helper API', function (done) {
-      //     // get the current lyftToken
-      //     let token = redisGetKey('lyftBearerToken');
-      //
-      //     // call the helper API to refresh the lyftBearerToken
-      //     let helperURL = process.env.CARVIS_HELPER_API + '/lyft/refreshBearerToken';
-      //     fetch(helperURL, {
-      //         method: 'GET',
-      //         headers: {
-      //           'Content-Type': 'application/json',
-      //           'x-access-token': process.env.CARVIS_HELPER_API_KEY
-      //         }
-      //       })
-      //       .then(res => {
-      //         return res.json();
-      //       })
-      //       .then(data => {
-      //         console.log('success refreshToken', data);
-      //         setTimeout(() => {
-      //           // fetch the new token - compare to not be equal to the old one
-      //           expect(redisGetKey('lyftBearerToken'))
-      //             .not.to.equal(token);
-      //           done();
-      //         }, 5000);
-      //       })
-      //       .catch(err => {
-      //         console.warn('error refreshing token', err);
-      //       });
-      //   });
-      //   // more tests within Redis.
+      // more tests within Redis.
     });
 
     describe('Test Developer API', function () {
@@ -692,7 +701,7 @@ describe('API server', function () {
               })
               .then(res => res.json())
               .then(data => {
-                console.log('rides for user', userId, data);
+                // console.log('rides for user', userId, data);
                 expect(data)
                   .to.be.ok;
                 // returns an array of objects, which have `id`

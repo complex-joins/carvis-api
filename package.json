@@ -12,7 +12,7 @@
     "setup": "node ./tools/resolveGitIgnored.js;",
     "docker:deploy": "npm run build; docker build -t alexcstark/carvis-api .; docker push alexcstark/carvis-api",
     "test": "mocha --compilers js:babel-core/register ./tests/index.js",
-    "start": "npm run build; node ./dist/server/index.js"
+    "start": "npm run build; redis-server & node ./dist/server/index.js"
   },
   "repository": {
     "type": "git",
