@@ -347,11 +347,9 @@ describe('API server', function () {
           .catch(err => console.warn('error fetch', err));
       });
 
-      // TODO: test delete user also removes user from Redis.
-
       it('should remove a user from redis on deleteUser', function (done) {
         let url = `http://localhost:${PORT}/dev/users/${redisTestUser}`;
-
+        // tests the combination of the user and redis delete methods
         fetch(url, {
             method: 'DELETE',
             headers: {
@@ -375,7 +373,7 @@ describe('API server', function () {
       });
 
       it('should update a user and find the update in Redis', function (done) {
-        let apiURL = `http://localhost:${PORT}/users/7`
+        let apiURL = `http://localhost:${PORT}/users/1`; // hardcoded... bad.
         let body = {
           email: 'TESTSAREBADMMMMMKAY2@gmail.com' + Math.random()
         };
@@ -620,10 +618,25 @@ describe('API server', function () {
           })
           .then(data => {
             console.log('success public getEstimate', data);
+            let rideId = data.id;
             // test for truthy response
             expect(data)
               .to.be.ok;
-            done();
+            // delete the ride we just created
+            let deleteURL = `http://localhost:${PORT}/rides/${rideId}`
+            fetch(deleteURL, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-access-token': process.env.CARVIS_API_KEY
+                }
+              })
+              .then(res => res.json())
+              .then(data => {
+                // optional - check if really deleted.
+                done();
+              })
+              .catch(err => console.warn('error delete ride', err));
           })
           .catch(err => console.warn('error public getEstimate', err));
       });
