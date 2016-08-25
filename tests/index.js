@@ -8,7 +8,7 @@ const request = require('supertest');
 const server = require('./testServer');
 
 const User = require('../src/server/models/User');
-import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey, redisIncrementKeyValue, redisHashGetOneAsync } from './../src/redis/redisHelperFunctions';
+import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey, redisIncrementKeyValue, redisHashGetOneAsync, redisDelete } from './../src/redis/redisHelperFunctions';
 import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/controllers/Internal';
 import { createNewDeveloperKey } from './../src/server/controllers/DeveloperAPI';
 import hasValidDevAPIToken from './../src/server/server-configuration/hasValidDevAPIToken';
@@ -18,7 +18,18 @@ let currentListeningServer;
 let PORT = 8080;
 let testUserId;
 let testCount;
+let redisTestUser;
 let keyObj = {};
+
+// TODO: REMOVE ALL TEST USERS, RIDES, REDIS KEYS, etc.
+// =====
+// remove test users --
+// app.delete('/dev/users/:userid', hasValidAPIToken, deleteUser);
+// remove test rides --
+// app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);
+// remove test redis keys --
+// redisDelete(keyName, cb)
+// =====
 
 describe('API server', function () {
   this.timeout(18000);
@@ -33,7 +44,7 @@ describe('API server', function () {
   describe('Check basic build', function () {
     it('should return 200', function (done) {
       axios.get(`http://localhost:${PORT}/`)
-        .then((res) => {
+        .then(res => {
           assert.equal(res.status, 200, 'did not return 200', res.status);
           done();
         });
@@ -322,15 +333,43 @@ describe('API server', function () {
             return res.json();
           })
           .then(data => {
-            console.log(data);
+            console.log('success create user', data);
+            redisTestUser = data[0].id;
             // fetch the new user, find the same email (in Redis)
-            redisHashGetOne(data[0].id, 'email', function (res) {
+            redisHashGetOne(redisTestUser, 'email', function (res) {
               expect(res)
                 .to.equal(body.email);
               done();
             });
           })
           .catch(err => console.warn('error fetch', err));
+      });
+
+      // TODO: test delete user also removes user from Redis.
+
+      it('should remove a user from redis on deleteUser', function (done) {
+        let url = `http://localhost:${PORT}/dev/users/${redisTestUser}`;
+
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+              'x-access-token': process.env.CARVIS_API_KEY,
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(res => res.json())
+          .then(data => {
+            console.log('success remove user', data);
+            redisHashGetAll(redisTestUser, result => {
+              if (result) {
+                let err = 'redis did not remove user';
+                done(err);
+              } else {
+                done();
+              }
+            });
+          })
+          .catch(err => console.warn('error delete user', err));
       });
 
       it('should update a user and find the update in Redis', function (done) {

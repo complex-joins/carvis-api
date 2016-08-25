@@ -1,5 +1,5 @@
 import { User } from '../models/User';
-import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey } from './../../redis/redisHelperFunctions';
+import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey, redisDelete } from './../../redis/redisHelperFunctions';
 
 export const getUserDashboardData = (req, res) => {
   let userId = req.params.userid;
@@ -100,7 +100,18 @@ export const updateOrCreateUser = (req, res) => {
 };
 
 export const deleteUser = (req, res) => {
-  User.remove({ id: req.params.userid })
+  let userId = req.params.userid;
+
+  // in this case we want to delete both from redis and the DB.
+  redisDelete(userId, user => {
+    if (user) {
+      console.log('success delete', userId, user);
+    } else {
+      console.log('user was not in redis', userId, user);
+    }
+  });
+
+  User.remove({ id: userId })
     .then((user) => user.length === 0 ? res.json({}) : res.json(User.decryptModel(user[0])))
     .catch((err) => res.status(400)
       .json(err));
