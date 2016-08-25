@@ -29,11 +29,13 @@ export const updateUserData = (req, res) => {
     redisKeyValArray.push(req.body[newKeys[i]]);
   }
   console.log('redisKeyValArray', userId, redisKeyValArray);
-  redisSetHash(userId, redisKeyValArray);
-  User.update({ id: userId }, req.body)
-    .then((user) => user.length === 0 ? res.json({}) : res.json(user))
-    .catch((err) => res.status(400)
-      .json(err));
+  // update redis, and after updating redis, update the DB.
+  redisSetHash(userId, redisKeyValArray, result => {
+    User.update({ id: userId }, req.body)
+      .then((user) => user.length === 0 ? res.json({}) : res.json(user))
+      .catch((err) => res.status(400)
+        .json(err));
+  });
 };
 
 export const createUser = (req, res) => {
@@ -47,8 +49,9 @@ export const createUser = (req, res) => {
         redisKeyValArray.push(key);
         redisKeyValArray.push(user[0][key]);
       }
-      redisSetHash(userId, redisKeyValArray);
-      user.length === 0 ? res.json({}) : res.json(user);
+      redisSetHash(userId, redisKeyValArray, result => {
+        user.length === 0 ? res.json({}) : res.json(user);
+      });
     })
     .catch((err) => res.status(400)
       .json(err));
@@ -109,12 +112,11 @@ export const deleteUser = (req, res) => {
     } else {
       console.log('user was not in redis', userId, user);
     }
+    User.remove({ id: userId })
+      .then((user) => user.length === 0 ? res.json({}) : res.json(User.decryptModel(user[0])))
+      .catch((err) => res.status(400)
+        .json(err));
   });
-
-  User.remove({ id: userId })
-    .then((user) => user.length === 0 ? res.json({}) : res.json(User.decryptModel(user[0])))
-    .catch((err) => res.status(400)
-      .json(err));
 };
 
 export const getRawUser = (req, res) => {
