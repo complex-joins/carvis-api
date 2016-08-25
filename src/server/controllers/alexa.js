@@ -1,9 +1,12 @@
 const _ = require('lodash'); // used for _.filter
+const env = require('dotenv');
+const config = {};
+
 import { formatAnswer, getEstimate, addRide } from '../utils/ride-helper';
 import { placesCall } from './../utils/place-helper';
+env.config();
 
 const fakeoutMode = JSON.parse(process.env.FAKEOUT) || false; // when true, CARVIS will tell you about taxi fares, not uber and lyft estimates
-const config = {};
 
 if (fakeoutMode) {
   config.prompt = 'With CARVIS you can find the average taxi fare from an airport to your hotel, and vice versa. For example, you can ask, CARVIS, how much is a taxi from Marriot San Francisco to SFO airport?';

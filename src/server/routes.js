@@ -37,7 +37,6 @@ export default function (app) {
   // ===== alexa routes ===== //
   app.post('/alexa/launch', handleLaunch);
   app.post('/alexa/estimate', AlexaGetEstimate);
-
   app.post('/alexa/cancelRide', cancelRide);
 
 

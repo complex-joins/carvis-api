@@ -1,3 +1,7 @@
+const path = require('path');
+const dotenv = require('dotenv');
+dotenv.config();
+console.log(process.env);
 const assert = require('chai')
   .assert;
 const expect = require('chai')
@@ -6,7 +10,6 @@ const axios = require('axios');
 import fetch from 'node-fetch';
 const request = require('supertest');
 const server = require('./testServer');
-
 const User = require('../src/server/models/User');
 import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey, redisIncrementKeyValue, redisHashGetOneAsync } from './../src/redis/redisHelperFunctions';
 import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/controllers/Internal';
