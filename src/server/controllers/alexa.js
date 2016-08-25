@@ -17,7 +17,6 @@ if (fakeoutMode) {
 }
 
 exports.handleLaunch = function(req, res) {
-  //call to the DB with alexaID
   console.log(req.params)
   User.find({alexaUserId: req.params.alexaUserId})
   .then((user) => {
