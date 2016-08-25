@@ -13,10 +13,14 @@ export const updateLyftToken = (req, res) => {
   let token = req.body.token;
   console.log('updateLyftToken', token);
 
-  // refresh call to the helper API on expire time -- this will on success do a post to this API / function again (making it recursive at interval)
   // setTimeout is milliseconds, redis expire is seconds - this is ~1 day.
-  setTimeout(refreshToken, 84600000);
-  redisSetKeyWithExpire('lyftBearerToken', 84600, token /*, cb*/ );
+  redisSetKeyWithExpire('lyftBearerToken', 84600, token, result => {
+    // refresh call to the helper API on expire time -- this will on success do a post to this API / function again (making it recursive at interval)
+    setTimeout(() => {
+      refreshToken();
+    }, 84600000);
+    res.json({ message: 'updated lyftBearerToken in redis' });
+  });
 };
 
 export const getLyftToken = (req, res) => {
