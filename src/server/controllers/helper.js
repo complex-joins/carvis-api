@@ -9,7 +9,7 @@ import { User } from './../models/User';
 import { createMessage } from './../utils/twilioHelper';
 import { helperAPIQuery, getUserAndRequestRideDB } from './Ride';
 import { redisHashGetAll, redisSetKeyWithExpire, redisGetKey, redisHashGetOne } from './../../redis/redisHelperFunctions';
-import { getLyftBearerToken } from './Internal'
+import { getLyftBearerToken } from './../utils/ride-helper';
 
 //===== these are controllers for the web and public api's =====//
 
