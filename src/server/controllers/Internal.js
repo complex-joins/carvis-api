@@ -28,7 +28,9 @@ export const getLyftToken = (req, res) => {
       // call the helper API to query Lyft for a token
       refreshToken();
       // wait a reasonable amount of time to query redis again for the token
-      return setTimeout(getLyftToken, 500);
+      setTimeout(() => {
+        getLyftToken();
+      }, 1500);
     }
   });
 };
