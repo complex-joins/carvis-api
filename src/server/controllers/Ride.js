@@ -263,7 +263,7 @@ export const getAllRideData = (req, res) => {
 };
 
 export const deleteRide = (req, res) => {
-  Ride.delete({ id: req.params.rideid })
+  Ride.remove({ id: req.params.rideid })
     .then((ride) => res.json(ride))
     .catch((err) => res.status(400)
       .json(err));
