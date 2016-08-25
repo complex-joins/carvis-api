@@ -273,7 +273,7 @@ export const getEstimate = (req, res) => {
           origin: origin,
           destination: destination
         };
-        return addRideToDB({ body: body }, res); // hack. TODO: test.
+        return addRideToDB({ body: body }, res);
       } else {
         firstResult = uberEstimate;
       }
@@ -321,7 +321,7 @@ export const getEstimate = (req, res) => {
           origin: origin,
           destination: destination
         };
-        return addRideToDB({ body: body }, res); // hack. TODO: test.
+        return addRideToDB({ body: body }, res);
       } else {
         firstResult = lyftEstimate;
       }

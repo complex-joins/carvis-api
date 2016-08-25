@@ -1,8 +1,7 @@
 const fetch = require('node-fetch');
 
-// exporting only for testing. TODO: change hardcoded to dynamic.
 export const getLyftBearerToken = (cb) => {
-  let url = 'http://localhost:8080/internal/lyftBearerToken'; // hardcoded.
+  let url = 'http://localhost:8080/internal/lyftBearerToken'; // TODO: change to `process.env.CARVIS_API`
   return fetch(url, {
       method: 'GET',
       headers: {
@@ -78,7 +77,7 @@ export const getEstimate = (requestType, start, dest, cb) => {
       if (firstResult) {
         winner = compare(uberEstimate, firstResult);
         console.log('Winner:', winner);
-        cb(winner);
+        return cb(winner);
       } else {
         firstResult = uberEstimate;
       }
@@ -120,7 +119,7 @@ export const getEstimate = (requestType, start, dest, cb) => {
       if (firstResult) {
         winner = compare(firstResult, lyftEstimate);
         console.log('Winner:', winner);
-        cb(winner);
+        return cb(winner);
       } else {
         firstResult = lyftEstimate;
       }
@@ -153,7 +152,7 @@ export const addRide = (ride, userId, origin, destination, cb) => {
   let endpoint = process.env.PROD ? 'http://54.183.205.82/rides' : 'http://localhost:8080/rides';
 
   let body = {
-    userId: 3, // TODO: make this dynamic and not hardcoded once alexa auth is implemented
+    userId: userId,
     rideStatus: 'estimate',
     originLat: origin.coords[0],
     originLng: origin.coords[1],
@@ -161,7 +160,7 @@ export const addRide = (ride, userId, origin, destination, cb) => {
     destinationLat: destination.coords[0],
     destinationLng: destination.coords[1],
     destinationRoutableAddress: destination.descrip,
-    winningVendorRideType: null, // TODO: populate correctly
+    winningVendorRideType: null, // TODO: populate dynamic type
     winner: ride.vendor
   };
 
