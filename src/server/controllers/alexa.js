@@ -19,10 +19,16 @@ if (fakeoutMode) {
 
 exports.handleLaunch = function(req, res) {
   //call to the DB with alexaID
+  console.log(req.params)
   User.find({alexaUserId: req.params.alexaUserId})
-  .then((user) => user.length === 0 ? {} : User.decryptModel(user[0]))
+  .then((user) => {
+    // console.log('user==================',  user);
+    // console.log('USER DCYPRT================', User.decryptModel(user[0]));
+    return user.length === 0 ? {} : user[0];
+  })
   .then((data) => {
-    config.carvisUserID = data.userId || 1717;
+    console.log(data)
+    config.carvisUserID = data.id;
     return config;
   })
   .then((data) => {res.json(data);})
