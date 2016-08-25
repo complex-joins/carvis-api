@@ -427,12 +427,12 @@ describe('API server', function () {
         let body = {
           count: 1
         };
+        let token = keyObj.devKey;
 
-        // get a new developer API key
         fetch(apiURL, {
             method: 'POST',
             headers: {
-              'x-access-token': 'c6930e19-f447-4ed2-823f-c4444c454a0d',
+              'x-access-token': token,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify(body)
@@ -450,6 +450,54 @@ describe('API server', function () {
           .catch(err => console.warn('error public route test', err));
       });
 
+      it('should do a placesCall', function (done) {
+        let apiURL = `http://localhost:${PORT}/developer/places`
+        let token = keyObj.devKey;
+        let body = {
+          place: 'hack reactor', // destination.query
+          origin: {
+            descrip: 'Casa de Shez',
+            coords: [37.7773563, -122.3968629] // Shez's house
+          }
+        };
+
+        fetch(apiURL, {
+            method: 'POST',
+            headers: {
+              'x-access-token': token,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then(data => {
+            console.log('success public placesCall test', data);
+            // test for truthy response
+            expect(data.body.place)
+              .to.be.ok;
+            // works, but can add more precise checks.
+            done();
+          })
+          .catch(err => console.warn('error public placesCall test', err));
+      });
+
+      /*
+      /developer/estimate
+      /developer/addRide
+      /developer/requestRide
+      */
+
+      // it('should invoke addRide after getEstimate', function (done) {
+      //
+      // });
+      //
+      // it('should add a DB record on addRide after getEstimate', function (done) {
+      //
+      // });
+
+      // note: this test should be done last - as it invalidates the previously created key.
       it('should return 404 if key used >99 times', function (done) {
         let token = keyObj.devKey;
         let apiURL = `http://localhost:${PORT}/developer/testMyKey`
@@ -492,7 +540,7 @@ describe('API server', function () {
       // NOTE: this test runs, and passes, but is live (sends actual SMS from Lyft to your phoneNumber) - so commented out for now.
 
       // it('should increment key value when using DeveloperAPI', function (done) {
-      //   let token = 'c6930e19-f447-4ed2-823f-c4444c454a0d';
+      //   let token = keyObj.devKey;
       //   let oldVal = redisGetKey(token);
       //
       //   let apiURL = `http://localhost:${PORT}/developer/lyftPhoneAuth`

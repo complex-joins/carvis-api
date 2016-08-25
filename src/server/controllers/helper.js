@@ -98,11 +98,9 @@ export const testKey = (req, res) => {
 // `place` is a string, such as 'hack reactor'
 // the callback should invoke getEstimate which will flow into addRide
 // `nearbyLoc` is [lat, lng]
-
 export const placesCall = (req, res) => {
   let key = process.env.GOOGLE_PLACES_API_KEY;
   let place = req.body.place;
-
   let origin = req.body.origin; // {descrip: string, coords: [lat, lng]}
   let nearbyLoc = origin.coords;
   let loc, radius;
@@ -142,6 +140,8 @@ export const placesCall = (req, res) => {
           let routableAddress = data.result.formatted_address;
 
           // note: different response needs to be handled on client.
+          // on client you'd display the option - provide user a confirm modal so they can confirm we suggested the right destination
+          // after which getEstimate can be invoked from client.
           let body = {
             place: {
               lat: placeLat,
@@ -151,7 +151,7 @@ export const placesCall = (req, res) => {
               id: placeId // google maps id of place
             }
           };
-          res.json(body);
+          res.json({ body: body });
         })
         .catch(err => {
           console.log('error on place detail', err, '\nplace:', place);
