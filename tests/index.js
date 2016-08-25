@@ -101,6 +101,7 @@ describe('API server', function () {
           .catch((err) => done(err));
       });
       // app.put('/users/:userid', hasValidAPIToken, updateUserData);
+      // only tests for a 200 response
       it('should allow users to update their information', function (done) {
         axios.put(`http://localhost:${PORT}/users/${testUserId}`, { email: 'test${testUserId}second@gmail.com', password: 'newtest' }, {
             headers: { 'x-access-token': process.env.CARVIS_API_KEY }
@@ -111,6 +112,41 @@ describe('API server', function () {
           })
           .catch((err) => done(err));
       });
+
+      // app.put('/users/:userid', hasValidAPIToken, updateUserData);
+      it('should update a user and find the update in Redis', function (done) {
+        let apiURL = `http://localhost:${PORT}/users/${testUserId}`; // hardcoded... bad.
+        let body = {
+          email: 'TESTSAREBADMMMMMKAY2@gmail.com' + Math.random()
+        };
+        // update an existing user with a new random email
+        fetch(apiURL, {
+            method: 'PUT',
+            headers: {
+              'x-access-token': process.env.CARVIS_API_KEY,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then(data => {
+            console.log('success update user', data);
+            data = data[0]; // [{}] => {}
+            // test for a non-empty response
+            expect(data.id)
+              .to.be.ok;
+            // fetch the existing user, find new random email (in Redis)
+            redisHashGetOne(data.id, 'email', newEmail => {
+              expect(newEmail)
+                .to.equal(body.email);
+              done();
+            });
+          })
+          .catch(err => console.warn('error fetch', err));
+      });
+
       // app.delete('/dev/users/:userid', hasValidAPIToken, deleteUser);
       it('should delete the user created by the developer', function (done) {
         axios.delete(`http://localhost:${PORT}/dev/users/${testUserId}`, {
@@ -123,24 +159,53 @@ describe('API server', function () {
       });
       // app.post('/users/updateOrCreate', hasValidAPIToken, updateOrCreateUser)
       it('should properly update or create', function (done) {
-        axios.post(`http://localhost:${PORT}/users/updateOrCreate`, { email: 'newuser@gmial.com', password: 'yo', lyftToken: 'yellow' }, {
-            headers: { 'x-access-token': process.env.CARVIS_API_KEY }
+        let url = `http://localhost:${PORT}/users/updateOrCreate`;
+        let body = {
+          email: 'newuser@gmial.com',
+          password: 'yo',
+          lyftToken: 'yellow'
+        };
+        // updateOrCreate - create
+        fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': process.env.CARVIS_API_KEY
+            },
+            body: JSON.stringify(body)
           })
-          .then((res) => {
-            assert.equal(res.status, 200, 'did not return 200', res.status);
-            expect(res.data.lyftToken)
-              .to.equal('yellow');
-            return axios.post(`http://localhost:${PORT}/users/updateOrCreate`, { email: 'newuser@gmial.com', password: 'yo', lyftToken: 'blue' }, {
-              headers: { 'x-access-token': process.env.CARVIS_API_KEY }
-            });
+          .then(res => res.json())
+          .then(data => {
+            console.log('successful updateOrCreate', data);
+            expect(data.lyftToken)
+              .to.equal(body.lyftToken);
+            let userId = data.id;
+            let secondBody = {
+              id: userId,
+              email: 'newuser@gmial.com',
+              password: 'yo',
+              lyftToken: 'blue'
+            };
+            // updateOrCreate - update
+            console.log('firing second fetch updateOrCreate - update');
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-access-token': process.env.CARVIS_API_KEY
+                },
+                body: JSON.stringify(secondBody)
+              })
+              .then(res => res.json())
+              .then(data => {
+                console.log('successful updateOrCreate second pass', data);
+                expect(data.lyftToken)
+                  .to.equal(secondBody.lyftToken);
+                done();
+              })
+              .catch(err => done(err));
           })
-          .then((res) => {
-            expect(res.data.lyftToken)
-              .to.equal('blue');
-            // expect().to.equal('yo');
-            done();
-          })
-          .catch((err) => done(err));
+          .catch(err => done(err));
       });
 
       // ========== alexa tests =============== //
@@ -410,35 +475,6 @@ describe('API server', function () {
             });
           })
           .catch(err => console.warn('error delete user', err));
-      });
-
-      it('should update a user and find the update in Redis', function (done) {
-        let apiURL = `http://localhost:${PORT}/users/5`; // hardcoded... bad.
-        let body = {
-          email: 'TESTSAREBADMMMMMKAY2@gmail.com' + Math.random()
-        };
-        // update an existing user with a new random email
-        fetch(apiURL, {
-            method: 'PUT',
-            headers: {
-              'x-access-token': process.env.CARVIS_API_KEY,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(body)
-          })
-          .then(res => {
-            return res.json();
-          })
-          .then(data => {
-            console.log('success update user', data);
-            // fetch the existing user, find new random email (in Redis)
-            redisHashGetOne(data[0].id, 'email', newEmail => {
-              expect(newEmail)
-                .to.equal(body.email);
-              done();
-            });
-          })
-          .catch(err => console.warn('error fetch', err));
       });
       // more tests within Redis.
     });

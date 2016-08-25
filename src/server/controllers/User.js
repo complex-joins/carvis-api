@@ -29,9 +29,10 @@ export const updateUserData = (req, res) => {
   console.log('redisKeyValArray', userId, redisKeyValArray);
   // update redis, and after updating redis, update the DB.
   redisSetHash(userId, redisKeyValArray, result => {
+    console.log('success setHash', userId, result);
     User.update({ id: userId }, req.body)
-      .then((user) => user.length === 0 ? res.json({}) : res.json(user))
-      .catch((err) => res.status(400)
+      .then(user => user.length === 0 ? res.json({}) : res.json(user))
+      .catch(err => res.status(400)
         .json(err));
   });
 };
@@ -86,20 +87,35 @@ export const findOrCreateUser = (req, res) => {
     }
   });
 };
-// TODO: add redis.
+
+// check for unique fields to identify existing users in the DB
+// then first create or update the DB record, then do the same in Redis
 export const updateOrCreateUser = (req, res) => {
   const uniqueFields = ['email', 'uberEmail', 'lyftPhoneNumber', 'alexaUserId', 'id'];
-  const findObj = _(uniqueFields)
+  const findObj = _(req.body)
     .reduce((findObj, val, key) => {
-      if (uniqueFields.indexOf(key) >= 0 && findObj[key] !== null) {
+      if (uniqueFields.indexOf(key) >= 0 && req.body[key] !== null) {
         findObj[key] = val;
       }
+      console.log('findObj pre updateOrCreate', findObj);
       return findObj;
     }, {});
 
-  User.updateOrCreate(findObj)
+  User.updateOrCreate(findObj, req.body)
     .then(user => {
-      return user.length === 0 ? res.json({}) : res.json(User.decryptModel(user[0]));
+      user = user[0]; // [{}] => {}
+      console.log('success DB find user updateOrCreate', user);
+
+      let userKeys = Object.keys(user);
+      let redisKeyValArray = [];
+      for (let i = 0, len = userKeys.length; i < len; i++) {
+        redisKeyValArray.push(userKeys[i]);
+        redisKeyValArray.push(user[userKeys[i]]);
+      }
+      redisSetHash(user.id, redisKeyValArray, result => {
+        return user.length === 0 ? res.json({}) : res.json(User.decryptModel(user));
+      });
+
     })
     .catch(err => res.status(400)
       .json(err));
