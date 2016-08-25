@@ -55,8 +55,6 @@ export const createUser = (req, res) => {
 export const getAllUserData = (req, res) => {
   User.findAll()
     .then((users) => {
-      console.log('get all users');
-      console.log('test', User);
       return users.length === 0 ? res.json({}) : res.json(User.decryptCollection(users));
     })
     .catch((err) => res.status(400).json(err));

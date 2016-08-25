@@ -2,8 +2,8 @@ import bluebird from 'bluebird'; // promisify everything for async!
 
 const redis = bluebird.promisifyAll(require('redis'));
 
-const CARVIS_CACHE_PORT = process.env.REDIS_PORT.split(':')[2] || 6379;
-const CARVIS_CACHE = process.env.REDIS_PORT.split(':')[1].slice(2) || '127.0.0.1';
+const CARVIS_CACHE_PORT = process.env.PROD ? process.env.REDIS_PORT.split(':')[2] : 6379;
+const CARVIS_CACHE = process.env.PROD ?  process.env.REDIS_PORT.split(':')[1].slice(2) : '127.0.0.1';
 const client = redis.createClient(CARVIS_CACHE_PORT, CARVIS_CACHE);
 // this sets the Redis server as an LRU cache with 400MB space.
 // elasticcache micro has 555MB, but leaving some space for safety ?
