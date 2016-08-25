@@ -218,13 +218,14 @@ describe('API server', function () {
         redisGetKey('testKey', function (res) {
           expect(res)
             .to.equal('testValue');
+          // remove the hash just created
+          redisDelete('testKey', () => done());
         });
-        done();
       });
 
       it('should set a key with expiration', function (done) {
         redisSetKeyWithExpire('testAnotherKey', 1, 'anotherTestValue', function () {
-          redisGetKey('testAnotherKey', function (res) {
+          redisGetKey('testAnotherKey', res => {
             // test the setting / getting of the key
             expect(res)
               .to.equal('anotherTestValue');
@@ -232,12 +233,12 @@ describe('API server', function () {
 
           // test the expiration
           setTimeout(() => {
-            redisGetKey('testAnotherKey', function (res) {
+            redisGetKey('testAnotherKey', res => {
               expect(res)
                 .not.to.equal('anotherTestValue');
-
+              // remove the key just added.
+              redisDelete('testAnotherKey', () => done());
             });
-            done();
           }, 1100);
         });
       });
@@ -256,7 +257,8 @@ describe('API server', function () {
           expect(res)
             .to.equal('val1');
         });
-        done();
+        // remove the hash just created
+        redisDelete('testHash', () => done());
       });
 
       it('should getLyftToken', function (done) {
@@ -725,13 +727,13 @@ describe('API server', function () {
           .then(data => {
             console.log('success rate limit test', data.message);
             if (data.message === 'API key over rate limit, request new key') {
-              done();
+              redisDelete(token, () => done());
             } else {
               // test for truthy response
               expect(data)
                 .to.be.ok;
               let err = 'RATE LIMITING NOT WORKING!';
-              done(err);
+              redisDelete(token, () => done(err));
             }
           })
           .catch(err => console.warn('error fetch', err));

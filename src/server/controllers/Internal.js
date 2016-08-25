@@ -5,8 +5,6 @@ const CARVIS_HELPER_API_KEY = process.env.CARVIS_HELPER_API_KEY;
 
 // the below sets and gets the bearer tokens -- invoked on post and get to the API server route '/internal/lyftBearerToken', called from the helper API where the logic to refresh the token lives.
 
-// on client consumption - instead of looking in process.env - check redis with `getLyftToken`
-
 // Redis functions return value when no callback is provided
 
 export const updateLyftToken = (req, res) => {

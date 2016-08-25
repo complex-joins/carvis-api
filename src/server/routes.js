@@ -19,8 +19,8 @@ export default function (app) {
   });
 
   // ===== user routes ===== //
-  app.get('/dev/users', hasValidAPIToken, getAllUserData);
   app.post('/dev/users', hasValidAPIToken, createUser);
+  app.get('/dev/users', hasValidAPIToken, getAllUserData);
   app.get('/dev/users/raw', hasValidAPIToken, rawUserData);
   app.post('/auth/users', hasValidAPIToken, findOrCreateUser);
   app.get('/users/:userid', hasValidAPIToken, getUserDashboardData);
@@ -37,7 +37,6 @@ export default function (app) {
   app.post('/rides/cancelRide/:userid', hasValidAPIToken, shareRideETA);
 
   // ===== addRide, getEstimate and placesCall web routes ===== //
-
   // placesCall - web
   app.post('/web/places', hasValidAPIToken, placesCall);
   // getEstimate - web
