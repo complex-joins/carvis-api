@@ -50,10 +50,10 @@ export default function (app) {
   app.post('/web/requestRide', hasValidAPIToken, requestRide);
 
   // ===== alexa routes ===== //
-  app.post('/alexa/launch', handleLaunch);
-  app.post('/alexa/estimate', AlexaGetEstimate);
 
-  // ===== internal routes ===== //
+  app.post('/alexa/estimate', AlexaGetEstimate);
+  app.post('/alexa/launch/:alexaUserId', handleLaunch);
+
   app.get('/internal/lyftBearerToken', hasValidAPIToken, getLyftToken);
   app.post('/internal/lyftBearerToken', hasValidAPIToken, updateLyftToken);
 
