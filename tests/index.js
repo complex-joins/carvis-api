@@ -296,7 +296,7 @@ describe('API server', function () {
 
       it('should fetch the lyftBearerToken', function (done) {
         // fetch that token via the endpoint
-        var apiURL = `http://localhost:${PORT}/internal/lyftBearerToken`
+        let apiURL = `http://localhost:${PORT}/internal/lyftBearerToken`
         fetch(apiURL, {
             method: 'GET',
             headers: {
@@ -318,7 +318,7 @@ describe('API server', function () {
       });
 
       it('should add a user to redis on creating a user', function (done) {
-        var apiURL = `http://localhost:${PORT}/dev/users`
+        let apiURL = `http://localhost:${PORT}/dev/users`
         let body = {
           email: 'someuser@gmail.com' + Math.random()
         };
@@ -375,7 +375,7 @@ describe('API server', function () {
       });
 
       it('should update a user and find the update in Redis', function (done) {
-        var apiURL = `http://localhost:${PORT}/users/7`
+        let apiURL = `http://localhost:${PORT}/users/7`
         let body = {
           email: 'TESTSAREBADMMMMMKAY2@gmail.com' + Math.random()
         };
@@ -667,6 +667,7 @@ describe('API server', function () {
             expect(data)
               .to.be.ok;
             rideId = data.id;
+            console.log('rideId in addRide is', rideId);
             let queryURL = `http://localhost:${PORT}/rides/${userId}`;
 
             return fetch(queryURL, {
@@ -682,10 +683,24 @@ describe('API server', function () {
                 expect(data)
                   .to.be.ok;
                 // returns an array of objects, which have `id`
-                // we check all rides for the user to see if our test ride was added.
-                for (var i = 0, len = data.length; i < len; i++) {
+                // we check the user's rides to see if our test ride was added.
+                for (let i = 0, len = data.length; i < len; i++) {
                   if (data[i]['id'] === rideId) {
-                    done();
+                    // delete the ride we just created
+                    let deleteURL = `http://localhost:${PORT}/rides/${rideId}`
+                    fetch(deleteURL, {
+                        method: 'DELETE',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'x-access-token': process.env.CARVIS_API_KEY
+                        }
+                      })
+                      .then(res => res.json())
+                      .then(data => {
+                        // optional - check if really deleted.
+                        done();
+                      })
+                      .catch(err => console.warn('error delete ride', err));
                   }
                 }
               })

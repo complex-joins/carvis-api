@@ -56,7 +56,7 @@ export const addRide = function (req, res) {
             };
             return helperAPIQuery(body, vendor);
           }
-        } else { // only invoked if we don't have the user in Redis 
+        } else { // only invoked if we don't have the user in Redis
           let dbURL = 'http://' + CARVIS_API + '/users/' + userId;
           console.log('pre db get', vendor, userId, dbURL, rideId);
 
