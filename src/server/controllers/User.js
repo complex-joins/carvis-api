@@ -139,10 +139,18 @@ export const deleteUser = (req, res) => {
 };
 
 export const getRawUser = (req, res) => {
-  User.find({ id: req.params.userid })
-    .then((user) => user.length === 0 ? res.json({}) : res.json(user))
-    .catch((err) => res.status(400)
-      .json(err));
+  let userId = req.params.userid;
+  // get from redis, if not found, try DB
+  redisHashGetAll(userId, user => {
+    if (user) {
+      res.json(user);
+    } else {
+      User.find({ id: userId })
+        .then((user) => user.length === 0 ? res.json({}) : res.json(user))
+        .catch((err) => res.status(400)
+          .json(err));
+    }
+  });
 };
 
 // what is this? @alex?

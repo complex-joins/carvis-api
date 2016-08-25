@@ -13,6 +13,7 @@ import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/con
 import { createNewDeveloperKey } from './../src/server/controllers/DeveloperAPI';
 import hasValidDevAPIToken from './../src/server/server-configuration/hasValidDevAPIToken';
 import { getLyftBearerToken } from './../src/server/utils/ride-helper';
+import { createMessage } from './../src/server/utils/twilioHelper';
 
 let currentListeningServer;
 let PORT = 8080;
@@ -787,16 +788,54 @@ describe('API server', function () {
           .catch(err => console.warn('error public addRide', err));
       });
 
+      // live test, would actually request a ride
       // /developer/requestRide
       // it('should request a ride from the public endpoint', function(done) {
+      //
+      // });
+
+      // can only test this after requesting a ride - risky
+      // app.post('developer/shareETA/:userid', hasValidDevAPIToken, shareRideETA);
+      // it('should return the shareETA URL', function (done) {
+      //
+      // });
+
+      // test separated from the shareETA - invoke createMessage same way.
+      it('should invoke createMessage with Twilio', function (done) {
+        let url = `http://localhost:${PORT}/internal/sendTwilio`;
+        let body = {
+          message: 'test Twilio - Carvis-API'
+        };
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+              'x-access-token': process.env.CARVIS_API_KEY,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          })
+          .then(res => res.json())
+          .then(data => {
+            console.log('success Twilio createMessage', data);
+            expect(data)
+              .to.be.ok;
+            done();
+          })
+          .catch(err => done(err));
+      });
+
+      // can only test this after requesting a ride - risky
+      // app.post('/developer/cancelRide/:userid', hasValidDevAPIToken, cancelRide);
+      // it('should cancel a requested ride', function(done) {
       //
       // });
 
       // note: this test should be done last - as it invalidates the previously created key.
       it('should return 404 if key used >99 times', function (done) {
         let token = keyObj.devKey;
-        let apiURL = `http://localhost:${PORT}/developer/testMyKey`
-          // increment the key value 100 times
+        let apiURL = `http://localhost:${PORT}/developer/testMyKey`;
+        // increment the key value 100 times
         for (let i = 0; i < 100; i++) {
           redisIncrementKeyValue(token);
         }

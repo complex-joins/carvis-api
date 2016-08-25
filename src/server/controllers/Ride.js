@@ -174,7 +174,11 @@ export const shareRideETA = (req, res) => {
       console.log('success lyft shareETA', data);
 
       let URLmessage = message + data.shareUrl;
-      createMessage(number, URLmessage);
+      let twilioBody = {
+        message: URLmessage,
+        number: number
+      };
+      createMessage({ body: twilioBody });
       res.json();
     })
     .catch(err => {

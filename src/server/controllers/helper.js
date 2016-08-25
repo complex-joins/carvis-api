@@ -6,7 +6,6 @@ const CARVIS_API_KEY = process.env.CARVIS_API_KEY;
 import fetch from 'node-fetch';
 import { Ride } from './../models/Ride';
 import { User } from './../models/User';
-import { createMessage } from './../utils/twilioHelper';
 import { helperAPIQuery, getUserAndRequestRideDB } from './Ride';
 import { redisHashGetAll, redisSetKeyWithExpire, redisGetKey, redisHashGetOne } from './../../redis/redisHelperFunctions';
 import { getLyftBearerToken } from './../utils/ride-helper';

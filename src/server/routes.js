@@ -1,4 +1,4 @@
-import { getRidesForUser, addRide, updateRide, getAllRideData, deleteRide, shareRideETA } from './controllers/Ride';
+import { getRidesForUser, addRide, updateRide, getAllRideData, deleteRide, shareRideETA, cancelRide } from './controllers/Ride';
 import { getUserDashboardData, updateUserData, createUser, getAllUserData, findOrCreateUser, updateOrCreateUser, deleteUser, rawUserData } from './controllers/User';
 import { getLyftToken, updateLyftToken } from './controllers/Internal';
 import { createNewDeveloperKey } from './controllers/DeveloperAPI';
@@ -10,6 +10,7 @@ import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 import hasValidDevAPIToken from './server-configuration/hasValidDevAPIToken';
 import { handleLaunch, AlexaGetEstimate } from './controllers/alexa';
 import { lyftPhoneAuth, lyftPhoneCodeAuth, uberLogin, testKey, getEstimate, placesCall, addRideToDB, requestRide } from './controllers/helper';
+import { createMessage } from './utils/twilioHelper';
 
 export default function (app) {
   // TODO: only let the user with that ID find users (middleware);
@@ -34,7 +35,7 @@ export default function (app) {
   app.post('/rides', hasValidAPIToken, addRide);
   app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);
   app.post('/rides/shareETA/:userid', hasValidAPIToken, shareRideETA);
-  app.post('/rides/cancelRide/:userid', hasValidAPIToken, shareRideETA);
+  app.post('/rides/cancelRide/:userid', hasValidAPIToken, cancelRide);
 
   // ===== addRide, getEstimate and placesCall web routes ===== //
   // placesCall - web
@@ -56,6 +57,7 @@ export default function (app) {
 
   app.get('/internal/lyftBearerToken', hasValidAPIToken, getLyftToken);
   app.post('/internal/lyftBearerToken', hasValidAPIToken, updateLyftToken);
+  app.post('/internal/sendTwilio', hasValidAPIToken, createMessage);
 
   // ===== carvis auth routes ===== //
   // app.post('/signin', requireSignin, Authentication.signin);
@@ -87,6 +89,9 @@ export default function (app) {
   // - on web invoked via a button, not in flow from addRide
   // this function actually requests a ride via the helperAPI
   app.post('/developer/requestRide', hasValidDevAPIToken, requestRide);
+  // below two routes only work for lyft currently.
+  app.post('developer/shareETA/:userid', hasValidDevAPIToken, shareRideETA);
+  app.post('/developer/cancelRide/:userid', hasValidDevAPIToken, cancelRide);
 
   // more routes
   // ===== ... the end ... ===== //
