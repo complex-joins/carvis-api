@@ -22,8 +22,6 @@ exports.handleLaunch = function(req, res) {
   console.log(req.params)
   User.find({alexaUserId: req.params.alexaUserId})
   .then((user) => {
-    // console.log('user==================',  user);
-    // console.log('USER DCYPRT================', User.decryptModel(user[0]));
     return user.length === 0 ? {} : user[0];
   })
   .then((data) => {
