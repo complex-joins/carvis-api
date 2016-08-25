@@ -153,8 +153,28 @@ describe('API server', function () {
             headers: { 'x-access-token': process.env.CARVIS_API_KEY }
           })
           .then((res) => {
+            // test for an OK statuscode / response.
             assert.equal(res.status, 200, 'did not return 200', res.status);
-            done();
+
+            // test if the user was really deleted.
+            let url = `http://localhost:${PORT}/users/${testUserId}`;
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-access-token': process.env.CARVIS_API_KEY
+                }
+              })
+              .then(res => res.json())
+              .then(data => {
+                console.log('successful could not find user after delete', data);
+                expect(data)
+                  .to.be.an('object');
+                expect(data)
+                  .to.be.empty;
+                done();
+              })
+              .catch(err => done(err));
           });
       });
       // app.post('/users/updateOrCreate', hasValidAPIToken, updateOrCreateUser)
