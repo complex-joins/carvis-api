@@ -34,4 +34,4 @@ export const RideSchema = function (ride) {
   ride.string('tripDuration', 255); // duration of the ride origin to destination - returned by vendor on confirmation of request-ride
 };
 
-export const Ride = db.model('rides');
+export const Ride = db.model('rides', RideSchema);

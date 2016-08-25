@@ -29,6 +29,7 @@ export default function (app) {
   app.delete('/dev/users/:userid', hasValidAPIToken, deleteUser);
 
   // ===== rides routes ===== //
+  app.get('/rides/:userid', hasValidAPIToken, getRidesForUser);
   app.put('/rides/:rideid', hasValidAPIToken, updateRide);
   app.post('/rides', hasValidAPIToken, addRide);
   app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);

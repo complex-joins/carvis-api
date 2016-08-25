@@ -3,18 +3,21 @@ import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKe
 
 export const getUserDashboardData = (req, res) => {
   let userId = req.params.userid;
-  var user = redisHashGetAll(userId /*, cb*/ );
-
-  if (user) {
-    console.log('found user in redis, getUserDashboardData', user);
-    res.json(User.decryptModel(user));
-  } else {
-    console.log('no redis - doing db fetch getUserDashboardData');
-    User.find({ id: userId })
-      .then((user) => user.length === 0 ? res.json({}) : res.json([User.decryptModel(user[0])]))
-      .catch((err) => res.status(400)
-        .json(err));
-  }
+  redisHashGetAll(userId, user => {
+    if (user) {
+      console.log('found user in redis, getUserDashboardData', user);
+      res.json(user);
+      // NOTE: redis returns the encrypted version.
+      // do we depend on a decrypted version anywhere?
+      // ie. lyftToken ?
+    } else {
+      console.log('no redis - doing db fetch getUserDashboardData');
+      User.find({ id: userId })
+        .then((user) => user.length === 0 ? res.json({}) : res.json([User.decryptModel(user[0])]))
+        .catch((err) => res.status(400)
+          .json(err));
+    }
+  });
 };
 
 export const updateUserData = (req, res) => {
@@ -53,8 +56,18 @@ export const createUser = (req, res) => {
 
 export const getAllUserData = (req, res) => {
   User.findAll()
-    .then((users) => users.length === 0 ? res.json({}) : res.json(User.decryptCollection(users)))
-    .catch((err) => res.status(400)
+    .then(users => {
+      console.log('users in getAllUserData', users);
+      users.length === 0 ? res.json({}) : res.json(User.decryptCollection(users));
+    })
+    .catch(err => res.status(400)
+      .json(err));
+};
+
+export const rawUserData = (req, res) => {
+  User.findAll()
+    .then(users => res.json(users))
+    .catch(err => res.status(400)
       .json(err));
 };
 
@@ -73,7 +86,7 @@ export const findOrCreateUser = (req, res) => {
   });
 };
 
-// TODO - redis.
+// TODO - redis for lyft/uber signup! very important.
 export const updateOrCreateUser = (req, res) => {
   let firstParam = Object.keys(req.body)[0];
   User.updateOrCreate({
@@ -89,13 +102,6 @@ export const updateOrCreateUser = (req, res) => {
 export const deleteUser = (req, res) => {
   User.remove({ id: req.params.userid })
     .then((user) => user.length === 0 ? res.json({}) : res.json(User.decryptModel(user[0])))
-    .catch((err) => res.status(400)
-      .json(err));
-};
-
-export const rawUserData = (req, res) => {
-  User.findAll()
-    .then((users) => res.json(users))
     .catch((err) => res.status(400)
       .json(err));
 };

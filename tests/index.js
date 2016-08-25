@@ -43,7 +43,10 @@ describe('API server', function () {
 
       it('should get all users when presented with the API access token', function (done) {
         axios.get(`http://localhost:${PORT}/dev/users`, {
-            headers: { 'x-access-token': process.env.CARVIS_API_KEY }
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': process.env.CARVIS_API_KEY
+            }
           })
           .then((res) => {
             testCount = res.data.length;
@@ -560,7 +563,7 @@ describe('API server', function () {
             descrip: 'Hack Reactor, Market Street, San Francisco, CA, United States',
             coords: [37.7836966, -122.4089664]
           },
-          userId: 1,
+          userId: 1
         };
 
         fetch(apiURL, {
@@ -584,26 +587,71 @@ describe('API server', function () {
           .catch(err => console.warn('error public getEstimate', err));
       });
 
-      /*
-      {
-        winner: { vendor: 'Uber', estimate: 623, estimateType: 'fare' },
-        userId: 1,
-        origin: {
-          descrip: 'Casa de Shez',
-          coords: [37.7773563, -122.3968629]
-        },
-        destination: {
-          descrip: 'Hack Reactor, Market Street, San Francisco, CA, United States',
-          coords: [37.7836966, -122.4089664]
-        }
-      }
-      */
+      it('should add a DB record on addRide', function (done) {
+        let apiURL = `http://localhost:${PORT}/developer/addRide`
+        let token = keyObj.devKey;
+        let userId = 1;
+        let rideId;
+        let body = {
+          winner: {
+            vendor: 'Uber',
+            estimate: 623,
+            estimateType: 'fare'
+          },
+          userId: userId,
+          origin: {
+            descrip: 'Casa de Shez',
+            coords: [37.7773563, -122.3968629]
+          },
+          destination: {
+            descrip: 'Hack Reactor, Market Street, San Francisco, CA, United States',
+            coords: [37.7836966, -122.4089664]
+          }
+        };
 
+        fetch(apiURL, {
+            method: 'POST',
+            headers: {
+              'x-access-token': token,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          })
+          .then(res => {
+            return res.json();
+          })
+          .then(data => {
+            console.log('success public addRide', data);
+            // test for truthy response
+            expect(data)
+              .to.be.ok;
+            rideId = data.id;
+            let queryURL = `http://localhost:${PORT}/rides/${userId}`;
 
-      // /developer/addRide
-      // it('should add a DB record on addRide after getEstimate', function (done) {
-      //
-      // });
+            return fetch(queryURL, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-access-token': process.env.CARVIS_API_KEY
+                }
+              })
+              .then(res => res.json())
+              .then(data => {
+                console.log('rides for user', userId, data);
+                expect(data)
+                  .to.be.ok;
+                // returns an array of objects, which have `id`
+                // we check all rides for the user to see if our test ride was added.
+                for (var i = 0, len = data.length; i < len; i++) {
+                  if (data[i]['id'] === rideId) {
+                    done();
+                  }
+                }
+              })
+              .catch(err => console.warn('error db fetch ride for user', err));
+          })
+          .catch(err => console.warn('error public addRide', err));
+      });
 
       // /developer/requestRide
       // it('should request a ride from the public endpoint', function(done) {

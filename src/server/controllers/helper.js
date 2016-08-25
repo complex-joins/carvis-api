@@ -345,7 +345,7 @@ export const addRideToDB = (req, res) => {
   // currently answer is not used.
 
   let body = {
-    userId: 3, // TODO: make this dynamic once alexa auth is implemented
+    userId: userId,
     rideStatus: 'estimate',
     originLat: origin.coords[0],
     originLng: origin.coords[1],
@@ -353,7 +353,7 @@ export const addRideToDB = (req, res) => {
     destinationLat: destination.coords[0],
     destinationLng: destination.coords[1],
     destinationRoutableAddress: destination.descrip,
-    winningVendorRideType: null, // TODO: populate correctly
+    winningVendorRideType: null, // TODO: populate correctly - dynamic car type
     winner: winner.vendor
   };
 
