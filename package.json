@@ -12,7 +12,7 @@
     "setup": "node ./tools/resolveGitIgnored.js;",
     "docker:deploy": "npm run build; docker build -t alexcstark/carvis-api .; docker push alexcstark/carvis-api",
     "test": "mocha --compilers js:babel-core/register ./tests/index.js",
-    "start": "npm run build; node ./dist/server/index.js"
+    "start": "npm run build; redis-server & node ./dist/server/index.js"
   },
   "repository": {
     "type": "git",
@@ -53,8 +53,9 @@
     "pg": "^6.1.0",
     "redis": "^2.6.2",
     "shelljs": "^0.7.3",
-    "storkSQL": "^0.1.28",
-    "twilio": "^2.9.2"
+    "storkSQL": "^0.1.30",
+    "twilio": "^2.9.2",
+    "uuid-v4": "^0.1.0"
   },
   "devDependencies": {
     "babel-plugin-transform-inline-environment-variables": "^6.8.0",

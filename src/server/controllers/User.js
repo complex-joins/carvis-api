@@ -1,20 +1,21 @@
 import { User } from '../models/User';
-import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey } from './../../redis/redisHelperFunctions';
+import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey, redisDelete } from './../../redis/redisHelperFunctions';
+import _ from 'lodash';
 
 export const getUserDashboardData = (req, res) => {
   let userId = req.params.userid;
-  var user = redisHashGetAll(userId /*, cb*/ );
-
-  if (user) {
-    console.log('found user in redis, getUserDashboardData', user);
-    res.json(User.decryptModel(user));
-  } else {
-    console.log('no redis - doing db fetch getUserDashboardData');
-    User.find({ id: userId })
-      .then((user) => user.length === 0 ? res.json({}) : res.json([User.decryptModel(user[0])]))
-      .catch((err) => res.status(400)
-        .json(err));
-  }
+  redisHashGetAll(userId, user => {
+    if (user) {
+      console.log('found user in redis, getUserDashboardData', user);
+      res.json(User.decryptModel(user));
+    } else {
+      console.log('no redis - doing db fetch getUserDashboardData');
+      User.find({ id: userId })
+        .then((user) => user.length === 0 ? res.json({}) : res.json([User.decryptModel(user[0])]))
+        .catch((err) => res.status(400)
+          .json(err));
+    }
+  });
 };
 
 export const updateUserData = (req, res) => {
@@ -26,11 +27,14 @@ export const updateUserData = (req, res) => {
     redisKeyValArray.push(req.body[newKeys[i]]);
   }
   console.log('redisKeyValArray', userId, redisKeyValArray);
-  redisSetHash(userId, redisKeyValArray);
-  User.update({ id: userId }, req.body)
-    .then((user) => user.length === 0 ? res.json({}) : res.json(user))
-    .catch((err) => res.status(400)
-      .json(err));
+  // update redis, and after updating redis, update the DB.
+  redisSetHash(userId, redisKeyValArray, result => {
+    console.log('success setHash', userId, result);
+    User.update({ id: userId }, req.body)
+      .then(user => user.length === 0 ? res.json({}) : res.json(user))
+      .catch(err => res.status(400)
+        .json(err));
+  });
 };
 
 export const createUser = (req, res) => {
@@ -44,8 +48,9 @@ export const createUser = (req, res) => {
         redisKeyValArray.push(key);
         redisKeyValArray.push(user[0][key]);
       }
-      redisSetHash(userId, redisKeyValArray);
-      user.length === 0 ? res.json({}) : res.json(user);
+      redisSetHash(userId, redisKeyValArray, result => {
+        user.length === 0 ? res.json({}) : res.json(user);
+      });
     })
     .catch((err) => res.status(400)
       .json(err));
@@ -53,50 +58,84 @@ export const createUser = (req, res) => {
 
 export const getAllUserData = (req, res) => {
   User.findAll()
-    .then((users) => users.length === 0 ? res.json({}) : res.json(User.decryptCollection(users)))
-    .catch((err) => res.status(400)
+    .then(users => {
+      console.log('users in getAllUserData', users);
+      users.length === 0 ? res.json({}) : res.json(User.decryptCollection(users));
+    })
+    .catch(err => res.status(400)
+      .json(err));
+};
+
+export const rawUserData = (req, res) => {
+  User.findAll()
+    .then(users => res.json(users))
+    .catch(err => res.status(400)
       .json(err));
 };
 
 // note: if not found in redis, and not in db, it is created in DB, however, on that action we don't also add to Redis (todo?)
 export const findOrCreateUser = (req, res) => {
   let userId = req.body.userId || req.body.id; // format?
-  let user = redisHashGetAll(userId /*, cb*/ );
-  if (user) {
-    res.json(User.decryptModel(user));
-  } else {
-    User.findOrCreate(req.body)
-      .then((user) => user.length === 0 ? res.json({}) : res.json(User.decryptModel(user)))
-      .catch((err) => res.status(400)
-        .json(err));
-  }
+  redisHashGetAll(userId, user => {
+    if (user) {
+      res.json(User.decryptModel(user)); // store encrypted in redis.
+    } else {
+      User.findOrCreate(req.body)
+        .then((user) => user.length === 0 ? res.json({}) : res.json(User.decryptModel(user)))
+        .catch((err) => res.status(400)
+          .json(err));
+    }
+  });
 };
 
-// TODO - redis.
+// check for unique fields to identify existing users in the DB
+// then first create or update the DB record, then do the same in Redis
 export const updateOrCreateUser = (req, res) => {
-  let firstParam = Object.keys(req.body)[0];
-  User.updateOrCreate({
-      [firstParam]: req.body[firstParam]
-    }, req.body)
-    .then((user) => {
-      return user.length === 0 ? res.json({}) : res.json(User.decryptModel(user[0]));
+  const uniqueFields = ['email', 'uberEmail', 'lyftPhoneNumber', 'alexaUserId', 'id'];
+  const findObj = _(req.body)
+    .reduce((findObj, val, key) => {
+      if (uniqueFields.indexOf(key) >= 0 && req.body[key] !== null) {
+        findObj[key] = val;
+      }
+      console.log('findObj pre updateOrCreate', findObj);
+      return findObj;
+    }, {});
+
+  User.updateOrCreate(findObj, req.body)
+    .then(user => {
+      user = user[0]; // [{}] => {}
+      console.log('success DB find user updateOrCreate', user);
+
+      let userKeys = Object.keys(user);
+      let redisKeyValArray = [];
+      for (let i = 0, len = userKeys.length; i < len; i++) {
+        redisKeyValArray.push(userKeys[i]);
+        redisKeyValArray.push(user[userKeys[i]]);
+      }
+      redisSetHash(user.id, redisKeyValArray, result => {
+        return user.length === 0 ? res.json({}) : res.json(User.decryptModel(user));
+      });
+
     })
-    .catch((err) => res.status(400)
+    .catch(err => res.status(400)
       .json(err));
 };
 
 export const deleteUser = (req, res) => {
-  User.remove({ id: req.params.userid })
-    .then((user) => user.length === 0 ? res.json({}) : res.json(User.decryptModel(user[0])))
-    .catch((err) => res.status(400)
-      .json(err));
-};
+  let userId = req.params.userid;
 
-export const rawUserData = (req, res) => {
-  User.findAll()
-    .then((users) => res.json(users))
-    .catch((err) => res.status(400)
-      .json(err));
+  // in this case we want to delete both from redis and the DB.
+  redisDelete(userId, user => {
+    if (user) {
+      console.log('success delete', userId, user);
+    } else {
+      console.log('user was not in redis', userId, user);
+    }
+    User.remove({ id: userId })
+      .then((user) => user.length === 0 ? res.json({}) : res.json(User.decryptModel(user[0])))
+      .catch((err) => res.status(400)
+        .json(err));
+  });
 };
 
 export const getRawUser = (req, res) => {

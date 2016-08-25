@@ -116,5 +116,19 @@ export const redisIncrementKeyValue = (keyName, cb) => {
       } else {
         return res;
       }
-    });
+    })
+    .catch(err => console.warn('err redis increment', err));
+};
+
+export const redisDelete = (keyName, cb) => {
+  return client.delAsync(keyName)
+    .then(res => {
+      console.log('redis success del', keyName, res);
+      if (cb) {
+        return cb(res);
+      } else {
+        return res;
+      }
+    })
+    .catch(err => console.warn('err redis delete', err));
 };
