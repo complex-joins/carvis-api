@@ -1,5 +1,4 @@
 const _ = require('lodash'); // used for _.filter
-const env = require('dotenv');
 const config = {};
 import { User } from '../models/User';
 import { formatAnswer, getEstimate, addRide } from '../utils/ride-helper';
