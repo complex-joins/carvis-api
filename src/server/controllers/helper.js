@@ -1,12 +1,14 @@
+// const CARVIS_HELPER_API = process.env.HELPER_PORT; tcp doesnt work right now
 const CARVIS_HELPER_API = process.env.CARVIS_HELPER_API;
 const CARVIS_HELPER_API_KEY = process.env.CARVIS_HELPER_API_KEY;
 import fetch from 'node-fetch';
+console.log('CARVIS HELPER APPIIII      sdfa', CARVIS_HELPER_API);
 
 export const lyftPhoneAuth = (req, res) => {
   let phoneNumber = req.body.phoneNumber;
   console.log('phone number is ', phoneNumber);
 
-  let url = 'http://' + CARVIS_HELPER_API + '/lyft/phoneauth';
+  let url = CARVIS_HELPER_API + '/lyft/phoneauth';
 
   fetch(url, {
       method: 'POST',
@@ -33,7 +35,7 @@ export const lyftPhoneCodeAuth = (req, res) => {
   // let phoneNumber = req.body.phoneNumber;
   console.log('got code', lyftCode);
 
-  let url =  'http://' + CARVIS_HELPER_API + '/lyft/phoneCodeAuth';
+  let url = CARVIS_HELPER_API + '/lyft/phoneCodeAuth';
 
   fetch(url, {
       method: 'POST',
@@ -56,7 +58,7 @@ export const lyftPhoneCodeAuth = (req, res) => {
 };
 
 export const uberLogin = (req, res) => {
-  let url =  'http://' + CARVIS_HELPER_API + '/uber/login';
+  let url = CARVIS_HELPER_API + '/uber/login';
 
   fetch(url, {
       method: 'POST',

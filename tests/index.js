@@ -16,7 +16,7 @@ import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/con
 import { createNewDeveloperKey } from './../src/server/controllers/DeveloperAPI';
 import hasValidDevAPIToken from './../src/server/server-configuration/hasValidDevAPIToken';
 import { getLyftBearerToken } from './../src/server/utils/ride-helper';
-import Stork from 'storkSQL';
+import Stork from '../src/db/stork/src/index';
 
 
 let currentListeningServer;
