@@ -6,7 +6,7 @@ export const lyftPhoneAuth = (req, res) => {
   let phoneNumber = req.body.phoneNumber;
   console.log('phone number is ', phoneNumber);
 
-  let url = CARVIS_HELPER_API + '/lyft/phoneauth';
+  let url = 'http://' + CARVIS_HELPER_API + '/lyft/phoneauth';
 
   fetch(url, {
       method: 'POST',
@@ -33,7 +33,7 @@ export const lyftPhoneCodeAuth = (req, res) => {
   // let phoneNumber = req.body.phoneNumber;
   console.log('got code', lyftCode);
 
-  let url = CARVIS_HELPER_API + '/lyft/phoneCodeAuth';
+  let url =  'http://' + CARVIS_HELPER_API + '/lyft/phoneCodeAuth';
 
   fetch(url, {
       method: 'POST',
@@ -56,7 +56,7 @@ export const lyftPhoneCodeAuth = (req, res) => {
 };
 
 export const uberLogin = (req, res) => {
-  let url = CARVIS_HELPER_API + '/uber/login';
+  let url =  'http://' + CARVIS_HELPER_API + '/uber/login';
 
   fetch(url, {
       method: 'POST',

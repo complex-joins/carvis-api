@@ -4,7 +4,7 @@ const config = {};
 
 import { formatAnswer, getEstimate, addRide } from '../utils/ride-helper';
 import { placesCall } from './../utils/place-helper';
-env.config();
+!process.env.PROD && env.config();
 
 const fakeoutMode = JSON.parse(process.env.FAKEOUT) || false; // when true, CARVIS will tell you about taxi fares, not uber and lyft estimates
 
