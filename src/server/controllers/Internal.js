@@ -38,7 +38,7 @@ export const getLyftToken = (req, res) => {
 };
 
 const refreshToken = () => {
-  let helperURL = CARVIS_HELPER_API + '/lyft/refreshBearerToken';
+  let helperURL = 'http://' + CARVIS_HELPER_API + '/lyft/refreshBearerToken';
   fetch(helperURL, {
       method: 'GET',
       headers: {

@@ -1,3 +1,4 @@
+// const CARVIS_HELPER_API = process.env.HELPER_PORT; tcp doesnt work right now
 const CARVIS_HELPER_API = process.env.CARVIS_HELPER_API;
 const CARVIS_HELPER_API_KEY = process.env.CARVIS_HELPER_API_KEY;
 const CARVIS_API = process.env.CARVIS_API;
