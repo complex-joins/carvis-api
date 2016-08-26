@@ -61,7 +61,6 @@ export const createUser = (req, res) => {
 export const getAllUserData = (req, res) => {
   User.findAll()
     .then(users => {
-      console.log('users in getAllUserData', users);
       users.length === 0 ? res.json({}) : res.json(User.decryptCollection(users));
     })
     .catch(err => res.status(400)
@@ -99,7 +98,6 @@ export const updateOrCreateUser = (req, res) => {
       if (uniqueFields.indexOf(key) >= 0 && req.body[key] !== null) {
         findObj[key] = val;
       }
-      console.log('findObj pre updateOrCreate', findObj);
       return findObj;
     }, {});
 
