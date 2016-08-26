@@ -1,4 +1,4 @@
-import Stork from './stork/src/index';
+import Stork from './storkSQL/src/index';
 // require('dotenv').config();
 let DB_CONFIG;
 
