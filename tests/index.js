@@ -652,16 +652,11 @@ describe('API server', function () {
                 .to.equal(body.email);
               done();
             });
-          }) <<
-          << << < HEAD
+          })
           .catch(err => {
             console.warn('error delete user', err);
             done(err);
-          }); ===
-        === =
-
-        >>>
-        >>> > 73837 bbdf7d1793cc093a3d9825a0d3a22b82679
+          });
       });
       // more tests within Redis.
     });
