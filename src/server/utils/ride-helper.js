@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 export const getLyftBearerToken = (cb) => {
-  let url = 'http://localhost:8080/internal/lyftBearerToken'; // TODO: change to `process.env.CARVIS_API`
+  let url = 'http://' + process.env.CARVIS_API + '/internal/lyftBearerToken';
   return fetch(url, {
       method: 'GET',
       headers: {
@@ -152,7 +152,7 @@ export const addRide = (ride, userId, origin, destination, cb) => {
   let endpoint = process.env.PROD ? 'http://54.183.205.82/rides' : 'http://localhost:8080/rides';
 
   let body = {
-    userId: userId,
+    userId: userId || 1, // TODO: make this fully dynamic with no hardcoded fallback, once alexa auth is implemented
     rideStatus: 'estimate',
     originLat: origin.coords[0],
     originLng: origin.coords[1],

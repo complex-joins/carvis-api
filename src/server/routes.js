@@ -90,5 +90,6 @@ export default function (app) {
   app.post('/developer/cancelRide/:userid', hasValidDevAPIToken, cancelRide);
 
   // more routes
+
   // ===== ... the end ... ===== //
 }
