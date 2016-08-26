@@ -184,7 +184,6 @@ export const addRide = (ride, userId, origin, destination, cb) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Content-Type': 'application/json',
         'x-access-token': process.env.CARVIS_API_KEY
           // TODO: add api key so that POST to /rides succeeds
           // but caution, that will actually try to request a ride - we should spoof that on dev
