@@ -1,7 +1,6 @@
 const path = require('path');
 const dotenv = require('dotenv');
 dotenv.config();
-console.log(process.env);
 const assert = require('chai')
   .assert;
 const expect = require('chai')
@@ -11,22 +10,53 @@ import fetch from 'node-fetch';
 const request = require('supertest');
 const server = require('./testServer');
 const User = require('../src/server/models/User');
+import _ from 'lodash';
 import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey, redisIncrementKeyValue, redisHashGetOneAsync } from './../src/redis/redisHelperFunctions';
 import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/controllers/Internal';
 import { createNewDeveloperKey } from './../src/server/controllers/DeveloperAPI';
 import hasValidDevAPIToken from './../src/server/server-configuration/hasValidDevAPIToken';
 import { getLyftBearerToken } from './../src/server/utils/ride-helper';
+import Stork from 'storkSQL';
+
 
 let currentListeningServer;
 let PORT = 8080;
 let testUserId;
 let testCount;
 let keyObj = {};
+let DB_CONFIG = {
+  host: process.env.TEST_DB_HOST,
+  port: 5432,
+  database: process.env.TEST_DB_DATABASE,
+  user: process.env.TEST_DB_USER,
+  password: process.env.TEST_DB_PASS,
+  ssl: true
+};
+
+// if (process.env.AWS && JSON.parse(process.env.AWS)) {
+//   DB_CONFIG
+// } else {
+//   // DB_CONFIG = JSON.parse(process.env.DB_CONFIG_OBJ_JSON);
+// }
+
+const db = new Stork({
+  connection: DB_CONFIG,
+  client: 'pg'
+});
+
+
+
 
 describe('API server', function () {
   this.timeout(18000);
-  before(function () {
+  before(function (done) {
     currentListeningServer = server.default.listen(PORT);
+
+    db.dropTableIfExists('users')
+    .then(() => db.createTable('users', User.UserSchema))
+    .then(() => done())
+    .catch((err) => done(err));
+
   });
 
   after(function () {
@@ -49,8 +79,8 @@ describe('API server', function () {
             headers: { 'x-access-token': process.env.CARVIS_API_KEY }
           })
           .then((res) => {
-            testCount = res.data.length;
-            assert.equal(res.status, 200, 'did not return 200', res.status);
+            testCount = _.isEmpty(res.data) ? 0 : res.data.length;
+            expect(res.status).to.equal(200);
             done();
           })
           .catch((err) => done(err));
@@ -61,6 +91,7 @@ describe('API server', function () {
             headers: { 'x-access-token': process.env.CARVIS_API_KEY }
           })
           .then((res) => {
+            // console.log('res', res);
             testUserId = res.data[0].id;
             assert.equal(res.status, 200, 'did not return 200', res.status);
             done();

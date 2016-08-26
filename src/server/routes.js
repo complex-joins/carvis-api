@@ -2,9 +2,6 @@ import { getRidesForUser, addRide, updateRide, getAllRideData, deleteRide, share
 import { getUserDashboardData, updateUserData, createUser, getAllUserData, findOrCreateUser, updateOrCreateUser, deleteUser, rawUserData } from './controllers/User';
 import { getLyftToken, updateLyftToken } from './controllers/Internal';
 import { createNewDeveloperKey } from './controllers/DeveloperAPI';
-// import passport from 'passport';
-// import passportService from './services/passport';
-// import Authentication from './controllers/authentication';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 import hasValidDevAPIToken from './server-configuration/hasValidDevAPIToken';
 import { handleLaunch, AlexaGetEstimate, cancelRide } from './controllers/alexa';
@@ -64,8 +61,6 @@ export default function (app) {
   app.post('/developer/uberLogin', hasValidDevAPIToken, uberLogin);
   app.post('/developer/testMyKey', hasValidDevAPIToken, testKey);
   // more routes
-
-
 
   // ===== ... the end ... ===== //
 }

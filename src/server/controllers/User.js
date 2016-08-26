@@ -37,9 +37,7 @@ export const updateUserData = (req, res) => {
 export const createUser = (req, res) => {
   User.create(req.body)
     .then((user) => {
-      // add user to redis only after successful DB add
       let userId = user[0].id; // Carvis userId
-      console.log(user[0]);
       let redisKeyValArray = [];
       for (let key in user[0]) {
         redisKeyValArray.push(key);
@@ -77,14 +75,14 @@ export const findOrCreateUser = (req, res) => {
 // TODO - redis.
 export const updateOrCreateUser = (req, res) => {
   const uniqueFields = ['email', 'uberEmail', 'lyftPhoneNumber', 'alexaUserId', 'id'];
-  const findObj = _(uniqueFields).reduce((findObj, val, key) => {
+  const findObj = _(req.body).reduce((findObj, val, key) => {
     if (uniqueFields.indexOf(key) >= 0 && findObj[key] !== null) {
       findObj[key] = val;
     }
     return findObj;
   }, {});
 
-  User.updateOrCreate(findObj)
+  User.updateOrCreate(findObj, req.body)
   .then((user) => {
     return user.length === 0 ? res.json({}) : res.json(User.decryptModel(user[0]));
   })

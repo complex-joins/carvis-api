@@ -1,10 +1,8 @@
 import express from 'express';
 import { PORT, configureServer } from '../src/server/server-configuration/config';
 import routes from '../src/server/routes';
-if (!process.env.PROD) {
-  require('dotenv').config();
-  console.log('hi');
-}
+require('dotenv').config();
+
 const app = express();
 // Sessions, passport, auth middleware
 configureServer(app);
