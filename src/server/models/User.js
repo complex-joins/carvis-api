@@ -1,8 +1,8 @@
 import db from '../../db/db';
-import uuid from 'uuid-v4';
+import uuid from 'uuid-v4'; // TODO: !!!
 
 export const UserSchema = function (user) {
-  user.uuid('id')
+  user.increments('id')
     .primary();
   user.timestamp('created_at')
     .defaultTo(db.knex.fn.now());

@@ -36,7 +36,7 @@ export const createMessage = (req, res) => {
 
   client.messages.create({
     to: number,
-    from: "+19495417437", // diff?
+    from: "+19495417437",
     body: message
   }, (err, message) => {
     // The HTTP request to Twilio will run asynchronously. This callback
@@ -49,8 +49,10 @@ export const createMessage = (req, res) => {
       // information about the text messsage you just sent:
       console.log('Success! The SID for this SMS message is:', message.sid);
       console.log('Message sent on:', message.dateCreated);
+      res.json({ message: 'success!', SID: message.sid, created: message.dateCreated })
     } else {
-      console.log('Error in Twilio SMS send', err);
+      console.warn('Error in Twilio SMS send', err);
+      res.json({ message: 'error! Twilio didn\'t work' });
     }
   });
 }

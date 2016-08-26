@@ -170,7 +170,7 @@ export const getEstimate = (req, res) => {
   let destination = req.body.destination; // same format as origin
   let start = origin.coords;
   let dest = destination.coords;
-  let userId = req.body.userId; // user we're doing the query for
+  let userId = req.body.carvisUserId || req.body.userId;
 
   // tokens, URLs
   let lyftToken = getLyftBearerToken();

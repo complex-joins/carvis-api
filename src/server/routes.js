@@ -49,6 +49,8 @@ export default function (app) {
   // - on web invoked via a button, not in flow from addRide
   // this function actually requests a ride via the helperAPI
   app.post('/web/requestRide', hasValidAPIToken, requestRide);
+  app.post('/web/shareETA/:userid', hasValidAPIToken, shareRideETA);
+  app.post('/web/cancelRide/:userid', hasValidAPIToken, cancelRide);
 
   // ===== alexa routes ===== //
 
@@ -90,7 +92,7 @@ export default function (app) {
   // this function actually requests a ride via the helperAPI
   app.post('/developer/requestRide', hasValidDevAPIToken, requestRide);
   // below two routes only work for lyft currently.
-  app.post('developer/shareETA/:userid', hasValidDevAPIToken, shareRideETA);
+  app.post('/developer/shareETA/:userid', hasValidDevAPIToken, shareRideETA);
   app.post('/developer/cancelRide/:userid', hasValidDevAPIToken, cancelRide);
 
   // more routes
