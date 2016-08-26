@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 export const getLyftBearerToken = (cb) => {
-  let url = 'http://localhost:8080/internal/lyftBearerToken'; // TODO: change to `process.env.CARVIS_API`
+  let url = 'http://' + process.env.CARVIS_API + '/internal/lyftBearerToken';
   return fetch(url, {
       method: 'GET',
       headers: {
