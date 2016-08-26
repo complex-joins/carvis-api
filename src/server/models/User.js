@@ -51,7 +51,7 @@ export const UserSchema = function (user) {
   user.string('uberPassword', 255);
 };
 
-export const User = db.model('users', {
+export const User = db.model('users', UserSchema, {
   secureFields: {
     password: process.env.USER_ENCRYPT,
     fields: ['lyftToken', 'lyftPaymentInfo', 'uberPassword', 'uberToken', 'password', 'alexaUserId']

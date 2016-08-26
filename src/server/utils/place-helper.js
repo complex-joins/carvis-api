@@ -1,11 +1,8 @@
-var fetch = require('node-fetch');
-fetch.Promise = require('bluebird');
-var _ = require('lodash');
+const fetch = require('node-fetch');
+const key = process.env.GOOGLE_PLACES_API_KEY;
 
-var key = process.env.GOOGLE_PLACES_API_KEY;
-
-var placesCall = function(place, cb, nearbyLoc) {
-  var loc, radius;
+export const placesCall = (place, cb, nearbyLoc) => {
+  let loc, radius;
   if (nearbyLoc) { // nearby location was passed in as reference to search near
     loc = '' + nearbyLoc[0] + ',' + nearbyLoc[1];
     radius = '150000';
@@ -14,41 +11,40 @@ var placesCall = function(place, cb, nearbyLoc) {
     radius = '20000000';
   }
 
-  var url = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${place}&location=${loc}&radius=${radius}&key=${key}';
-  url = _.template(url)({
-    place: place,
-    key: key,
-    loc: loc,
-    radius: radius
-  });
+  let url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${place}&location=${loc}&radius=${radius}&key=${key}`;
 
-  fetch(url).then( function(res) {
-    return res.json();
-  }).then( function(data) {
-    var placeDesc = data.predictions[0].description;
-    console.log('Place found:', placeDesc);
-    // TODO: filter out place results with distance from home > 100 miles
-    var placeId = data.predictions[0].place_id;
-    var detailURL = 'https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&key=${key}';
-    detailURL = _.template(detailURL)({
-      placeId: placeId,
-      key: key
-    });
-
-    fetch(detailURL).then( function(res) {
+  fetch(url)
+    .then(res => {
       return res.json();
-    }).then( function(data) {
-      var placeLat = data.result.geometry.location.lat;
-      var placeLong = data.result.geometry.location.lng;
-      var routableAddress = data.result.formatted_address;
-      // ie. "48 Pirrama Road, Pyrmont NSW, Australia"
-      cb(placeDesc, [placeLat, placeLong]);
-    }).catch( function(err) {
-      console.log('error on place detail', err);
-    });
-  }).catch(function(err) {
-    console.log('err in places', err);
-  });
-};
+    })
+    .then(data => {
+      // if no predictions found, break out
+      if (!data.predictions.length) {
+        cb(null, null);
+        return;
+      }
 
-module.exports = placesCall;
+      let placeDesc = data.predictions[0].description;
+      console.log('Place found:', placeDesc);
+      // TODO: filter out place results with distance from home > 100 miles
+      let placeId = data.predictions[0].place_id;
+      let detailURL = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&key=${key}`;
+
+      fetch(detailURL)
+        .then(res => {
+          return res.json();
+        })
+        .then(data => {
+          let placeLat = data.result.geometry.location.lat;
+          let placeLong = data.result.geometry.location.lng;
+          let routableAddress = data.result.formatted_address;
+          cb(placeDesc, [placeLat, placeLong]);
+        })
+        .catch(err => {
+          console.log('error on place detail', err, '\nplace:', place);
+        });
+    })
+    .catch(err => {
+      console.log('err in places:', err, '\nplace:', place, '\nurl', url);
+    });
+};

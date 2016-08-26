@@ -1,9 +1,9 @@
 import fetch from 'node-fetch';
 import btoa from 'btoa';
 import { phoneAuth, phoneCodeAuth, getCost, requestRide, shareETA, cancelRide } from './../utils/lyftPrivateMethods';
-const auth = !process.env.PROD ? require('./../../../secret/config.js')
+const auth = !JSON.parse(process.env.PROD) ? require('./../../../secret/config.js')
   .LYFT_USER_ID : process.env.LYFT_USER_ID;
-const APItoken = !process.env.PROD ? require('./../../../secret/config.js')
+const APItoken = !JSON.parse(process.env.PROD) ? require('./../../../secret/config.js')
   .CARVIS_API_KEY : process.env.CARVIS_API_KEY;
 const APIserver = process.env.CARVIS_API || 'localhost:8080';
 const baseURL = 'https://api.lyft.com/v1/';
