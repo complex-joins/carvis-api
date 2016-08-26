@@ -393,6 +393,9 @@ export const requestRide = (req, res) => {
 
   // carvisUserId -- to query the user table for tokens etc.
   let userId = ride.userId;
+
+  console.log('requestRide', req.body);
+
   redisHashGetAll(userId, user => {
     console.log('user on redis getall addRide', user);
     if (user) {
