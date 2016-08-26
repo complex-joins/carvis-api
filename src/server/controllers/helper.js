@@ -234,6 +234,7 @@ export const getEstimate = (req, res) => {
   let winner = null;
 
   // do calls to both APIs for the relevant estimates
+  console.log('pre-uber getEstimate', uberEndpoint);
   fetch(uberEndpoint, {
       method: 'GET',
       headers: {
@@ -382,6 +383,21 @@ export const addRideToDB = (req, res) => {
     })
     .catch((err) => res.status(400)
       .json(err)); // add catch for errors.
+
+  // === commented out pending team discussion === //
+  // if a rideId is supplied we update instead of create
+  // making this double-function as updateOrCreate for Rides.
+  // delete needed before update as model doesn't have carvisRideId field
+  // if (req.body.carvisRideId) {
+  //   let carvisRideId = req.body.carvisRideId;
+  //   delete req.body.carvisRideId;
+  //   Ride.update({ id: carvisRideId }, req.body)
+  //     .then((ride) => res.json(ride))
+  //     .catch((err) => res.status(400)
+  //       .json(err));
+  // } else {
+  // Ride.create
+  // }
 };
 
 // untested.

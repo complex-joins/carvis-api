@@ -241,6 +241,7 @@ export const updateRide = (req, res) => {
   let carvisRideId = req.params.rideid;
   let lyftRideId = req.body.lyftRideId || null;
   let vendor = lyftRideId ? 'Lyft' : 'Uber';
+  let userId = req.body.userId;
 
   let carvisRideKey = `${userId}:carvisRide`;
   let rideKey = `${userId}:ride`;

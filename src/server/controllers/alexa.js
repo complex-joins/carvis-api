@@ -1,6 +1,7 @@
 const _ = require('lodash'); // used for _.filter
 import { formatAnswer, getEstimate, addRide } from '../utils/ride-helper';
 import { placesCall } from './../utils/place-helper';
+import { User } from './../models/User';
 
 const fakeoutMode = JSON.parse(process.env.FAKEOUT) || false; // when true, CARVIS will tell you about taxi fares, not uber and lyft estimates
 const config = {};
@@ -19,7 +20,8 @@ if (fakeoutMode) {
 exports.handleLaunch = function (req, res) {
   console.log(req.params)
   User.find({ alexaUserId: req.params.alexaUserId })
-    .then(user => {
+    .then(user => { // need User.decryptModel(user[0]) ? 
+      console.log('alexa handleLaunch User.find', user);
       return user.length === 0 ? {} : user[0];
     })
     .then(data => {

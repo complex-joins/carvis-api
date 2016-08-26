@@ -22,6 +22,7 @@ let testCount;
 let redisTestUser;
 let keyObj = {};
 let alexaUserId = "amzn1.account.AM3B227HF3FAM1B261HK7FFM3A2";
+let testRideId;
 
 // TODO: REMOVE ALL TEST USERS, RIDES, REDIS KEYS, etc.
 // =====
@@ -155,6 +156,98 @@ describe('API server', function () {
           .catch(err => console.warn('error fetch', err));
       });
 
+      // app.post('/rides', hasValidAPIToken, addRide);
+      // app.put('/rides/:rideid', hasValidAPIToken, updateRide);
+      it('should add a ride', function (done) {
+        let url = `http://localhost:${PORT}/web/addRide`;
+        let body = {
+          winner: {
+            vendor: 'Uber',
+            estimate: 100,
+            estimateType: 'fare'
+          },
+          origin: {
+            descrip: 'test',
+            coords: [1, 2]
+          },
+          destination: {
+            descrip: 'test',
+            coords: [1, 2]
+          },
+          userId: testUserId,
+          rideStatus: 'estimate'
+        };
+        // create a ride
+        fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': process.env.CARVIS_API_KEY
+            },
+            body: JSON.stringify(body)
+          })
+          .then(res => res.json())
+          .then(data => {
+            console.log('success create ride', data);
+
+            // some equality tests for the req.body
+            expect(data.rideStatus)
+              .to.equal('estimate');
+            expect(data.winner)
+              .to.equal('Uber');
+            expect(data.originLat)
+              .to.equal('1');
+
+            let testRideId = data.id;
+            let updateURL = `http://localhost:${PORT}/rides/${testRideId}`;
+
+            let updateBody = {
+              winner: {
+                vendor: 'Uber',
+                estimate: 100,
+                estimateType: 'fare'
+              },
+              origin: {
+                descrip: 'test',
+                coords: [1, 2]
+              },
+              destination: {
+                descrip: 'test',
+                coords: [1, 2]
+              },
+              userId: testUserId,
+              rideStatus: 'testing!' // only field that changed
+            };
+
+            fetch(updateURL, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-access-token': process.env.CARVIS_API_KEY
+                },
+                body: JSON.stringify(updateBody)
+              })
+              .then(res => res.json())
+              .then(data => {
+                console.log('success update ride', data);
+                // the ID of the updated ride equals the ID of the original
+                expect(data.id)
+                  .to.equal(testRideId);
+                // updated rideStatus reflects new rideStatus
+                expect(data.rideStatus)
+                  .to.equal('testing!');
+                done()
+              })
+              .catch(err => done(err));
+          })
+          .catch(err => done(err));
+
+      });
+
+      it('should update a ride', function (done) {
+
+      });
+
       // app.delete('/dev/users/:userid', hasValidAPIToken, deleteUser);
       it('should delete the user created by the developer', function (done) {
         axios.delete(`http://localhost:${PORT}/dev/users/${testUserId}`, {
@@ -227,8 +320,12 @@ describe('API server', function () {
               .then(res => res.json())
               .then(data => {
                 console.log('successful updateOrCreate second pass', data);
-                expect(data.lyftToken)
+                expect(data.lyftToken) // lyftToken - new lyftToken
                   .to.equal(secondBody.lyftToken);
+                expect(data.email) // email - old/same email
+                  .to.equal(body.email);
+                expect(data.id) // userId same as before
+                  .to.equal(userId);
                 done();
               })
               .catch(err => done(err));
