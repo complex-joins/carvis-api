@@ -196,26 +196,6 @@ export const getEstimate = (req, res) => {
     // if that is also equal, return one randomly
     return uberEstimate < lyftEstimate ? uberAsWinner : lyftAsWinner;
   };
-  // this function formats a text-based description of the winner / ride.
-  // const formatAnswer = (winner, mode, originDescrip, destDescrip) => {
-  //   mode = mode.includes('cheap') ? 'cheapest' : 'fastest';
-  //   let winnerEstimate, answer;
-  //
-  //   // convert estimate to $ or minutes
-  //   if (mode === 'fastest') {
-  //     let minutes = Math.floor(winner.estimate / 60);
-  //     winnerEstimate = minutes.toString() + ' minute';
-  //     winnerEstimate += minutes > 1 ? 's' : '';
-  //   } else {
-  //     winner.estimate = (staging) ? winner.estimate * 2 : winner.estimate;
-  //     let dollars = Math.floor(winner.estimate / 100);
-  //     let cents = Math.floor(winner.estimate % 100);
-  //     winnerEstimate = dollars.toString() + ' dollars';
-  //     winnerEstimate += (cents) ? ' and ' + cents.toString() + ' cents' : '';
-  //   }
-  //   answer = `The ${mode} ride to ${destDescrip} is from ${winner.vendor}, with an estimate of ${winnerEstimate}`;
-  //   return answer;
-  // };
 
   // we can estimate price and/or time for rides
   if (requestType.includes('cheap')) {
@@ -266,9 +246,7 @@ export const getEstimate = (req, res) => {
       if (firstResult) {
         winner = compare(uberEstimate, firstResult);
         console.log('Winner:', winner);
-        // let answer = formatAnswer(winner);
         let body = {
-          // answer: answer,
           winner: winner,
           userId: userId,
           origin: origin,
@@ -313,10 +291,7 @@ export const getEstimate = (req, res) => {
       if (firstResult) {
         winner = compare(firstResult, lyftEstimate);
         console.log('Winner:', winner);
-        // let answer = formatAnswer(winner);
-
         let body = {
-          // answer: answer,
           winner: winner,
           userId: userId,
           origin: origin,
@@ -341,9 +316,6 @@ export const addRideToDB = (req, res) => {
   let userId = req.body.userId;
   let origin = req.body.origin;
   let destination = req.body.destination;
-  // let answer = req.body.answer;
-  // NOTE: what to do with answer ? // any way to return this to the client? (or should these calculations / formatting happen on client ? )
-  // currently answer is not used.
 
   let body = {
     userId: userId,

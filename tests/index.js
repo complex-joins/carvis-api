@@ -35,21 +35,12 @@ let DB_CONFIG = {
 let alexaUserId = "amzn1.account.AM3B227HF3FAM1B261HK7FFM3A2";
 let testRideId;
 
-// if (process.env.AWS && JSON.parse(process.env.AWS)) {
-//   DB_CONFIG
-// } else {
-//   // DB_CONFIG = JSON.parse(process.env.DB_CONFIG_OBJ_JSON);
-// }
-
 const db = new Stork({
   connection: DB_CONFIG,
   client: 'pg'
 });
 
-
-
-
-// TODO: REMOVE ALL TEST USERS, RIDES, REDIS KEYS, etc.
+// REMOVE ALL TEST USERS, RIDES, REDIS KEYS, etc.
 // =====
 // remove test users --
 // app.delete('/dev/users/:userid', hasValidAPIToken, deleteUser);
