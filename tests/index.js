@@ -1,6 +1,4 @@
 const path = require('path');
-const dotenv = require('dotenv');
-dotenv.config();
 const assert = require('chai')
   .assert;
 const expect = require('chai')
@@ -14,9 +12,9 @@ import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKe
 import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/controllers/Internal';
 import { createNewDeveloperKey } from './../src/server/controllers/DeveloperAPI';
 import hasValidDevAPIToken from './../src/server/server-configuration/hasValidDevAPIToken';
-import { getLyftBearerToken } from './../src/server/utils/ride-helper';
 import { createMessage } from './../src/server/utils/twilioHelper';
-import Stork from '../src/db/stork/src/index';
+import { getLyftBearerToken } from './../src/server/utils/ride-helper';
+import Stork from '../src/db/storkSQL/src/index';
 import _ from 'lodash';
 
 

@@ -1,7 +1,7 @@
 const _ = require('lodash'); // used for _.filter
 const env = require('dotenv');
 const config = {};
-import {User} from '../models/User';
+import { User } from '../models/User';
 import { formatAnswer, getEstimate, addRide } from '../utils/ride-helper';
 import { placesCall } from './../utils/place-helper';
 
@@ -136,7 +136,7 @@ export const AlexaGetEstimate = (req, res) => {
   }
 };
 
-exports.cancelRide = function(req, res) {
+exports.alexaCancelRide = function (req, res) {
   console.log('cancelRide req', req);
-  res.json({prompt: 'Canceling your ride...'});
+  res.json({ prompt: 'Canceling your ride...' });
 };
