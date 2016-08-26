@@ -116,9 +116,10 @@ export const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, r
 };
 
 export const helperAPIQuery = (body, vendor, res) => {
+  console.log('vendor in helperAPIQuery', vendor, vendor === 'Uber', typeof vendor);
   let helperURL = vendor === 'Lyft' ? CARVIS_HELPER_API + '/lyft/getCost' : CARVIS_HELPER_API + '/uber/getEstimate';
-
-  helperURL = 'http://localhost:8888/uber/getEstimate';
+  console.log(vendor === 'Lyft' ? CARVIS_HELPER_API + '/lyft/getCost' : CARVIS_HELPER_API + '/uber/getEstimate');
+  helperURL = 'http://localhost:8888/uber/getEstimate'; // hardcoded.
 
   return fetch(helperURL, {
       method: 'POST',

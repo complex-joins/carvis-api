@@ -1,4 +1,7 @@
 const fetch = require('node-fetch');
+import { refreshToken } from './../controllers/Internal';
+
+let initial = true;
 
 export const getLyftBearerToken = (cb) => {
   let url = 'http://' + process.env.CARVIS_API + '/internal/lyftBearerToken';
@@ -22,7 +25,15 @@ export const getLyftBearerToken = (cb) => {
 };
 
 export const getEstimate = (requestType, start, dest, cb) => {
-  let lyftToken = getLyftBearerToken();
+  // hack-around for the initial app load lyftToken (only needed the very first time the app is initialized... could just prepopulate Redis as well).
+  let lyftToken;
+  if (initial) {
+    refreshToken(() => {
+      lyftToken = getLyftBearerToken();
+      initial = false;
+    });
+  }
+
   let uberToken = process.env.UBER_SERVER_TOKEN;
   let uberURL = 'https://api.uber.com/v1/';
   let lyftURL = 'https://api.lyft.com/v1/';
