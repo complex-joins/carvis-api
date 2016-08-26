@@ -807,30 +807,33 @@ describe('API server', function () {
       //
       // });
 
-      // test separated from the shareETA - invoke createMessage same way.
-      it('should invoke createMessage with Twilio', function (done) {
-        let url = `http://localhost:${PORT}/internal/sendTwilio`;
-        let body = {
-          message: 'test Twilio - Carvis-API'
-        };
+      // note: commented out as it triggers a live SMS from Twilio -
+      // uncomment this test when needed.
+      // test separated from shareETA - invokes createMessage the same way.
 
-        fetch(url, {
-            method: 'POST',
-            headers: {
-              'x-access-token': process.env.CARVIS_API_KEY,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(body)
-          })
-          .then(res => res.json())
-          .then(data => {
-            console.log('success Twilio createMessage', data);
-            expect(data)
-              .to.be.ok;
-            done();
-          })
-          .catch(err => done(err));
-      });
+      // it('should invoke createMessage with Twilio', function (done) {
+      //   let url = `http://localhost:${PORT}/internal/sendTwilio`;
+      //   let body = {
+      //     message: 'test Twilio - Carvis-API'
+      //   };
+      //
+      //   fetch(url, {
+      //       method: 'POST',
+      //       headers: {
+      //         'x-access-token': process.env.CARVIS_API_KEY,
+      //         'Content-Type': 'application/json'
+      //       },
+      //       body: JSON.stringify(body)
+      //     })
+      //     .then(res => res.json())
+      //     .then(data => {
+      //       console.log('success Twilio createMessage', data);
+      //       expect(data)
+      //         .to.be.ok;
+      //       done();
+      //     })
+      //     .catch(err => done(err));
+      // });
 
       // can only test this after requesting a ride - risky
       // app.post('/developer/cancelRide/:userid', hasValidDevAPIToken, cancelRide);
