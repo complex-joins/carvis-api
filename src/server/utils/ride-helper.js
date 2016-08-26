@@ -153,7 +153,7 @@ export const addRide = (ride, userId, origin, destination, cb) => {
   let endpoint = process.env.PROD ? 'http://54.183.205.82/rides' : 'http://localhost:8080/rides';
 
   let body = {
-    userId: 3, // TODO: make this dynamic and not hardcoded once alexa auth is implemented
+    userId: 8, // TODO: make this dynamic and not hardcoded once alexa auth is implemented
     rideStatus: 'estimate',
     originLat: origin.coords[0],
     originLng: origin.coords[1],
@@ -183,7 +183,8 @@ export const addRide = (ride, userId, origin, destination, cb) => {
   fetch(endpoint, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-access-token': process.env.CARVIS_API_KEY
           // TODO: add api key so that POST to /rides succeeds
           // but caution, that will actually try to request a ride - we should spoof that on dev
           // plus we'll need to wait for privateMethods to be available on prod (via an api)

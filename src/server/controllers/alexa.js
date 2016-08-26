@@ -1,6 +1,7 @@
 const _ = require('lodash'); // used for _.filter
 import { formatAnswer, getEstimate, addRide } from '../utils/ride-helper';
 import { placesCall } from './../utils/place-helper';
+import { User } from '../models/User';
 
 const fakeoutMode = JSON.parse(process.env.FAKEOUT) || false; // when true, CARVIS will tell you about taxi fares, not uber and lyft estimates
 const config = {};
@@ -100,6 +101,11 @@ export const AlexaGetEstimate = (req, res) => {
       };
     }
 
+    // destination.query is a string, such as 'hack reactor'
+    // the callback expects descrip and coordinates
+    // descrip - unsure - string
+    // origin.coords -- home location [lat, lng]
+
     placesCall(destination.query, (descrip, coords) => {
       // if descrip is empty, alexa will reply appropriately
       if (!descrip) {
@@ -107,8 +113,8 @@ export const AlexaGetEstimate = (req, res) => {
         return;
       }
 
-      destination.descrip = descrip; // string
-      destination.coords = coords; // [lat, lng]
+      destination.descrip = descrip;
+      destination.coords = coords;
       if (origin.descrip) {
         // make getEstimate call since originDescrip async call resolved first
         getEstimate(mode, origin.coords, destination.coords, winner => {
