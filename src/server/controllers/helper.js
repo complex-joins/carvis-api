@@ -15,8 +15,8 @@ import { getLyftBearerToken } from './../utils/ride-helper';
 //===== these are controllers for the web and public api's =====//
 
 export const lyftPhoneAuth = (req, res) => {
-  let phoneNumber = req.body.phoneNumber;
   console.log('phone number is ', phoneNumber);
+  let phoneNumber = req.body.phoneNumber;
 
   let url = CARVIS_HELPER_API + '/lyft/phoneauth';
 

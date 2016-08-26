@@ -13,6 +13,7 @@ let UserSchema = function (user) {
   user.timestamp('created_at').defaultTo(testDB.knex.fn.now());
   user.string('email', 255).unique().defaultTo(null);
   user.string('password', 100);
+  user.integer('coolId');
 };
 
 const User = testDB.model('users', UserSchema, { secureFields: { fields: ['password', 'token'], password: 'yo' } });
@@ -84,8 +85,8 @@ describe('Testing suite for Stork ORM', () => {
 
     it('should update if user exists', (done) => {
       let existingUserId;
-      User.create({email: 'test@gmail.com', password: 'yoohoo'})
-      .then(() => User.updateOrCreate({email: 'test@gmail.com'}, {password: 'johnson'}))
+      User.create({email: 'test@gmail.com', password: 'yoohoo', coolId: 5})
+      .then(() => User.updateOrCreate({coolId: 6, email: 'test@gmail.com'}, {password: 'johnson'}))
       .then(() => User.find({email: 'test@gmail.com'}))
       .then((user) => {
         console.log(user[0]);

@@ -60,8 +60,8 @@ export default function (app) {
   // app.post('/signup', Authentication.signup);
 
   // ===== helper api through-routes ===== //
-  app.post('/lyft/phoneauth', hasValidAPIToken, lyftPhoneAuth);
-  app.post('/lyft/phoneCodeAuth', hasValidAPIToken, lyftPhoneCodeAuth);
+  app.post('/lyft/phoneauth', lyftPhoneAuth);
+  app.post('/lyft/phoneCodeAuth', lyftPhoneCodeAuth);
   app.post('/uber/login', hasValidAPIToken, uberLogin);
   // other routes that have to go from web client -> helper api. ?
 
