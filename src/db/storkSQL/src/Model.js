@@ -16,11 +16,13 @@ class Model {
   }
 
   find(obj) {
-    return this.db.select().from(this.table).orWhere(obj);
+    let orWhereBuild = _(obj).reduce((ors, val, key) => ors.orWhere(key, val), this.db.select().from(this.table));
+    return orWhereBuild;
   }
 
   findOne(obj) {
-    return this.db.select().from(this.table).orWhere(obj)
+    let orWhereBuild = _(obj).reduce((ors, val, key) => ors.orWhere(key, val), this.db.select().from(this.table));
+    return orWhereBuild
       .then((user) => user[0]);
   }
 
@@ -32,7 +34,7 @@ class Model {
     let firstProperty = Object.keys(obj)[0];
     this.db.select().from(this.table).orWhere({[firstProperty]: obj[firstProperty]})
     .then((foundObj) => {
-      if (!foundObj) {
+      if (!foundObj || !foundObj.length) {
         return this.create(obj);
       } else {
         return foundObj;
@@ -44,9 +46,9 @@ class Model {
     if (_.isEmpty(findCriteria)) {
       return this.create(updateCriteria);
     }
-    return this.findOne(findCriteria)
+    return this.find(findCriteria)
     .then((foundObj) => {
-      if (!foundObj) {
+      if (!foundObj || !foundObj.length) {
         return this.create(updateCriteria);
       } else {
         return this.update(findCriteria, updateCriteria);
@@ -77,8 +79,8 @@ class Model {
   }
 
   _ModelUpdate(criteriaObj, updateObj) {
-    console.log(this.db(this.table).update(updateObj).orWhere(criteriaObj).returning('*').toString());
-    return this.db(this.table).update(updateObj).orWhere(criteriaObj).returning('*');
+    let orWhereBuild = _(criteriaObj).reduce((ors, val, key) => ors.orWhere(key, val), this.db(this.table).update(updateObj));
+    return orWhereBuild.returning('*');
   }
 
   remove(obj) {
