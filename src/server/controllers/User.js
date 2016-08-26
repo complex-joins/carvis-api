@@ -103,8 +103,14 @@ export const updateOrCreateUser = (req, res) => {
     }, {});
 
   console.log('findObj', findObj);
+  let userFields = _.clone(req.body, true);
+  
+  if (userFields.id) {
+    delete userFields['id'];
+    console.log('userFields:', userFields);  
+  }
 
-  User.updateOrCreate(findObj, req.body)
+  User.updateOrCreate(findObj, userFields)
     .then(user => {
       user = user[0]; // [{}] => {}
       console.log('success DB find user updateOrCreate', user);
