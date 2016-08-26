@@ -10,7 +10,8 @@ import { User } from './../models/User';
 import { helperAPIQuery, getUserAndRequestRideDB } from './Ride';
 import { redisHashGetAll, redisSetKeyWithExpire, redisGetKey, redisHashGetOne } from './../../redis/redisHelperFunctions';
 import { getLyftBearerToken } from './../utils/ride-helper';
-
+import { refreshToken } from './Internal';
+let initial = false;
 //===== these are controllers for the web and public api's =====//
 
 export const lyftPhoneAuth = (req, res) => {
@@ -174,7 +175,26 @@ export const getEstimate = (req, res) => {
   let userId = req.body.carvisUserId || req.body.userId;
 
   // tokens, URLs
-  let lyftToken = getLyftBearerToken();
+  // let lyftToken = getLyftBearerToken();
+  // let lyftToken;
+  // if (initial) {
+  //   refreshToken(() => {
+  //     setTimeout(() => {
+  //       lyftToken = getLyftBearerToken(() => {
+  //         return lyftFetch(lyftEndpoint, lyftAuth);
+  //       });
+  //     }, 1500);
+  //     initial = false;
+  //   });
+  // } else {
+  //   lyftToken = getLyftBearerToken(() => {
+  //     lyftFetch(lyftEndpoint, lyftAuth);
+  //   });
+  // }
+
+  // let lyftToken = getLyftBearerToken();
+  let lyftToken = 'gAAAAABXwLzCz8bFu47OD68_-fLfeV92ragRxGl6yl-hQlCZ7BvRWwCynEPK1IaQT8_CsUt8KBZQ3tBDu4ukme4LmnrbhTOOpNmQQStB1qMrfqaiMsDkj7gomkLOmDZmBl7TdVACmvaxNj-JBlO5moZcrOx3gSHsALz_7GcmMThq5InzoIdVH1zayIZms-iH2H99-MhOsNTpNbx4xamnpQwqboJ3uBL4Eg==';
+
   let uberToken = process.env.UBER_SERVER_TOKEN;
   let uberURL = 'https://api.uber.com/v1/';
   let lyftURL = 'https://api.lyft.com/v1/';
@@ -262,6 +282,7 @@ export const getEstimate = (req, res) => {
       console.log('error in uber fetch', err);
     });
 
+  // const lyftFetch = (lyftEndpoint, lyftAuth) => {
   fetch(lyftEndpoint, {
       method: 'GET',
       headers: {
@@ -273,18 +294,19 @@ export const getEstimate = (req, res) => {
       return res.json();
     })
     .then(function (data) {
+      console.log('lyftEstimate return ', data);
       let lyftEstimate;
-      if (lyftPath === 'cost') {
-        if (!data.cost_estimates || !data.cost_estimates[0].estimated_cost_cents_max) {
+      if (lyftPath === 'cost') { // note: cost - line is the [1] index return
+        if (!data.cost_estimates || !data.cost_estimates[1].estimated_cost_cents_max) {
           lyftEstimate = -1;
         } else {
-          lyftEstimate = parseFloat(data.cost_estimates[0].estimated_cost_cents_max);
+          lyftEstimate = parseFloat(data.cost_estimates[1].estimated_cost_cents_max);
         }
       } else if (lyftPath === 'eta') {
         // lyft will still give a time estimate even when there's no valid fare
         if (!data.eta_estimates || !data.eta_estimates[0].eta_seconds) {
           lyftEstimate = -1;
-        } else {
+        } else { // note: time - line is the [0] index returned
           lyftEstimate = data.eta_estimates[0].eta_seconds;
         }
       }
@@ -306,6 +328,7 @@ export const getEstimate = (req, res) => {
     .catch(function (err) {
       console.log('error in lyft fetch', err);
     });
+  // };
 };
 
 // this calls the Ride controller addRide method, which adds a ride to the DB
@@ -317,6 +340,7 @@ export const addRideToDB = (req, res) => {
   let origin = req.body.origin;
   let destination = req.body.destination;
 
+  // TODO: make sure both estimates (winner and loser) are posted to the DB.
   let body = {
     userId: userId,
     rideStatus: 'estimate',
@@ -406,7 +430,7 @@ export const requestRide = (req, res) => {
           destination: destination,
           rideId: rideId
         };
-        return helperAPIQuery(body, vendor);
+        return helperAPIQuery(body, vendor, res);
 
       } else if (vendor === 'Lyft') {
         let body = {
@@ -417,13 +441,13 @@ export const requestRide = (req, res) => {
           destination: destination,
           rideId: rideId
         };
-        return helperAPIQuery(body, vendor);
+        return helperAPIQuery(body, vendor, res);
       }
     } else { // only invoked if we don't have the user in Redis
       let dbURL = 'http://' + CARVIS_API + '/users/' + userId;
       console.log('pre db get', vendor, userId, dbURL, rideId);
 
-      return getUserAndRequestRideDB(dbURL, origin, destination, partySize, rideId, vendor);
+      return getUserAndRequestRideDB(dbURL, origin, destination, partySize, rideId, vendor, res);
     }
   });
 };
