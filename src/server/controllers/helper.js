@@ -31,7 +31,7 @@ export const lyftPhoneAuth = (req, res) => {
     })
     .then(function (data) {
       console.log('success lyft phone auth', data);
-      res.json({ message: 'on its way' });
+      res.json(data);
     })
     .catch(function (err) {
       console.warn('err lyft phone auth', err);
@@ -58,7 +58,7 @@ export const lyftPhoneCodeAuth = (req, res) => {
     })
     .then(function (data) {
       console.log('success lyft phone code auth', data);
-      res.json({ message: 'yes!' });
+      res.json(data);
     })
     .catch(function (err) {
       console.warn('err lyft phone code auth', err);
@@ -81,7 +81,7 @@ export const uberLogin = (req, res) => {
     })
     .then(function (data) {
       console.log('success uber login', data);
-      res.json({ message: 'on its way' });
+      res.json(data);
     })
     .catch(function (err) {
       console.warn('err uber login', err);

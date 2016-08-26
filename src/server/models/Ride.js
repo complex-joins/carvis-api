@@ -1,7 +1,8 @@
 import db from '../../db/db';
+import uuid from 'uuid-v4';
 
 export const RideSchema = function (ride) {
-  ride.increments('id')
+  ride.uuid('id')
     .primary();
   ride.timestamp('created_at')
     .defaultTo(db.knex.fn.now());
