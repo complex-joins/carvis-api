@@ -36,7 +36,7 @@ export const AlexaGetEstimate = (req, res) => {
   let slots = req.body.data.request.intent.slots;
   console.log('slots:', slots);
 
-  let userId = req.body.userId; // the unique alexa session userId. that said, its the *carvis userId* i should be storing in the session and passing to carvis api endpoints
+  let userId = req.body.carvisUserId; // PAY ATTENTION======== the unique alexa session userId. that said, its the *carvis userId* i should be storing in the session and passing to carvis api endpoints
   let mode = (fakeoutMode) ? 'cheapest' : slots.MODE.value; // cheapest or fastest
 
   // find the ORIGIN slot that is populated in this request, if any

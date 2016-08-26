@@ -31,7 +31,7 @@ export default function (app) {
   // ===== rides routes ===== //
   app.get('/rides/:userid', hasValidAPIToken, getRidesForUser);
   app.put('/rides/:rideid', hasValidAPIToken, updateRide);
-  app.post('/rides', hasValidAPIToken, addRide);
+  app.post('/rides', addRide);
   app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);
   app.post('/rides/shareETA/:userid', hasValidAPIToken, shareRideETA);
   app.post('/rides/cancelRide/:userid', hasValidAPIToken, shareRideETA);

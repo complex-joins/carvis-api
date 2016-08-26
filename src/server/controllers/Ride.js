@@ -18,32 +18,34 @@ export const addRide = function (req, res) {
       let vendor = ride.winner;
       let rideId = ride.id;
       let origin = {
-        lat: ride.originLat,
-        lng: ride.originLng,
-        routableAddress: ride.originRoutableAddress
+        address: ride.originRoutableAddress,
+        lat: 37.7773563,
+        lng: -122.3968629
       };
       let destination = {
-        lat: ride.destinationLat,
-        lng: ride.destinationLng,
-        routableAddress: ride.destinationRoutableAddress
+        address: ride.destinationRoutableAddress,
+        lat: 37.6213129,
+        lng: -122.3789554
       };
       let partySize = ride.partySize || 1;
-
+      console.log('ORIGIN=========', origin);
       // carvisUserId -- to query the user table for tokens etc.
       let userId = ride.userId;
       // return out of the promise - redis or DB query etc to request ride.
-      return redisHashGetAll(userId, user => {
-        console.log('user on redis getall addRide', user);
+      return User.findById(userId)
+             .then(user => {
+        console.log('user on redis getall addRide================', user);
 
         if (user) {
           if (vendor === 'Uber') {
             let body = {
               origin: origin,
-              token: user.uberToken,
+              token: "706174632e17c4fb2d613963b655d88d",
               destination: destination,
               rideId: rideId
             };
             return helperAPIQuery(body, vendor);
+            console.log('RIGHT BEFOEW HELPERAPICALL==============');
 
           } else if (vendor === 'Lyft') {
             let body = {
@@ -57,13 +59,13 @@ export const addRide = function (req, res) {
             return helperAPIQuery(body, vendor);
           }
         } else { // only invoked if we don't have the user in Redis
-          let dbURL = 'http://' + CARVIS_API + '/users/' + userId;
+          let dbURL = 'https://' + CARVIS_API + '/users/' + userId;
           console.log('pre db get', vendor, userId, dbURL, rideId);
 
           return getUserAndRequestRideDB(dbURL, origin, destination, partySize, rideId, vendor);
         }
       }); // redis query for user.
-
+      console.log('WHERE THE FUCK AM I====================');
     })
     .catch((err) => res.status(400)
       .json(err)); // add catch for errors.
@@ -87,7 +89,7 @@ export const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, r
       if (vendor === 'Uber') {
         let body = {
           origin: origin,
-          token: data.uberToken,
+          token: "7e3163225d10cebd54fc14dc5562542d26802090d5f78911f92ed511fbe83b18236576246a2afca23f4d",
           destination: destination,
           rideId: rideId
         };
@@ -115,12 +117,9 @@ export const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, r
 
 // TODO: add redis check for cost signature Uber
 export const helperAPIQuery = (body, vendor) => {
-  if (vendor === 'Lyft') {
-    let helperURL = CARVIS_HELPER_API + '/lyft/getCost';
-  } else {
-    let helperURL = CARVIS_HELPER_API + '/uber/getEstimate';
-  }
-
+  console.log('INSIDE HELPERAPI==================', body);
+    let helperURL = "http://localhost:8888/uber/getEstimate";
+  console.log('HEPERURL================', helperURL);
   return fetch(helperURL, {
       method: 'POST',
       headers: {
@@ -130,10 +129,11 @@ export const helperAPIQuery = (body, vendor) => {
       body: JSON.stringify(body)
     })
     .then(res => {
+      console.log('RESPONSE 1====================', res);
       return res.json();
     })
     .then(data => {
-      console.log('success request ride', data);
+      console.log('success request ride==============', data);
     })
     .catch(err => {
       console.warn('err request ride', err);
