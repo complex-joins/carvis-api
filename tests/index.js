@@ -53,7 +53,7 @@ describe('API server', function () {
     currentListeningServer = server.default.listen(PORT);
 
     db.dropTableIfExists('users')
-    .then(() => db.createTable('users', User.UserSchema))
+    .then((res) => db.createTable('users', User.UserSchema))
     .then(() => done())
     .catch((err) => done(err));
 
@@ -365,7 +365,7 @@ describe('API server', function () {
       });
 
       it('should update a user and find the update in Redis', function (done) {
-        var apiURL = `http://localhost:${PORT}/users/1`
+        var apiURL = `http://localhost:${PORT}/users/2`
         let body = {
           email: 'TESTSAREBADMMMMMKAY2@gmail.com' + Math.random()
         };
@@ -382,7 +382,7 @@ describe('API server', function () {
             return res.json();
           })
           .then(data => {
-            console.log('success update user', data);
+            // console.log('success update user', data);
             // fetch the existing user, find new random email (in Redis)
             redisHashGetOne(data[0].id, 'email', function (res) {
               expect(res)

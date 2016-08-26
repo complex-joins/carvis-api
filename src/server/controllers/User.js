@@ -28,8 +28,12 @@ export const updateUserData = (req, res) => {
   }
   console.log('redisKeyValArray', userId, redisKeyValArray);
   redisSetHash(userId, redisKeyValArray);
+
   User.update({ id: userId }, req.body)
-    .then((user) => user.length === 0 ? res.json({}) : res.json(user))
+    .then((user) => {
+      // console.log('USER =====', user);
+      return user.length === 0 ? res.json({}) : res.json(user)
+    })
     .catch((err) => res.status(400)
       .json(err));
 };
