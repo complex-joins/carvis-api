@@ -54,15 +54,22 @@ describe('API server', function () {
     describe('Check restful routes', function () {
       // app.get('/dev/users', hasValidAPIToken, getAllUserData);
       it('should get all users when presented with the API access token', function (done) {
-        axios.get(`http://localhost:${PORT}/dev/users`, {
+        let url = `http://localhost:${PORT}/dev/users`;
+        fetch(url, {
             headers: {
               'Content-Type': 'application/json',
               'x-access-token': process.env.CARVIS_API_KEY
             }
           })
-          .then((res) => {
-            testCount = res.data.length;
+          .then(res => res.json())
+          .then(data => {
+            console.log('data get all users', data);
+            testCount = data.length;
             assert.equal(res.status, 200, 'did not return 200', res.status);
+            expect(data[0].id)
+              .to.be.ok;
+            expect(data)
+              .to.have.length.above(0);
             done();
           })
           .catch((err) => done(err));

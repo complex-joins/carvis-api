@@ -16,19 +16,20 @@ if (fakeoutMode) {
   config.helpSpeech += 'To begin, tell me to book the cheapest or fastest car, and where you want to go';
 }
 
-exports.handleLaunch = function(req, res) {
+exports.handleLaunch = function (req, res) {
   console.log(req.params)
-  User.find({alexaUserId: req.params.alexaUserId})
-  .then((user) => {
-    return user.length === 0 ? {} : user[0];
-  })
-  .then((data) => {
-    console.log(data)
-    config.carvisUserID = data.id;
-    return config;
-  })
-  .then((data) => {res.json(data);})
-  .catch((err) => res.status(400).json(err))
+  User.find({ alexaUserId: req.params.alexaUserId })
+    .then(user => {
+      return user.length === 0 ? {} : user[0];
+    })
+    .then(data => {
+      console.log(data)
+      config.carvisUserID = data.id;
+      return config;
+    })
+    .then(data => res.json(data))
+    .catch(err => res.status(400)
+      .json(err));
 };
 
 export const AlexaGetEstimate = (req, res) => {

@@ -183,7 +183,7 @@ export const addRide = (ride, userId, origin, destination, cb) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-access-token': process.env.CARVIS_API
+        'x-access-token': process.env.CARVIS_API_KEY
       },
       body: JSON.stringify(body)
     })
