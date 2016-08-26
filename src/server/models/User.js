@@ -1,7 +1,7 @@
 import db from '../../db/db';
 
 export const UserSchema = function (user) {
-  user.uuid('id')
+  user.increments('id')
     .primary();
   user.timestamp('created_at')
     .defaultTo(db.knex.fn.now());
