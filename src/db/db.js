@@ -1,5 +1,4 @@
 import Stork from './storkSQL/src/index';
-// require('dotenv').config();
 let DB_CONFIG;
 
 // if (process.env.PG_PORT_5432_TCP_ADDR) {
@@ -11,14 +10,14 @@ let DB_CONFIG;
 //     password: process.env.POSTGRES_PASSWORD
 //   };
 // } else {
-  DB_CONFIG = {
-    host: process.env.TEST_DB_HOST,
-    port: 5432,
-    database: process.env.TEST_DB_DATABASE,
-    user: process.env.TEST_DB_USER,
-    password: process.env.TEST_DB_PASS,
-    ssl: true
-  };
+DB_CONFIG = {
+  host: process.env.TEST_DB_HOST,
+  port: 5432,
+  database: process.env.TEST_DB_DATABASE,
+  user: process.env.TEST_DB_USER,
+  password: process.env.TEST_DB_PASS,
+  ssl: true
+};
 // }
 
 // }

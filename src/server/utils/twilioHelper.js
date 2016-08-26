@@ -10,15 +10,39 @@ if (process.env.PROD) {
 }
 const client = require('twilio')(TWILIO_SID, TWILIO_TOKEN);
 
-// NOTE: Twilio will only work with approved numbers on the free trial account, for now Chris' number is approved.
+// Twilio will only work with approved numbers on the free trial account.
+// for now only Chris' number (see below) is approved.
 // -- a test notice is included in all messages until we load $$$ to Twilio.
 
 // Twilio SMS send to be invoked via a client side form, which upon click sends a POST request to our server on the '/message' path with a body of { number: targetPhoneNumber, message: intendedMessage }
 
 // Twilio Functions
-export const createMessage = (number, message) => {
+export const createMessage = (req, res) => {
+  let message = req.body.message;
+  // default number for testing.
+  let number = req.body.number || "+14242179767";
+  // in cases of international/invalid numbers Twilio will handle errors
+  // we still want to know what the case was
+  // and in case the +1 was ommitted we add it in.
+  if (number.length < 12) {
+    if (number.slice(0, 1) !== '+') {
+      console.log('US number without +1 prefix')
+      number = '+1' + number;
+    } else {
+      console.info('international number', number);
+    }
+  } else {
+    if (number.slice(0, 1) !== '+') {
+      console.warn('invalid number', number);
+    } else if (number.length === 12) {
+      console.log('US number', number);
+    } else {
+      console.info('international number', number);
+    }
+  }
+
   client.messages.create({
-    to: "+14242179767", // TODO: number
+    to: number,
     from: "+19495417437",
     body: message
   }, (err, message) => {
@@ -32,8 +56,10 @@ export const createMessage = (number, message) => {
       // information about the text messsage you just sent:
       console.log('Success! The SID for this SMS message is:', message.sid);
       console.log('Message sent on:', message.dateCreated);
+      res.json({ message: 'success!', SID: message.sid, created: message.dateCreated })
     } else {
-      console.log('Error in Twilio SMS send', err);
+      console.warn('Error in Twilio SMS send', err);
+      res.json({ message: 'error! Twilio didn\'t work' });
     }
   });
 }

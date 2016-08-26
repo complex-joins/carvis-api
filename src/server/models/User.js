@@ -1,4 +1,5 @@
 import db from '../../db/db';
+import uuid from 'uuid-v4'; // TODO: !!!
 
 export const UserSchema = function (user) {
   user.increments('id')

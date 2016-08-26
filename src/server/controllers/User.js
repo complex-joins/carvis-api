@@ -23,8 +23,10 @@ export const updateUserData = (req, res) => {
   let redisKeyValArray = [];
   let newKeys = Object.keys(req.body);
   for (let i = 0, len = newKeys.length; i < len; i++) {
-    redisKeyValArray.push(newKeys[i]);
-    redisKeyValArray.push(req.body[newKeys[i]]);
+    if (req.body[newKeys[i]] !== null) {
+      redisKeyValArray.push(newKeys[i]);
+      redisKeyValArray.push(req.body[newKeys[i]]);
+    }
   }
   console.log('redisKeyValArray', userId, redisKeyValArray);
   // update redis, and after updating redis, update the DB.
@@ -43,8 +45,10 @@ export const createUser = (req, res) => {
       let userId = user[0].id; // Carvis userId
       let redisKeyValArray = [];
       for (let key in user[0]) {
-        redisKeyValArray.push(key);
-        redisKeyValArray.push(user[0][key]);
+        if (user[0][key] !== null) {
+          redisKeyValArray.push(key);
+          redisKeyValArray.push(user[0][key]);
+        }
       }
       redisSetHash(userId, redisKeyValArray, result => {
         user.length === 0 ? res.json({}) : res.json(user);
@@ -107,10 +111,11 @@ export const updateOrCreateUser = (req, res) => {
       let userKeys = Object.keys(user);
       let redisKeyValArray = [];
       for (let i = 0, len = userKeys.length; i < len; i++) {
-        redisKeyValArray.push(userKeys[i]);
-        redisKeyValArray.push(user[userKeys[i]]);
+        if (user[userKeys[i]] !== null) {
+          redisKeyValArray.push(userKeys[i]);
+          redisKeyValArray.push(user[userKeys[i]]);
+        }
       }
-      console.log('ARGUEMNTS TO RSH', user.id, redisKeyValArray);
       redisSetHash(user.id, redisKeyValArray, result => {
         return user.length === 0 ? res.json({}) : res.json(User.decryptModel(user));
       });
@@ -138,10 +143,18 @@ export const deleteUser = (req, res) => {
 };
 
 export const getRawUser = (req, res) => {
-  User.find({ id: req.params.userid })
-    .then((user) => user.length === 0 ? res.json({}) : res.json(user))
-    .catch((err) => res.status(400)
-      .json(err));
+  let userId = req.params.userid;
+  // get from redis, if not found, try DB
+  redisHashGetAll(userId, user => {
+    if (user) {
+      res.json(user);
+    } else {
+      User.find({ id: userId })
+        .then((user) => user.length === 0 ? res.json({}) : res.json(user))
+        .catch((err) => res.status(400)
+          .json(err));
+    }
+  });
 };
 
 // what is this? @alex?

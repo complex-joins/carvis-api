@@ -7,7 +7,6 @@ const CARVIS_API_KEY = process.env.CARVIS_API_KEY;
 import fetch from 'node-fetch';
 import { Ride } from './../models/Ride';
 import { User } from './../models/User';
-import { createMessage } from './../utils/twilioHelper';
 import { helperAPIQuery, getUserAndRequestRideDB } from './Ride';
 import { redisHashGetAll, redisSetKeyWithExpire, redisGetKey, redisHashGetOne } from './../../redis/redisHelperFunctions';
 import { getLyftBearerToken } from './../utils/ride-helper';
@@ -33,7 +32,7 @@ export const lyftPhoneAuth = (req, res) => {
     })
     .then(function (data) {
       console.log('success lyft phone auth', data);
-      res.json({ message: 'on its way' });
+      res.json(data);
     })
     .catch(function (err) {
       console.warn('err lyft phone auth', err);
@@ -60,7 +59,7 @@ export const lyftPhoneCodeAuth = (req, res) => {
     })
     .then(function (data) {
       console.log('success lyft phone code auth', data);
-      res.json({ message: 'yes!' });
+      res.json(data);
     })
     .catch(function (err) {
       console.warn('err lyft phone code auth', err);
@@ -83,7 +82,7 @@ export const uberLogin = (req, res) => {
     })
     .then(function (data) {
       console.log('success uber login', data);
-      res.json({ message: 'on its way' });
+      res.json(data);
     })
     .catch(function (err) {
       console.warn('err uber login', err);
@@ -172,7 +171,7 @@ export const getEstimate = (req, res) => {
   let destination = req.body.destination; // same format as origin
   let start = origin.coords;
   let dest = destination.coords;
-  let userId = req.body.userId; // user we're doing the query for
+  let userId = req.body.carvisUserId || req.body.userId;
 
   // tokens, URLs
   let lyftToken = getLyftBearerToken();
@@ -197,26 +196,6 @@ export const getEstimate = (req, res) => {
     // if that is also equal, return one randomly
     return uberEstimate < lyftEstimate ? uberAsWinner : lyftAsWinner;
   };
-  // this function formats a text-based description of the winner / ride.
-  // const formatAnswer = (winner, mode, originDescrip, destDescrip) => {
-  //   mode = mode.includes('cheap') ? 'cheapest' : 'fastest';
-  //   let winnerEstimate, answer;
-  //
-  //   // convert estimate to $ or minutes
-  //   if (mode === 'fastest') {
-  //     let minutes = Math.floor(winner.estimate / 60);
-  //     winnerEstimate = minutes.toString() + ' minute';
-  //     winnerEstimate += minutes > 1 ? 's' : '';
-  //   } else {
-  //     winner.estimate = (staging) ? winner.estimate * 2 : winner.estimate;
-  //     let dollars = Math.floor(winner.estimate / 100);
-  //     let cents = Math.floor(winner.estimate % 100);
-  //     winnerEstimate = dollars.toString() + ' dollars';
-  //     winnerEstimate += (cents) ? ' and ' + cents.toString() + ' cents' : '';
-  //   }
-  //   answer = `The ${mode} ride to ${destDescrip} is from ${winner.vendor}, with an estimate of ${winnerEstimate}`;
-  //   return answer;
-  // };
 
   // we can estimate price and/or time for rides
   if (requestType.includes('cheap')) {
@@ -236,6 +215,7 @@ export const getEstimate = (req, res) => {
   let winner = null;
 
   // do calls to both APIs for the relevant estimates
+  console.log('pre-uber getEstimate', uberEndpoint);
   fetch(uberEndpoint, {
       method: 'GET',
       headers: {
@@ -266,15 +246,13 @@ export const getEstimate = (req, res) => {
       if (firstResult) {
         winner = compare(uberEstimate, firstResult);
         console.log('Winner:', winner);
-        // let answer = formatAnswer(winner);
         let body = {
-          // answer: answer,
           winner: winner,
           userId: userId,
           origin: origin,
           destination: destination
         };
-        return addRideToDB({ body: body }, res); // hack. TODO: test.
+        return addRideToDB({ body: body }, res);
       } else {
         firstResult = uberEstimate;
       }
@@ -313,16 +291,13 @@ export const getEstimate = (req, res) => {
       if (firstResult) {
         winner = compare(firstResult, lyftEstimate);
         console.log('Winner:', winner);
-        // let answer = formatAnswer(winner);
-
         let body = {
-          // answer: answer,
           winner: winner,
           userId: userId,
           origin: origin,
           destination: destination
         };
-        return addRideToDB({ body: body }, res); // hack. TODO: test.
+        return addRideToDB({ body: body }, res);
       } else {
         firstResult = lyftEstimate;
       }
@@ -341,9 +316,6 @@ export const addRideToDB = (req, res) => {
   let userId = req.body.userId;
   let origin = req.body.origin;
   let destination = req.body.destination;
-  // let answer = req.body.answer;
-  // NOTE: what to do with answer ? // any way to return this to the client? (or should these calculations / formatting happen on client ? )
-  // currently answer is not used.
 
   let body = {
     userId: userId,
@@ -384,6 +356,21 @@ export const addRideToDB = (req, res) => {
     })
     .catch((err) => res.status(400)
       .json(err)); // add catch for errors.
+
+  // === commented out pending team discussion === //
+  // if a rideId is supplied we update instead of create
+  // making this double-function as updateOrCreate for Rides.
+  // delete needed before update as model doesn't have carvisRideId field
+  // if (req.body.carvisRideId) {
+  //   let carvisRideId = req.body.carvisRideId;
+  //   delete req.body.carvisRideId;
+  //   Ride.update({ id: carvisRideId }, req.body)
+  //     .then((ride) => res.json(ride))
+  //     .catch((err) => res.status(400)
+  //       .json(err));
+  // } else {
+  // Ride.create
+  // }
 };
 
 // untested.

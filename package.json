@@ -16,7 +16,7 @@
     "migrate": "node _tools/migrate.js",
     "test": "redis-server & mocha --compilers js:babel-core/register ./tests/index.js",
     "start:dev": "npm run build:server -- -w & npm run build:db -- -w & npm run build:redis -- -w & npm run build:tools -- -w & nodemon -L ./dist/server/index.js",
-    "start": "npm run build; node ./dist/server/index.js"
+    "start": "npm run build; redis-server & node ./dist/server/index.js"
   },
   "repository": {
     "type": "git",

@@ -72,7 +72,7 @@ export const redisSetKey = (keyName, value, cb) => {
         return res;
       }
     })
-    .catch(err => console.warn('redis error setting key', keyName));
+    .catch(err => console.warn('redis error setting key', keyName, err));
 };
 export const redisSetKeyAsync = bluebird.promisify(redisSetKey);
 
@@ -87,7 +87,7 @@ export const redisSetKeyWithExpire = (keyName, expire, value, cb) => {
         return res;
       }
     })
-    .catch(err => console.warn('redis error setting key', keyName));
+    .catch(err => console.warn('redis error setting key', keyName, err));
 };
 export const redisSetKeyWithExpireAsync = bluebird.promisify(redisSetKeyWithExpire);
 
@@ -102,7 +102,7 @@ export const redisGetKey = (keyName, cb) => {
         return res;
       }
     })
-    .catch(err => console.warn('redis error getting key', keyName));
+    .catch(err => console.warn('redis error getting key', keyName, err));
 };
 export const redisGetKeyAsync = bluebird.promisify(redisGetKey);
 
@@ -116,7 +116,7 @@ export const redisIncrementKeyValue = (keyName, cb) => {
         return res;
       }
     })
-    .catch(err => console.warn('err redis increment', err));
+    .catch(err => console.warn('err redis increment', keyName, err));
 };
 
 export const redisDelete = (keyName, cb) => {
@@ -129,5 +129,5 @@ export const redisDelete = (keyName, cb) => {
         return res;
       }
     })
-    .catch(err => console.warn('err redis delete', err));
+    .catch(err => console.warn('err redis delete', keyName, err));
 };

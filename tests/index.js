@@ -1,6 +1,4 @@
 const path = require('path');
-const dotenv = require('dotenv');
-dotenv.config();
 const assert = require('chai')
   .assert;
 const expect = require('chai')
@@ -14,6 +12,7 @@ import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKe
 import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/controllers/Internal';
 import { createNewDeveloperKey } from './../src/server/controllers/DeveloperAPI';
 import hasValidDevAPIToken from './../src/server/server-configuration/hasValidDevAPIToken';
+import { createMessage } from './../src/server/utils/twilioHelper';
 import { getLyftBearerToken } from './../src/server/utils/ride-helper';
 import Stork from '../src/db/storkSQL/src/index';
 import _ from 'lodash';
@@ -33,22 +32,15 @@ let DB_CONFIG = {
   password: process.env.TEST_DB_PASS,
   ssl: true
 };
-
-// if (process.env.AWS && JSON.parse(process.env.AWS)) {
-//   DB_CONFIG
-// } else {
-//   // DB_CONFIG = JSON.parse(process.env.DB_CONFIG_OBJ_JSON);
-// }
+let alexaUserId = "amzn1.account.AM3B227HF3FAM1B261HK7FFM3A2";
+let testRideId;
 
 const db = new Stork({
   connection: DB_CONFIG,
   client: 'pg'
 });
 
-
-
-
-// TODO: REMOVE ALL TEST USERS, RIDES, REDIS KEYS, etc.
+// REMOVE ALL TEST USERS, RIDES, REDIS KEYS, etc.
 // =====
 // remove test users --
 // app.delete('/dev/users/:userid', hasValidAPIToken, deleteUser);
@@ -64,9 +56,9 @@ describe('API server', function () {
     currentListeningServer = server.default.listen(PORT);
 
     db.dropTableIfExists('users')
-    .then((res) => db.createTable('users', User.UserSchema))
-    .then(() => done())
-    .catch((err) => done(err));
+      .then((res) => db.createTable('users', User.UserSchema))
+      .then(() => done())
+      .catch((err) => done(err));
 
   });
 
@@ -86,15 +78,25 @@ describe('API server', function () {
     describe('Check restful routes', function () {
       // app.get('/dev/users', hasValidAPIToken, getAllUserData);
       it('should get all users when presented with the API access token', function (done) {
-        axios.get(`http://localhost:${PORT}/dev/users`, {
+        let url = `http://localhost:${PORT}/dev/users`;
+        fetch(url, {
             headers: {
               'Content-Type': 'application/json',
               'x-access-token': process.env.CARVIS_API_KEY
             }
           })
-          .then((res) => {
-            testCount = _.isEmpty(res.data) ? 0 : res.data.length;
-            expect(res.status).to.equal(200);
+          .then(res => res.json())
+          .then(data => {
+            console.log('data get all users', data);
+            testCount = data.length;
+            expect(data)
+              .to.be.ok;
+            // test DB might be empty before test start
+            if (data.length) {
+              // check for the ID property on the user
+              expect(data[0].id)
+                .to.be.ok;
+            }
             done();
           })
           .catch((err) => done(err));
@@ -181,6 +183,109 @@ describe('API server', function () {
           .catch(err => console.warn('error fetch', err));
       });
 
+      // the below tests: (note: could be separated out)
+      // app.post('/rides', hasValidAPIToken, addRide);
+      // app.put('/rides/:rideid', hasValidAPIToken, updateRide);
+      // app.delete('/rides/:rideid', hasValidAPIToken, deleteRide);
+      it('should add, update and delete a ride', function (done) {
+        let url = `http://localhost:${PORT}/web/addRide`;
+        let body = {
+          winner: {
+            vendor: 'Uber',
+            estimate: 100,
+            estimateType: 'fare'
+          },
+          origin: {
+            descrip: 'test',
+            coords: [1, 2]
+          },
+          destination: {
+            descrip: 'test',
+            coords: [1, 2]
+          },
+          userId: testUserId,
+          rideStatus: 'estimate'
+        };
+        // create a ride
+        fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': process.env.CARVIS_API_KEY
+            },
+            body: JSON.stringify(body)
+          })
+          .then(res => res.json())
+          .then(data => {
+            console.log('success create ride', data);
+
+            // some equality tests for the req.body
+            expect(data.rideStatus)
+              .to.equal('estimate');
+            expect(data.winner)
+              .to.equal('Uber');
+            expect(data.originLat)
+              .to.equal('1');
+
+            let testRideId = data.id;
+            let updateURL = `http://localhost:${PORT}/rides/${testRideId}`;
+
+            let updateBody = {
+              winner: {
+                vendor: 'Uber',
+                estimate: 100,
+                estimateType: 'fare'
+              },
+              origin: {
+                descrip: 'test',
+                coords: [1, 2]
+              },
+              destination: {
+                descrip: 'test',
+                coords: [1, 2]
+              },
+              userId: testUserId,
+              rideStatus: 'testing!' // only field that changed
+            };
+
+            fetch(updateURL, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-access-token': process.env.CARVIS_API_KEY
+                },
+                body: JSON.stringify(updateBody)
+              })
+              .then(res => res.json())
+              .then(data => {
+                console.log('success update ride', data);
+                // the ID of the updated ride equals the ID of the original
+                expect(data.id)
+                  .to.equal(testRideId);
+                // updated rideStatus reflects new rideStatus
+                expect(data.rideStatus)
+                  .to.equal('testing!');
+
+                let deleteURL = `http://localhost:${PORT}/rides/${testRideId}`;
+                fetch(deleteURL, {
+                    method: 'DELETE',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'x-access-token': process.env.CARVIS_API_KEY
+                    }
+                  })
+                  .then(res => res.json())
+                  .then(data => {
+                    console.log('success delete ride', data);
+                    done();
+                  })
+                  .catch(err => done(err));
+              })
+              .catch(err => done(err));
+          })
+          .catch(err => done(err));
+      });
+
       // app.delete('/dev/users/:userid', hasValidAPIToken, deleteUser);
       it('should delete the user created by the developer', function (done) {
         axios.delete(`http://localhost:${PORT}/dev/users/${testUserId}`, {
@@ -253,8 +358,12 @@ describe('API server', function () {
               .then(res => res.json())
               .then(data => {
                 console.log('successful updateOrCreate second pass', data);
-                expect(data.lyftToken)
+                expect(data.lyftToken) // lyftToken - new lyftToken
                   .to.equal(secondBody.lyftToken);
+                expect(data.email) // email - old/same email
+                  .to.equal(body.email);
+                expect(data.id) // userId same as before
+                  .to.equal(userId);
                 done();
               })
               .catch(err => done(err));
@@ -439,7 +548,10 @@ describe('API server', function () {
               .to.equal('true');
             done();
           })
-          .catch(err => console.warn('error fetch', err));
+          .catch(err => {
+            console.warn('error fetch', err);
+            done(err);
+          });
       });
 
       // commented out until helper api - carvis api in production
@@ -472,6 +584,7 @@ describe('API server', function () {
       //       })
       //       .catch(err => {
       //         console.warn('error refreshing token', err);
+      //         done(err);
       //       });
       //   });
       // });
@@ -503,7 +616,10 @@ describe('API server', function () {
               done();
             });
           })
-          .catch(err => console.warn('error fetch', err));
+          .catch(err => {
+            console.warn('error fetch', err);
+            done(err);
+          });
       });
 
       it('should update a user and find the update in Redis', function (done) {
@@ -530,7 +646,10 @@ describe('API server', function () {
               done();
             });
           })
-
+          .catch(err => {
+            console.warn('error delete user', err);
+            done(err);
+          });
       });
       // more tests within Redis.
     });
@@ -562,7 +681,10 @@ describe('API server', function () {
               done();
             });
           })
-          .catch(err => console.warn('error fetch', err));
+          .catch(err => {
+            console.warn('error fetch', err);
+            done(err);
+          });
       });
 
       it('should validate using that new key', function (done) {
@@ -590,7 +712,10 @@ describe('API server', function () {
               .to.be.ok;
             done();
           })
-          .catch(err => console.warn('error public route test', err));
+          .catch(err => {
+            console.warn('error public route test', err);
+            done(err);
+          });
       });
 
       it('should not validate using nonexistent key', function (done) {
@@ -618,7 +743,10 @@ describe('API server', function () {
               .to.equal('invalid API key');
             done();
           })
-          .catch(err => console.warn('error public route test', err));
+          .catch(err => {
+            console.warn('error public route test', err);
+            done(err);
+          });
       });
 
       it('should increment key value when using DeveloperAPI', function (done) {
@@ -652,7 +780,10 @@ describe('API server', function () {
                 done();
               });
             })
-            .catch(err => console.warn('error fetch', err));
+            .catch(err => {
+              console.warn('error fetch', err);
+              done(err);
+            });
         });
       });
 
@@ -686,7 +817,10 @@ describe('API server', function () {
             // works, but can add more precise checks.
             done();
           })
-          .catch(err => console.warn('error public placesCall', err));
+          .catch(err => {
+            console.warn('error public placesCall', err);
+            done(err);
+          });
       });
 
       // NOTE: currently Lyft will always return a -1 here, as we're overwriting the lyftBearerToken with the string 'true' in a previous test.
@@ -737,9 +871,15 @@ describe('API server', function () {
                 // optional - check if really deleted.
                 done();
               })
-              .catch(err => console.warn('error delete ride', err));
+              .catch(err => {
+                console.warn('error delete ride', err);
+                done(err);
+              });
           })
-          .catch(err => console.warn('error public getEstimate', err));
+          .catch(err => {
+            console.warn('error public getEstimate', err);
+            done(err);
+          });
       });
 
       it('should add a DB record on addRide', function (done) {
@@ -814,25 +954,75 @@ describe('API server', function () {
                         // optional - check if really deleted.
                         done();
                       })
-                      .catch(err => console.warn('error delete ride', err));
+                      .catch(err => {
+                        console.warn('error delete ride', err);
+                        done(err);
+                      });
                   }
                 }
               })
-              .catch(err => console.warn('error db fetch ride for user', err));
+              .catch(err => {
+                console.warn('error db fetch ride for user', err);
+                done(err);
+              });
           })
-          .catch(err => console.warn('error public addRide', err));
+          .catch(err => {
+            console.warn('error public addRide', err);
+            done(err);
+          });
       });
 
+      // live test, would actually request a ride
       // /developer/requestRide
       // it('should request a ride from the public endpoint', function(done) {
+      //
+      // });
+
+      // can only test this after requesting a ride - risky
+      // app.post('developer/shareETA/:userid', hasValidDevAPIToken, shareRideETA);
+      // it('should return the shareETA URL', function (done) {
+      //
+      // });
+
+      // note: commented out as it triggers a live SMS from Twilio -
+      // uncomment this test when needed.
+      // test separated from shareETA - invokes createMessage the same way.
+
+      // it('should invoke createMessage with Twilio', function (done) {
+      //   let url = `http://localhost:${PORT}/internal/sendTwilio`;
+      //   let body = {
+      //     message: 'test Twilio - Carvis-API'
+      //   };
+      //
+      //   fetch(url, {
+      //       method: 'POST',
+      //       headers: {
+      //         'x-access-token': process.env.CARVIS_API_KEY,
+      //         'Content-Type': 'application/json'
+      //       },
+      //       body: JSON.stringify(body)
+      //     })
+      //     .then(res => res.json())
+      //     .then(data => {
+      //       console.log('success Twilio createMessage', data);
+      //       expect(data)
+      //         .to.be.ok;
+      //       done();
+      //     })
+      //     .catch(err => done(err));
+      // });
+
+      // can only test this after requesting a ride - risky
+      // app.post('/developer/cancelRide/:userid', hasValidDevAPIToken, cancelRide);
+      // it('should cancel a requested ride', function(done) {
       //
       // });
 
       // note: this test should be done last - as it invalidates the previously created key.
       it('should return 404 if key used >99 times', function (done) {
         let token = keyObj.devKey;
-        let apiURL = `http://localhost:${PORT}/developer/testMyKey`
-          // increment the key value 100 times
+        let apiURL = `http://localhost:${PORT}/developer/testMyKey`;
+        // increment the key value 100 times
         for (let i = 0; i < 100; i++) {
           redisIncrementKeyValue(token);
         }
@@ -865,7 +1055,10 @@ describe('API server', function () {
               redisDelete(token, () => done(err));
             }
           })
-          .catch(err => console.warn('error fetch', err));
+          .catch(err => {
+            console.warn('error fetch', err);
+            done(err);
+          });
       });
       /* note:
       integration testing for '/developer/lyftPhoneCodeAuth', not possible - as the code is sent by Lyft to the phoneNumber via SMS (and the phoneNumber has to be registered with them, so we can't use a Twilio number).

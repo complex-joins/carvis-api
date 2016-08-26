@@ -1,10 +1,9 @@
 const _ = require('lodash'); // used for _.filter
 const env = require('dotenv');
 const config = {};
-import {User} from '../models/User';
+import { User } from '../models/User';
 import { formatAnswer, getEstimate, addRide } from '../utils/ride-helper';
 import { placesCall } from './../utils/place-helper';
-!process.env.PROD && env.config();
 
 const fakeoutMode = JSON.parse(process.env.FAKEOUT) || false; // when true, CARVIS will tell you about taxi fares, not uber and lyft estimates
 
@@ -19,19 +18,21 @@ if (fakeoutMode) {
   config.helpSpeech += 'To begin, tell me to book the cheapest or fastest car, and where you want to go';
 }
 
-exports.handleLaunch = function(req, res) {
+exports.handleLaunch = function (req, res) {
   console.log(req.params)
-  User.find({alexaUserId: req.params.alexaUserId})
-  .then((user) => {
-    return user.length === 0 ? {} : user[0];
-  })
-  .then((data) => {
-    console.log(data)
-    config.carvisUserID = data.id;
-    return config;
-  })
-  .then((data) => {res.json(data);})
-  .catch((err) => res.status(400).json(err))
+  User.find({ alexaUserId: req.params.alexaUserId })
+    .then(user => { // need User.decryptModel(user[0]) ?
+      console.log('alexa handleLaunch User.find', user);
+      return user.length === 0 ? {} : user[0];
+    })
+    .then(data => {
+      console.log(data)
+      config.carvisUserID = data.id;
+      return config;
+    })
+    .then(data => res.json(data))
+    .catch(err => res.status(400)
+      .json(err));
 };
 
 export const AlexaGetEstimate = (req, res) => {
@@ -135,7 +136,7 @@ export const AlexaGetEstimate = (req, res) => {
   }
 };
 
-exports.cancelRide = function(req, res) {
+exports.alexaCancelRide = function (req, res) {
   console.log('cancelRide req', req);
-  res.json({prompt: 'Canceling your ride...'});
+  res.json({ prompt: 'Canceling your ride...' });
 };

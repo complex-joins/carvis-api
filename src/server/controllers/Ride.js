@@ -113,12 +113,11 @@ export const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, r
     });
 };
 
-// TODO: add redis check for cost signature Uber
 export const helperAPIQuery = (body, vendor) => {
   if (vendor === 'Lyft') {
     let helperURL = CARVIS_HELPER_API + '/lyft/getCost';
   } else {
-    let helperURL = CARVIS_HELPER_API + '/uber/requestRide';
+    let helperURL = CARVIS_HELPER_API + '/uber/getEstimate';
   }
 
   return fetch(helperURL, {
@@ -175,7 +174,11 @@ export const shareRideETA = (req, res) => {
       console.log('success lyft shareETA', data);
 
       let URLmessage = message + data.shareUrl;
-      createMessage(number, URLmessage);
+      let twilioBody = {
+        message: URLmessage,
+        number: number
+      };
+      createMessage({ body: twilioBody });
       res.json();
     })
     .catch(err => {
@@ -238,6 +241,7 @@ export const updateRide = (req, res) => {
   let carvisRideId = req.params.rideid;
   let lyftRideId = req.body.lyftRideId || null;
   let vendor = lyftRideId ? 'Lyft' : 'Uber';
+  let userId = req.body.userId;
 
   let carvisRideKey = `${userId}:carvisRide`;
   let rideKey = `${userId}:ride`;
