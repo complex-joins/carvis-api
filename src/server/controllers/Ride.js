@@ -118,7 +118,7 @@ export const helperAPIQuery = (body, vendor) => {
   if (vendor === 'Lyft') {
     let helperURL = CARVIS_HELPER_API + '/lyft/getCost';
   } else {
-    let helperURL = CARVIS_HELPER_API + '/uber/requestRide';
+    let helperURL = CARVIS_HELPER_API + '/uber/getEstimate';
   }
 
   return fetch(helperURL, {
