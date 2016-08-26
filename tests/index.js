@@ -89,10 +89,14 @@ describe('API server', function () {
           .then(data => {
             console.log('data get all users', data);
             testCount = data.length;
-            expect(data[0].id)
-              .to.be.ok;
             expect(data)
-              .to.have.length.above(0);
+              .to.be.ok;
+            // test DB might be empty before test start
+            if (data.length) {
+              // check for the ID property on the user
+              expect(data[0].id)
+                .to.be.ok;
+            }
             done();
           })
           .catch((err) => done(err));
