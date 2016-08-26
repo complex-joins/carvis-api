@@ -1,6 +1,10 @@
 const fetch = require('node-fetch');
 const key = process.env.GOOGLE_PLACES_API_KEY;
 
+// `place` is a string, such as 'hack reactor'
+// the callback should invoke getEstimate which will flow into addRide
+// `nearbyLoc` is [lat, lng] of origin
+
 export const placesCall = (place, cb, nearbyLoc) => {
   let loc, radius;
   if (nearbyLoc) { // nearby location was passed in as reference to search near

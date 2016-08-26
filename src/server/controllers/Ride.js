@@ -31,42 +31,45 @@ export const addRide = function (req, res) {
 
       // carvisUserId -- to query the user table for tokens etc.
       let userId = ride.userId;
-      let user = redisHashGetAll(userId /*, cb*/ ); // redis query for user.
-      console.log('user on redis getall addRide', user);
+      // return out of the promise - redis or DB query etc to request ride.
+      return redisHashGetAll(userId, user => {
+        console.log('user on redis getall addRide', user);
 
-      if (user) {
-        if (vendor === 'Uber') {
-          let body = {
-            origin: origin,
-            token: user.uberToken,
-            destination: destination,
-            rideId: rideId
-          };
-          return helperAPIQuery(body, vendor);
+        if (user) {
+          if (vendor === 'Uber') {
+            let body = {
+              origin: origin,
+              token: user.uberToken,
+              destination: destination,
+              rideId: rideId
+            };
+            return helperAPIQuery(body, vendor);
 
-        } else if (vendor === 'Lyft') {
-          let body = {
-            lyftPaymentInfo: user.lyftPaymentInfo,
-            lyftToken: user.lyftToken,
-            origin: origin,
-            partySize: partySize,
-            destination: destination,
-            rideId: rideId
-          };
-          return helperAPIQuery(body, vendor);
+          } else if (vendor === 'Lyft') {
+            let body = {
+              lyftPaymentInfo: user.lyftPaymentInfo,
+              lyftToken: user.lyftToken,
+              origin: origin,
+              partySize: partySize,
+              destination: destination,
+              rideId: rideId
+            };
+            return helperAPIQuery(body, vendor);
+          }
+        } else { // only invoked if we don't have the user in Redis
+          let dbURL = 'http://' + CARVIS_API + '/users/' + userId;
+          console.log('pre db get', vendor, userId, dbURL, rideId);
+
+          return getUserAndRequestRideDB(dbURL, origin, destination, partySize, rideId, vendor);
         }
-      } else { // only invoked if we don't have the user in Redis at the moment
-        let dbURL = 'http://' + CARVIS_API + '/users/' + userId;
-        console.log('pre db get', vendor, userId, dbURL, rideId);
+      }); // redis query for user.
 
-        return getUserAndRequestRideDB(dbURL, origin, destination, partySize, rideId, vendor);
-      }
     })
     .catch((err) => res.status(400)
       .json(err)); // add catch for errors.
 };
 
-const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, rideId, vendor) => {
+export const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, rideId, vendor) => {
 
   return fetch(dbURL, {
       method: 'GET',
@@ -111,7 +114,7 @@ const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, rideId, 
 };
 
 // TODO: add redis check for cost signature Uber
-const helperAPIQuery = (body, vendor) => {
+export const helperAPIQuery = (body, vendor) => {
   if (vendor === 'Lyft') {
     let helperURL = CARVIS_HELPER_API + '/lyft/getCost';
   } else {
@@ -260,7 +263,7 @@ export const getAllRideData = (req, res) => {
 };
 
 export const deleteRide = (req, res) => {
-  Ride.delete({ id: req.params.rideid })
+  Ride.remove({ id: req.params.rideid })
     .then((ride) => res.json(ride))
     .catch((err) => res.status(400)
       .json(err));
