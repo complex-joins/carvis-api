@@ -4,7 +4,7 @@ import { getLyftToken, updateLyftToken } from './controllers/Internal';
 import { createNewDeveloperKey } from './controllers/DeveloperAPI';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 import hasValidDevAPIToken from './server-configuration/hasValidDevAPIToken';
-import { handleLaunch, AlexaGetEstimate } from './controllers/alexa';
+import { handleLaunch, AlexaGetEstimate, cancelRide } from './controllers/alexa';
 import { lyftPhoneAuth, lyftPhoneCodeAuth, uberLogin, testKey, getEstimate, placesCall, addRideToDB, requestRide } from './controllers/helper';
 
 export default function (app) {

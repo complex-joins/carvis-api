@@ -263,9 +263,9 @@ describe('API server', function () {
       });
 
       // ========== alexa tests =============== //
-
+      let alexaUserId = "amzn1.account.AM3B227HF3FAM1B261HK7FFM3A2";
       it('should return the correct data for an Alexa launch intent request', function (done) {
-        axios.post(`http://localhost:${PORT}/alexa/launch`, {
+        axios.post(`http://localhost:${PORT}/alexa/launch/${alexaUserId}`, {
             headers: { 'Content-Type': 'application/json' }
           })
           .then((res) => {
@@ -517,7 +517,8 @@ describe('API server', function () {
             headers: {
               'x-access-token': process.env.CARVIS_API_KEY,
               'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify(body)
           })
           .then(res => res.json())
           .then(data => {
@@ -527,19 +528,9 @@ describe('API server', function () {
               expect(res)
                 .to.equal(body.email);
               done();
-            }
-          });
-            console.log('success remove user', data);
-            redisHashGetAll(redisTestUser, result => {
-              if (result) {
-                let err = 'redis did not remove user';
-                done(err);
-              } else {
-                done();
-              }
             });
           })
-          .catch(err => console.warn('error delete user', err));
+
       });
       // more tests within Redis.
     });

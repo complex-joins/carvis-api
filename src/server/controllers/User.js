@@ -110,6 +110,7 @@ export const updateOrCreateUser = (req, res) => {
         redisKeyValArray.push(userKeys[i]);
         redisKeyValArray.push(user[userKeys[i]]);
       }
+      console.log('ARGUEMNTS TO RSH', user.id, redisKeyValArray);
       redisSetHash(user.id, redisKeyValArray, result => {
         return user.length === 0 ? res.json({}) : res.json(User.decryptModel(user));
       });
