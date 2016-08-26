@@ -92,7 +92,6 @@ export const findOrCreateUser = (req, res) => {
 // check for unique fields to identify existing users in the DB
 // then first create or update the DB record, then do the same in Redis
 export const updateOrCreateUser = (req, res) => {
-  console.log('req.body:', req.body);
   const uniqueFields = ['email', 'uberEmail', 'lyftPhoneNumber', 'alexaUserId', 'id'];
   const findObj = _(req.body)
     .reduce((findObj, val, key) => {
@@ -102,15 +101,7 @@ export const updateOrCreateUser = (req, res) => {
       return findObj;
     }, {});
 
-  console.log('findObj', findObj);
-  let userFields = _.clone(req.body, true);
-  
-  if (userFields.id) {
-    delete userFields['id'];
-    console.log('userFields:', userFields);  
-  }
-
-  User.updateOrCreate(findObj, userFields)
+  User.updateOrCreate(findObj, req.body)
     .then(user => {
       user = user[0]; // [{}] => {}
       console.log('success DB find user updateOrCreate', user);
