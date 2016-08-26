@@ -18,15 +18,17 @@ if (fakeoutMode) {
 }
 
 exports.handleLaunch = function (req, res) {
-  console.log(req.params)
+  console.log(req.params);
   User.find({ alexaUserId: req.params.alexaUserId })
     .then(user => { // need User.decryptModel(user[0]) ?
       console.log('alexa handleLaunch User.find', user);
       return user.length === 0 ? {} : user[0];
     })
     .then(data => {
-      console.log(data)
-      config.carvisUserID = data.id;
+      console.log(data);
+      if (data.id) {
+        config.carvisUserID = data.id;  
+      }
       return config;
     })
     .then(data => res.json(data))
