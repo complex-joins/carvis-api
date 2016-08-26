@@ -40,9 +40,7 @@ export const updateUserData = (req, res) => {
 export const createUser = (req, res) => {
   User.create(req.body)
     .then((user) => {
-      // add user to redis only after successful DB add
       let userId = user[0].id; // Carvis userId
-      console.log(user[0]);
       let redisKeyValArray = [];
       for (let key in user[0]) {
         redisKeyValArray.push(key);
@@ -112,6 +110,7 @@ export const updateOrCreateUser = (req, res) => {
         redisKeyValArray.push(userKeys[i]);
         redisKeyValArray.push(user[userKeys[i]]);
       }
+      console.log('ARGUEMNTS TO RSH', user.id, redisKeyValArray);
       redisSetHash(user.id, redisKeyValArray, result => {
         return user.length === 0 ? res.json({}) : res.json(User.decryptModel(user));
       });

@@ -1,9 +1,11 @@
 ### node etc ###
 
-.imdoneignore
-.imdone
-
+.env
 secret
+deploy
+production.yml
+
+docker-compose.yml
 
 work-stash
 

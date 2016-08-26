@@ -1,10 +1,11 @@
 const _ = require('lodash'); // used for _.filter
+const env = require('dotenv');
+const config = {};
+import {User} from '../models/User';
 import { formatAnswer, getEstimate, addRide } from '../utils/ride-helper';
 import { placesCall } from './../utils/place-helper';
-import { User } from './../models/User';
 
 const fakeoutMode = JSON.parse(process.env.FAKEOUT) || false; // when true, CARVIS will tell you about taxi fares, not uber and lyft estimates
-const config = {};
 
 if (fakeoutMode) {
   config.prompt = 'With CARVIS you can find the average taxi fare from an airport to your hotel, and vice versa. For example, you can ask, CARVIS, how much is a taxi from Marriot San Francisco to SFO airport?';
@@ -20,7 +21,7 @@ if (fakeoutMode) {
 exports.handleLaunch = function (req, res) {
   console.log(req.params)
   User.find({ alexaUserId: req.params.alexaUserId })
-    .then(user => { // need User.decryptModel(user[0]) ? 
+    .then(user => { // need User.decryptModel(user[0]) ?
       console.log('alexa handleLaunch User.find', user);
       return user.length === 0 ? {} : user[0];
     })
@@ -133,4 +134,9 @@ export const AlexaGetEstimate = (req, res) => {
       }
     }, origin.coords);
   }
+};
+
+exports.cancelRide = function(req, res) {
+  console.log('cancelRide req', req);
+  res.json({prompt: 'Canceling your ride...'});
 };

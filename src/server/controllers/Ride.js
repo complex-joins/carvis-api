@@ -4,9 +4,9 @@ import { createMessage } from './../utils/twilioHelper';
 import fetch from 'node-fetch';
 import { redisHashGetAll, redisSetKeyWithExpire, redisGetKey, redisHashGetOne } from './../../redis/redisHelperFunctions';
 
-const CARVIS_API = process.env.CARVIS_API;
+const CARVIS_API = process.env.CARVIS_API_IP;
 const CARVIS_API_KEY = process.env.CARVIS_API_KEY;
-const CARVIS_HELPER_API = process.env.CARVIS_HELPER_API;
+const CARVIS_HELPER_API = process.env.HELPER_PORT;
 const CARVIS_HELPER_API_KEY = process.env.CARVIS_HELPER_API_KEY;
 
 export const addRide = function (req, res) {

@@ -1,3 +1,6 @@
+const path = require('path');
+const dotenv = require('dotenv');
+dotenv.config();
 const assert = require('chai')
   .assert;
 const expect = require('chai')
@@ -6,7 +9,6 @@ const axios = require('axios');
 import fetch from 'node-fetch';
 const request = require('supertest');
 const server = require('./testServer');
-
 const User = require('../src/server/models/User');
 import { redisSetHash, redisHashGetAll, redisHashGetOne, redisSetKey, redisSetKeyWithExpire, redisGetKey, redisIncrementKeyValue, redisHashGetOneAsync, redisDelete } from './../src/redis/redisHelperFunctions';
 import { updateLyftToken, getLyftToken, refreshToken } from './../src/server/controllers/Internal';
@@ -14,6 +16,9 @@ import { createNewDeveloperKey } from './../src/server/controllers/DeveloperAPI'
 import hasValidDevAPIToken from './../src/server/server-configuration/hasValidDevAPIToken';
 import { getLyftBearerToken } from './../src/server/utils/ride-helper';
 import { createMessage } from './../src/server/utils/twilioHelper';
+import Stork from '../src/db/stork/src/index';
+import _ from 'lodash';
+
 
 let currentListeningServer;
 let PORT = 8080;
@@ -21,8 +26,30 @@ let testUserId;
 let testCount;
 let redisTestUser;
 let keyObj = {};
+let DB_CONFIG = {
+  host: process.env.TEST_DB_HOST,
+  port: 5432,
+  database: process.env.TEST_DB_DATABASE,
+  user: process.env.TEST_DB_USER,
+  password: process.env.TEST_DB_PASS,
+  ssl: true
+};
 let alexaUserId = "amzn1.account.AM3B227HF3FAM1B261HK7FFM3A2";
 let testRideId;
+
+// if (process.env.AWS && JSON.parse(process.env.AWS)) {
+//   DB_CONFIG
+// } else {
+//   // DB_CONFIG = JSON.parse(process.env.DB_CONFIG_OBJ_JSON);
+// }
+
+const db = new Stork({
+  connection: DB_CONFIG,
+  client: 'pg'
+});
+
+
+
 
 // TODO: REMOVE ALL TEST USERS, RIDES, REDIS KEYS, etc.
 // =====
@@ -36,8 +63,14 @@ let testRideId;
 
 describe('API server', function () {
   this.timeout(18000);
-  before(function () {
+  before(function (done) {
     currentListeningServer = server.default.listen(PORT);
+
+    db.dropTableIfExists('users')
+      .then((res) => db.createTable('users', User.UserSchema))
+      .then(() => done())
+      .catch((err) => done(err));
+
   });
 
   after(function () {
@@ -81,6 +114,7 @@ describe('API server', function () {
             headers: { 'x-access-token': process.env.CARVIS_API_KEY }
           })
           .then((res) => {
+            // console.log('res', res);
             testUserId = res.data[0].id;
             assert.equal(res.status, 200, 'did not return 200', res.status);
             done();
@@ -345,7 +379,7 @@ describe('API server', function () {
       });
 
       // ========== alexa tests =============== //
-
+      let alexaUserId = "amzn1.account.AM3B227HF3FAM1B261HK7FFM3A2";
       it('should return the correct data for an Alexa launch intent request', function (done) {
         axios.post(`http://localhost:${PORT}/alexa/launch/${alexaUserId}`, {
             headers: { 'Content-Type': 'application/json' }
@@ -595,32 +629,39 @@ describe('API server', function () {
           });
       });
 
-      it('should remove a user from redis on deleteUser', function (done) {
-        let url = `http://localhost:${PORT}/dev/users/${redisTestUser}`;
-        // tests the combination of the user and redis delete methods
-        fetch(url, {
-            method: 'DELETE',
+      it('should update a user and find the update in Redis', function (done) {
+        var apiURL = `http://localhost:${PORT}/users/2`
+        let body = {
+          email: 'TESTSAREBADMMMMMKAY2@gmail.com' + Math.random()
+        };
+        // update an existing user with a new random email
+        fetch(apiURL, {
+            method: 'PUT',
             headers: {
               'x-access-token': process.env.CARVIS_API_KEY,
               'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify(body)
           })
           .then(res => res.json())
           .then(data => {
-            console.log('success remove user', data);
-            redisHashGetAll(redisTestUser, result => {
-              if (result) {
-                let err = 'redis did not remove user';
-                done(err);
-              } else {
-                done();
-              }
+            // console.log('success update user', data);
+            // fetch the existing user, find new random email (in Redis)
+            redisHashGetOne(data[0].id, 'email', function (res) {
+              expect(res)
+                .to.equal(body.email);
+              done();
             });
-          })
+          }) <<
+          << << < HEAD
           .catch(err => {
             console.warn('error delete user', err);
             done(err);
-          });
+          }); ===
+        === =
+
+        >>>
+        >>> > 73837 bbdf7d1793cc093a3d9825a0d3a22b82679
       });
       // more tests within Redis.
     });

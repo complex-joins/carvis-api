@@ -2,10 +2,9 @@ import { getRidesForUser, addRide, updateRide, getAllRideData, deleteRide, share
 import { getUserDashboardData, updateUserData, createUser, getAllUserData, findOrCreateUser, updateOrCreateUser, deleteUser, rawUserData } from './controllers/User';
 import { getLyftToken, updateLyftToken } from './controllers/Internal';
 import { createNewDeveloperKey } from './controllers/DeveloperAPI';
-import Authentication from './controllers/authentication';
 import hasValidAPIToken from './server-configuration/hasValidAPIToken';
 import hasValidDevAPIToken from './server-configuration/hasValidDevAPIToken';
-import { handleLaunch, AlexaGetEstimate } from './controllers/alexa';
+import { handleLaunch, AlexaGetEstimate, cancelRide } from './controllers/alexa';
 import { lyftPhoneAuth, lyftPhoneCodeAuth, uberLogin, testKey, getEstimate, placesCall, addRideToDB, requestRide } from './controllers/helper';
 import { createMessage } from './utils/twilioHelper';
 
@@ -52,6 +51,8 @@ export default function (app) {
   // ===== alexa routes ===== //
 
   app.post('/alexa/estimate', AlexaGetEstimate);
+  app.post('/alexa/cancelRide', cancelRide);
+
   app.post('/alexa/launch/:alexaUserId', handleLaunch);
 
   app.get('/internal/lyftBearerToken', hasValidAPIToken, getLyftToken);
