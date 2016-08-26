@@ -21,6 +21,7 @@ let testUserId;
 let testCount;
 let redisTestUser;
 let keyObj = {};
+let alexaUserId = "amzn1.account.AM3B227HF3FAM1B261HK7FFM3A2";
 
 // TODO: REMOVE ALL TEST USERS, RIDES, REDIS KEYS, etc.
 // =====
@@ -65,7 +66,6 @@ describe('API server', function () {
           .then(data => {
             console.log('data get all users', data);
             testCount = data.length;
-            assert.equal(res.status, 200, 'did not return 200', res.status);
             expect(data[0].id)
               .to.be.ok;
             expect(data)
@@ -239,7 +239,7 @@ describe('API server', function () {
       // ========== alexa tests =============== //
 
       it('should return the correct data for an Alexa launch intent request', function (done) {
-        axios.post(`http://localhost:${PORT}/alexa/launch`, {
+        axios.post(`http://localhost:${PORT}/alexa/launch/${alexaUserId}`, {
             headers: { 'Content-Type': 'application/json' }
           })
           .then((res) => {
