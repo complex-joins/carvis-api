@@ -3,11 +3,11 @@
 # carvis-api
 
 With CARVIS you can order the cheapest or fastest car available, from your Amazon Alexa device and our web client.
-For example, you can say: `CARVIS, find me the cheapest ride to Hack Reactor`.
+For example, you can say: `CARVIS, find me the cheapest ride to Oracle Arena`.
 
 ##Team
 
-Built by `@alexcstark`, `@cpruijsen`, `@daredia`, `@JasonArkens17` as our final project `@hackreactor` .
+Built by `@alexcstark`, `@cpruijsen`, `@daredia`, `@JasonArkens17`.
 
 ##Stack:0 Built using Node, Express, Passport, [StorkSQL](https://www.npmjs.com/package/storkSQL)
 
