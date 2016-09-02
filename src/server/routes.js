@@ -8,7 +8,7 @@ import { handleLaunch, AlexaGetEstimate, alexaCancelRide } from './controllers/a
 import { lyftPhoneAuth, lyftPhoneCodeAuth, uberLogin, testKey, getEstimate, placesCall, addRideToDB, requestRide } from './controllers/helper';
 import { createMessage } from './utils/twilioHelper';
 
-export default function (app) {
+export default app => {
   // TODO: only let the user with that ID find users (middleware);
   app.get('/', (req, res) => {
     res.status(200)
@@ -92,4 +92,4 @@ export default function (app) {
   // more routes
 
   // ===== ... the end ... ===== //
-}
+};

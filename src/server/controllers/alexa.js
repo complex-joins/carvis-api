@@ -17,17 +17,14 @@ if (fakeoutMode) {
   config.helpSpeech += 'To begin, tell me to book the cheapest or fastest car, and where you want to go';
 }
 
-exports.handleLaunch = function (req, res) {
-  console.log(req.params);
+exports.handleLaunch = (req, res) => {
   User.find({ alexaUserId: req.params.alexaUserId })
     .then(user => { // need User.decryptModel(user[0]) ?
-      console.log('alexa handleLaunch User.find', user);
       return user.length === 0 ? {} : user[0];
     })
     .then(data => {
-      console.log(data);
       if (data.id) {
-        config.carvisUserID = data.id;  
+        config.carvisUserID = data.id;
       }
       return config;
     })
@@ -38,26 +35,19 @@ exports.handleLaunch = function (req, res) {
 
 export const AlexaGetEstimate = (req, res) => {
   let slots = req.body.data.request.intent.slots;
-  console.log('slots:', slots);
-
   let userId = req.body.userId; // the unique alexa session userId. that said, its the *carvis userId* i should be storing in the session and passing to carvis api endpoints
   let mode = (fakeoutMode) ? 'cheapest' : slots.MODE.value; // cheapest or fastest
-
   // find the ORIGIN slot that is populated in this request, if any
   let originArray = _.filter(slots, (slotValue, slotKey) => {
     return (slotValue.value && slotValue.value.length > 0 && slotKey.includes('ORIGIN'));
   });
   let origin = (originArray.length) ? { query: originArray[0].value } : null;
-  console.log('Alexa thinks the origin passed in is', origin);
-
   // find the DESTINATION slot that is populated in this request
   let destinationSlots = _.filter(slots, (slotValue, slotKey) => {
     return (slotValue.value && slotValue.value.length > 0 && slotKey.includes('DESTINATION'));
   });
   let destination = (destinationSlots.length) ? { query: destinationSlots[0].value } :
     null;
-  console.log('Alexa thinks my destination is', destination);
-
   let prompt, reprompt;
 
   if (!mode || !destination || (fakeoutMode && !origin)) {
@@ -137,7 +127,4 @@ export const AlexaGetEstimate = (req, res) => {
   }
 };
 
-exports.alexaCancelRide = function (req, res) {
-  console.log('cancelRide req', req);
-  res.json({ prompt: 'Canceling your ride...' });
-};
+exports.alexaCancelRide = (req, res) => res.json({ prompt: 'Canceling your ride...' });

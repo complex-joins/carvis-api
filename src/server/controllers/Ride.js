@@ -9,12 +9,10 @@ const CARVIS_API_KEY = process.env.CARVIS_API_KEY;
 const CARVIS_HELPER_API = process.env.HELPER_PORT;
 const CARVIS_HELPER_API_KEY = process.env.CARVIS_HELPER_API_KEY;
 
-export const addRide = function (req, res) {
+export const addRide = (req, res) => {
   Ride.create(req.body)
-    .then((ride) => {
+    .then(ride => {
       ride = ride[0];
-      console.log(ride);
-
       let vendor = ride.winner;
       let rideId = ride.id;
       let origin = {
@@ -33,8 +31,6 @@ export const addRide = function (req, res) {
       let userId = ride.userId;
       // return out of the promise - redis or DB query etc to request ride.
       return redisHashGetAll(userId, user => {
-        console.log('user on redis getall addRide', user);
-
         if (user) {
           if (vendor === 'Uber') {
             let body = {
@@ -58,15 +54,13 @@ export const addRide = function (req, res) {
           }
         } else { // only invoked if we don't have the user in Redis
           let dbURL = 'http://' + CARVIS_API + '/users/' + userId;
-          console.log('pre db get', vendor, userId, dbURL, rideId);
-
           return getUserAndRequestRideDB(dbURL, origin, destination, partySize, rideId, vendor);
         }
-      }); // redis query for user.
+      });
 
     })
-    .catch((err) => res.status(400)
-      .json(err)); // add catch for errors.
+    .catch(err => res.status(400)
+      .json(err));
 };
 
 export const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, rideId, vendor, res) => {
@@ -78,9 +72,7 @@ export const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, r
         'x-access-token': CARVIS_API_KEY
       }
     })
-    .then(res => {
-      return res.json();
-    })
+    .then(res => res.json())
     .then(data => {
       data = data[0];
 
@@ -91,7 +83,6 @@ export const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, r
           destination: destination,
           rideId: rideId
         };
-        console.log('helperAPIQuery', body, vendor, res);
         return helperAPIQuery(body, vendor, res);
 
       } else if (vendor === 'Lyft') {
@@ -103,16 +94,13 @@ export const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, r
           destination: destination,
           rideId: rideId
         };
-        console.log('helperAPIQuery', body, vendor, res);
         return helperAPIQuery(body, vendor, res);
 
       } else {
         console.warn('not a valid vendor - check stacktrace');
       }
     })
-    .catch(err => {
-      console.warn('error fetching user from db', err);
-    });
+    .catch(err => console.warn('error fetching user from db', err));
 };
 
 export const helperAPIQuery = (body, vendor, res) => {
@@ -129,20 +117,15 @@ export const helperAPIQuery = (body, vendor, res) => {
       },
       body: JSON.stringify(body)
     })
-    .then(res => {
-      return res.json();
-    })
+    .then(res => res.json())
     .then(data => {
-      console.log('success request ride', data);
       if (res) {
         res.json(data);
       } else {
         return;
       }
     })
-    .catch(err => {
-      console.warn('err request ride', err);
-    });
+    .catch(err => console.warn('err request ride', err));
 };
 
 export const shareRideETA = (req, res) => {
@@ -173,12 +156,8 @@ export const shareRideETA = (req, res) => {
       },
       body: JSON.stringify(body)
     })
-    .then(response => {
-      return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-      console.log('success lyft shareETA', data);
-
       let URLmessage = message + data.shareUrl;
       let twilioBody = {
         message: URLmessage,
@@ -187,9 +166,7 @@ export const shareRideETA = (req, res) => {
       createMessage({ body: twilioBody });
       res.json();
     })
-    .catch(err => {
-      console.warn('err lyft shareETA', err);
-    });
+    .catch(err => console.warn('err lyft shareETA', err));
 };
 
 // TODO: improve and add Uber.
@@ -223,23 +200,18 @@ export const cancelRide = (req, res) => {
       },
       body: JSON.stringify(body)
     })
-    .then(response => {
-      return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-      console.log('success lyft cancelRide', data);
       // update DB is handled by the helper API.
       // no response needed here.
     })
-    .catch(err => {
-      console.warn('err lyft cancelRide', err);
-    });
+    .catch(err => console.warn('err lyft cancelRide', err));
 };
 
 export const getRidesForUser = (req, res) => {
   Ride.find({ userId: req.params.userid })
-    .then((rides) => res.json(rides))
-    .catch((err) => res.status(400)
+    .then(rides => res.json(rides))
+    .catch(err => res.status(400)
       .json(err));
 };
 
@@ -248,7 +220,6 @@ export const updateRide = (req, res) => {
   let lyftRideId = req.body.lyftRideId || null;
   let vendor = lyftRideId ? 'Lyft' : 'Uber';
   let userId = req.body.userId;
-
   let carvisRideKey = `${userId}:carvisRide`;
   let rideKey = `${userId}:ride`;
   let vendorKey = `${userId}:vendor`;
@@ -260,21 +231,21 @@ export const updateRide = (req, res) => {
   redisSetKeyWithExpire(vendorKey, 300, vendor);
 
   Ride.update({ id: carvisRideId }, req.body)
-    .then((ride) => res.json(ride))
-    .catch((err) => res.status(400)
+    .then(ride => res.json(ride))
+    .catch(err => res.status(400)
       .json(err));
 };
 
 export const getAllRideData = (req, res) => {
   Ride.findAll()
-    .then((rides) => res.json(rides))
-    .catch((err) => res.status(400)
+    .then(rides => res.json(rides))
+    .catch(err => res.status(400)
       .json(err));
 };
 
 export const deleteRide = (req, res) => {
   Ride.remove({ id: req.params.rideid })
-    .then((ride) => res.json(ride))
-    .catch((err) => res.status(400)
+    .then(ride => res.json(ride))
+    .catch(err => res.status(400)
       .json(err));
 };
