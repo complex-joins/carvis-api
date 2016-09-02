@@ -26,7 +26,7 @@ export const createMessage = (req, res) => {
   // and in case the +1 was ommitted we add it in.
   if (number.length < 12) {
     if (number.slice(0, 1) !== '+') {
-      console.log('US number without +1 prefix')
+      console.warn('US number without +1 prefix')
       number = '+1' + number;
     } else {
       console.info('international number', number);
@@ -35,7 +35,7 @@ export const createMessage = (req, res) => {
     if (number.slice(0, 1) !== '+') {
       console.warn('invalid number', number);
     } else if (number.length === 12) {
-      console.log('US number', number);
+      console.info('US number', number);
     } else {
       console.info('international number', number);
     }
@@ -54,8 +54,6 @@ export const createMessage = (req, res) => {
       // The second argument to the callback will contain the information
       // sent back by Twilio for the request. In this case, it is the
       // information about the text messsage you just sent:
-      console.log('Success! The SID for this SMS message is:', message.sid);
-      console.log('Message sent on:', message.dateCreated);
       res.json({ message: 'success!', SID: message.sid, created: message.dateCreated })
     } else {
       console.warn('Error in Twilio SMS send', err);

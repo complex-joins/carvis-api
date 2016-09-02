@@ -1,7 +1,10 @@
 const fetch = require('node-fetch');
+import { refreshToken } from './../controllers/Internal';
 
 export const getLyftBearerToken = (cb) => {
-  let url = 'http://' + process.env.CARVIS_API + '/internal/lyftBearerToken';
+  console.log('getLyftBearerToken, ride helper');
+
+  let url = `http://${process.env.CARVIS_API}/internal/lyftBearerToken`;
   return fetch(url, {
       method: 'GET',
       headers: {
@@ -11,7 +14,7 @@ export const getLyftBearerToken = (cb) => {
     })
     .then(res => res.json())
     .then(data => {
-      console.log('new lyftBearerToken', data);
+      console.log('data return getLyftBearerToken ride-helper', data);
       if (cb) {
         return cb(data);
       } else {
@@ -22,113 +25,6 @@ export const getLyftBearerToken = (cb) => {
 };
 
 export const getEstimate = (requestType, start, dest, cb) => {
-  let lyftToken = getLyftBearerToken();
-  let uberToken = process.env.UBER_SERVER_TOKEN;
-  let uberURL = 'https://api.uber.com/v1/';
-  let lyftURL = 'https://api.lyft.com/v1/';
-
-  let uberPath, lyftPath;
-
-  if (requestType.includes('cheap')) {
-    uberPath = 'estimates/price';
-    lyftPath = 'cost';
-  } else if (requestType.includes('fast')) {
-    uberPath = 'estimates/time';
-    lyftPath = 'eta';
-  }
-
-  let uberEndpoint = `${uberURL}${uberPath}?start_latitude=${start[0]}&start_longitude=${start[1]}&end_latitude=${dest[0]}&end_longitude=${dest[1]}`;
-  let lyftEndpoint = `${lyftURL}${lyftPath}?lat=${start[0]}&lng=${start[1]}&start_lat=${start[0]}&start_lng=${start[1]}&end_lat=${dest[0]}&end_lng=${dest[1]}`;
-
-  let lyftAuth = 'Bearer ' + lyftToken;
-  let uberAuth = 'Token ' + uberToken;
-
-  let firstResult = null;
-  let winner = null;
-
-  fetch(uberEndpoint, {
-      method: 'GET',
-      headers: {
-        Authorization: uberAuth,
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(res => {
-      return res.json();
-    })
-    .then(data => {
-      let uberEstimate;
-
-      if (uberPath === 'estimates/price') {
-        if (!data.prices) {
-          uberEstimate = -1;
-        } else {
-          let dollarsString = data.prices[0].estimate.slice(1);
-          // TODO: make car type dynamic. right now hardcoded to POOL by using data.prices[0]
-          uberEstimate = parseFloat(dollarsString) * 100;
-        }
-      } else if (uberPath === 'estimates/time') {
-        // TODO: always make calls to BOTH time and price and return both to alexa as details
-        // esp since uber will still give a time estimate even when there's no valid fare
-        // (ex: destination = 'gardendale')
-        uberEstimate = data.times[0].estimate;
-      }
-
-      if (firstResult) {
-        winner = compare(uberEstimate, firstResult);
-        console.log('Winner:', winner);
-        return cb(winner);
-      } else {
-        firstResult = uberEstimate;
-      }
-      console.log('Uber Pool estimate:', uberEstimate);
-    })
-    .catch(function (err) {
-      console.log('error in uber fetch', err);
-    });
-
-  fetch(lyftEndpoint, {
-      method: 'GET',
-      headers: {
-        Authorization: lyftAuth,
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(function (res) {
-      return res.json();
-    })
-    .then(function (data) {
-      let lyftEstimate;
-
-      if (lyftPath === 'cost') {
-        if (!data.cost_estimates || !data.cost_estimates[0].estimated_cost_cents_max) {
-          lyftEstimate = -1;
-        } else {
-          lyftEstimate = parseFloat(data.cost_estimates[0].estimated_cost_cents_max);
-        }
-      } else if (lyftPath === 'eta') {
-        // TODO: make calls to BOTH time and price and return both to alexa as details
-        // esp since lyft will still give a time estimate even when there's no valid fare
-        // (ex: destination = 'gardendale')
-        if (!data.eta_estimates || !data.eta_estimates[0].eta_seconds) {
-          lyftEstimate = -1;
-        } else {
-          lyftEstimate = data.eta_estimates[0].eta_seconds;
-        }
-      }
-      if (firstResult) {
-        winner = compare(firstResult, lyftEstimate);
-        console.log('Winner:', winner);
-        return cb(winner);
-      } else {
-        firstResult = lyftEstimate;
-      }
-      console.log('Lyft Line estimate:', lyftEstimate);
-    })
-    .catch(function (err) {
-      console.log('error in lyft fetch', err);
-    });
-
   const compare = (uberEstimate, lyftEstimate) => {
     let estimateType = requestType.includes('cheap') ? 'fare' : 'eta';
     let uberAsWinner = { vendor: 'Uber', estimate: uberEstimate, estimateType: estimateType };
@@ -145,6 +41,102 @@ export const getEstimate = (requestType, start, dest, cb) => {
     // TODO: what if prices/times are equal? check times/prices as well
     // if that is also equal, return one randomly
   };
+
+  getLyftBearerToken(lyftToken => {
+    let uberToken = process.env.UBER_SERVER_TOKEN;
+    let uberURL = 'https://api.uber.com/v1/';
+    let lyftURL = 'https://api.lyft.com/v1/';
+
+    let uberPath, lyftPath;
+
+    if (requestType.includes('cheap')) {
+      uberPath = 'estimates/price';
+      lyftPath = 'cost';
+    } else if (requestType.includes('fast')) {
+      uberPath = 'estimates/time';
+      lyftPath = 'eta';
+    }
+
+    let uberEndpoint = `${uberURL}${uberPath}?start_latitude=${start[0]}&start_longitude=${start[1]}&end_latitude=${dest[0]}&end_longitude=${dest[1]}`;
+    let lyftEndpoint = `${lyftURL}${lyftPath}?lat=${start[0]}&lng=${start[1]}&start_lat=${start[0]}&start_lng=${start[1]}&end_lat=${dest[0]}&end_lng=${dest[1]}`;
+
+    let lyftAuth = 'Bearer ' + lyftToken;
+    let uberAuth = 'Token ' + uberToken;
+
+    let firstResult = null;
+    let winner = null;
+
+    fetch(uberEndpoint, {
+        method: 'GET',
+        headers: {
+          Authorization: uberAuth,
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        let uberEstimate;
+
+        if (uberPath === 'estimates/price') {
+          if (!data.prices) {
+            uberEstimate = -1;
+          } else {
+            let dollarsString = data.prices[0].estimate.slice(1);
+            // TODO: make car type dynamic. right now hardcoded to POOL by using data.prices[0]
+            uberEstimate = parseFloat(dollarsString) * 100;
+          }
+        } else if (uberPath === 'estimates/time') {
+          // TODO: always make calls to BOTH time and price and return both to alexa as details
+          // esp since uber will still give a time estimate even when there's no valid fare
+          // (ex: destination = 'gardendale')
+          uberEstimate = data.times[0].estimate;
+        }
+
+        if (firstResult) {
+          winner = compare(uberEstimate, firstResult);
+          return cb(winner);
+        } else {
+          firstResult = uberEstimate;
+        }
+      })
+      .catch(err => console.warn('error in uber fetch', err));
+
+    fetch(lyftEndpoint, {
+        method: 'GET',
+        headers: {
+          Authorization: lyftAuth,
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        let lyftEstimate;
+
+        if (lyftPath === 'cost') {
+          if (!data.cost_estimates || !data.cost_estimates[0].estimated_cost_cents_max) {
+            lyftEstimate = -1;
+          } else {
+            lyftEstimate = parseFloat(data.cost_estimates[0].estimated_cost_cents_max);
+          }
+        } else if (lyftPath === 'eta') {
+          // TODO: make calls to BOTH time and price and return both to alexa as details
+          // esp since lyft will still give a time estimate even when there's no valid fare
+          // (ex: destination = 'gardendale')
+          if (!data.eta_estimates || !data.eta_estimates[0].eta_seconds) {
+            lyftEstimate = -1;
+          } else {
+            lyftEstimate = data.eta_estimates[0].eta_seconds;
+          }
+        }
+        if (firstResult) {
+          winner = compare(firstResult, lyftEstimate);
+          return cb(winner);
+        } else {
+          firstResult = lyftEstimate;
+        }
+      })
+      .catch(err => console.warn('error in lyft fetch', err));
+  });
 };
 
 // note: ride - is called 'winner' in `alexa.js`
@@ -187,16 +179,11 @@ export const addRide = (ride, userId, origin, destination, cb) => {
       },
       body: JSON.stringify(body)
     })
-    .then(res => {
-      return res.json();
-    })
+    .then(res => res.json())
     .then(data => {
-      console.log('data inside POST to /rides:', data);
       cb(data);
     })
-    .catch(err => {
-      console.log('ERROR posting to /rides', err);
-    });
+    .catch(err => console.warn('ERROR posting to /rides', err));
 };
 
 export const formatAnswer = (winner, mode, originDescrip, destDescrip, staging) => {

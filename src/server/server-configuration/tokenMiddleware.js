@@ -1,4 +1,4 @@
-export default function (req, res, next) {
+export default (req, res, next) => {
 
   // check header or url parameters or post parameters for token
   const token = req.body.token || req.query.token || req.headers['x-access-token'];
@@ -7,7 +7,7 @@ export default function (req, res, next) {
   if (token) {
 
     // verifies secret and checks exp
-    jwt.verify(token, app.get('tokenSecret'), function (err, decoded) {
+    jwt.verify(token, app.get('tokenSecret'), (err, decoded) => {
       if (err) {
         return res.json({ success: false, message: 'Failed to authenticate token.' });
       } else {

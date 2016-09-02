@@ -9,10 +9,6 @@ import uuid from 'uuid-v4';
 export const createNewDeveloperKey = (req, res) => {
   // generate a unique id for the new key
   let newKey = uuid();
-  console.log('new dev api key', newKey);
-
   // set a 3 day expiration on the key
-  return redisSetKeyWithExpire(newKey, 259200, 1, token => {
-    res.json(newKey);
-  });
+  return redisSetKeyWithExpire(newKey, 259200, 1, token => res.json(newKey));
 };

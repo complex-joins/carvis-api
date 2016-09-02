@@ -10,15 +10,12 @@ import { User } from './../models/User';
 import { helperAPIQuery, getUserAndRequestRideDB } from './Ride';
 import { redisHashGetAll, redisSetKeyWithExpire, redisGetKey, redisHashGetOne } from './../../redis/redisHelperFunctions';
 import { getLyftBearerToken } from './../utils/ride-helper';
-
+import { refreshToken } from './Internal';
 //===== these are controllers for the web and public api's =====//
 
 export const lyftPhoneAuth = (req, res) => {
   let phoneNumber = req.body.phoneNumber;
-  console.log('phone number is ', phoneNumber);
-
-  let url = CARVIS_HELPER_API + '/lyft/phoneauth';
-
+  let url = `http://${CARVIS_HELPER_API}/lyft/phoneauth`;
   fetch(url, {
       method: 'POST',
       headers: {
@@ -27,25 +24,13 @@ export const lyftPhoneAuth = (req, res) => {
       },
       body: JSON.stringify(req.body) // pass through the body.
     })
-    .then(function (res) {
-      return res.json();
-    })
-    .then(function (data) {
-      console.log('success lyft phone auth', data);
-      res.json(data);
-    })
-    .catch(function (err) {
-      console.warn('err lyft phone auth', err);
-    });
+    .then(res => res.json())
+    .then(data => res.json(data))
+    .catch(err => console.warn('err lyft phone auth', err));
 };
 
 export const lyftPhoneCodeAuth = (req, res) => {
-  let lyftCode = req.body.lyftCode;
-  // let phoneNumber = req.body.phoneNumber;
-  console.log('got code', lyftCode);
-
-  let url = CARVIS_HELPER_API + '/lyft/phoneCodeAuth';
-
+  let url = `http://${CARVIS_HELPER_API}/lyft/phoneCodeAuth`;
   fetch(url, {
       method: 'POST',
       headers: {
@@ -54,21 +39,14 @@ export const lyftPhoneCodeAuth = (req, res) => {
       },
       body: JSON.stringify(req.body) // pass through body.
     })
-    .then(function (res) {
-      return res.json();
-    })
-    .then(function (data) {
-      console.log('success lyft phone code auth', data);
-      res.json(data);
-    })
-    .catch(function (err) {
-      console.warn('err lyft phone code auth', err);
-    });
+    .then(res => res.json())
+    .then(data => res.json(data))
+    .catch(err => console.warn('err lyft phone code auth', err));
 };
 
 export const uberLogin = (req, res) => {
-  let url = CARVIS_HELPER_API + '/uber/login';
-
+  let url = `http://${CARVIS_HELPER_API}/uber/login`;
+  console.log('uberLogin', req.body);
   fetch(url, {
       method: 'POST',
       headers: {
@@ -77,21 +55,13 @@ export const uberLogin = (req, res) => {
       },
       body: JSON.stringify(req.body) // pass through body.
     })
-    .then(function (res) {
-      return res.json();
-    })
-    .then(function (data) {
-      console.log('success uber login', data);
-      res.json(data);
-    })
-    .catch(function (err) {
-      console.warn('err uber login', err);
-    });
+    .then(res.json())
+    .then(data => res.json(data))
+    .catch(err => console.warn('err uber login', err));
 };
 
 export const testKey = (req, res) => {
   let count = req.body.count;
-  console.log('another one', count);
   res.json({ message: 'another one' + count });
 };
 
@@ -115,9 +85,7 @@ export const placesCall = (req, res) => {
   let url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${place}&location=${loc}&radius=${radius}&key=${key}`;
 
   fetch(url)
-    .then(res => {
-      return res.json();
-    })
+    .then(res => res.json())
     .then(data => {
       // if no predictions found, break out
       if (!data.predictions.length) {
@@ -125,15 +93,12 @@ export const placesCall = (req, res) => {
       }
 
       let placeDesc = data.predictions[0].description;
-      console.log('Place found:', placeDesc);
       // TODO: filter out place results with distance from home > 100 miles
       let placeId = data.predictions[0].place_id;
       let detailURL = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&key=${key}`;
 
       fetch(detailURL)
-        .then(res => {
-          return res.json();
-        })
+        .then(res => res.json())
         .then(data => {
           let placeLat = data.result.geometry.location.lat;
           let placeLng = data.result.geometry.location.lng;
@@ -153,18 +118,16 @@ export const placesCall = (req, res) => {
           };
           res.json({ body: body });
         })
-        .catch(err => {
-          console.log('error on place detail', err, '\nplace:', place);
-        });
+        .catch(err => console.warn('error on place detail', err, '\nplace:', place));
     })
-    .catch(err => {
-      console.log('err in places:', err, '\nplace:', place, '\nurl', url);
-    });
+    .catch(err => console.warn('err in places:', err, '\nplace:', place, '\nurl', url));
 };
 
 // this works the same as the getEstimate in ride-helper
 // with the difference that it looks for req.body for arguments
 export const getEstimate = (req, res) => {
+  console.log('getEstimate API', req.body);
+
   // body
   let requestType = req.body.requestType;
   let origin = req.body.origin; // {descrip: string, coords: [lat, lng]}
@@ -172,19 +135,18 @@ export const getEstimate = (req, res) => {
   let start = origin.coords;
   let dest = destination.coords;
   let userId = req.body.carvisUserId || req.body.userId;
-
-  // tokens, URLs
-  let lyftToken = getLyftBearerToken();
   let uberToken = process.env.UBER_SERVER_TOKEN;
   let uberURL = 'https://api.uber.com/v1/';
   let lyftURL = 'https://api.lyft.com/v1/';
-  let uberPath, lyftPath;
+  let uberPath;
+  let lyftPath;
 
   // comparison function lyft vs uber estimates
   const compare = (uberEstimate, lyftEstimate) => {
+    console.log(requestType, uberEstimate, lyftEstimate, 'compare!');
     let estimateType = requestType.includes('cheap') ? 'fare' : 'eta';
-    let uberAsWinner = { vendor: 'Uber', estimate: uberEstimate, estimateType: estimateType };
-    let lyftAsWinner = { vendor: 'Lyft', estimate: lyftEstimate, estimateType: estimateType };
+    let uberAsWinner = { vendor: 'Uber', estimate: uberEstimate, estimateType: estimateType, loserEstimate: lyftEstimate, loser: 'Lyft' };
+    let lyftAsWinner = { vendor: 'Lyft', estimate: lyftEstimate, estimateType: estimateType, loserEstimate: uberEstimate, loser: 'Uber' };
     if (uberEstimate < 0 && lyftEstimate > 0) {
       return lyftAsWinner;
     } else if (lyftEstimate < 0 && uberEstimate > 0) {
@@ -209,109 +171,107 @@ export const getEstimate = (req, res) => {
   let uberEndpoint = `${uberURL}${uberPath}?start_latitude=${start[0]}&start_longitude=${start[1]}&end_latitude=${dest[0]}&end_longitude=${dest[1]}`;
   let lyftEndpoint = `${lyftURL}${lyftPath}?lat=${start[0]}&lng=${start[1]}&start_lat=${start[0]}&start_lng=${start[1]}&end_lat=${dest[0]}&end_lng=${dest[1]}`;
 
-  let lyftAuth = 'Bearer ' + lyftToken;
-  let uberAuth = 'Token ' + uberToken;
-  let firstResult = null;
-  let winner = null;
+  console.log('about to getLyftBearerToken');
 
-  // do calls to both APIs for the relevant estimates
-  console.log('pre-uber getEstimate', uberEndpoint);
-  fetch(uberEndpoint, {
-      method: 'GET',
-      headers: {
-        Authorization: uberAuth,
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(res => {
-      return res.json();
-    })
-    .then(data => {
-      let uberEstimate;
-      if (uberPath === 'estimates/price') {
-        if (!data.prices) {
-          uberEstimate = -1;
-        } else {
-          let dollarsString = data.prices[0].estimate.slice(1);
-          // TODO: make car type dynamic. right now hardcoded to POOL/LINE
-          uberEstimate = parseFloat(dollarsString) * 100;
-        }
-      } else if (uberPath === 'estimates/time') {
-        // TODO: always make calls to BOTH time and price and return both
-        // uber will still give a time estimate even when there's no valid fare
-        uberEstimate = data.times[0].estimate;
-      }
-      // check to see if uber or lyft returned an estimate firstResult
-      // and invoke the comparison function when we have both
-      if (firstResult) {
-        winner = compare(uberEstimate, firstResult);
-        console.log('Winner:', winner);
-        let body = {
-          winner: winner,
-          userId: userId,
-          origin: origin,
-          destination: destination
-        };
-        return addRideToDB({ body: body }, res);
-      } else {
-        firstResult = uberEstimate;
-      }
-      console.log('Uber Pool estimate:', uberEstimate);
-    })
-    .catch(function (err) {
-      console.log('error in uber fetch', err);
-    });
+  // asynchronous call to get the lyftBearerToken from Redis or Lyft
+  getLyftBearerToken(lyftToken => {
+    let lyftAuth = 'Bearer ' + lyftToken;
+    let uberAuth = 'Token ' + uberToken;
+    let firstResult = null;
+    let winner = null;
+    let loser = null;
 
-  fetch(lyftEndpoint, {
-      method: 'GET',
-      headers: {
-        Authorization: lyftAuth,
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(function (res) {
-      return res.json();
-    })
-    .then(function (data) {
-      let lyftEstimate;
-      if (lyftPath === 'cost') {
-        if (!data.cost_estimates || !data.cost_estimates[0].estimated_cost_cents_max) {
-          lyftEstimate = -1;
-        } else {
-          lyftEstimate = parseFloat(data.cost_estimates[0].estimated_cost_cents_max);
+    // do calls to both APIs for the relevant estimates
+    fetch(uberEndpoint, {
+        method: 'GET',
+        headers: {
+          Authorization: uberAuth,
+          'Content-Type': 'application/json'
         }
-      } else if (lyftPath === 'eta') {
-        // lyft will still give a time estimate even when there's no valid fare
-        if (!data.eta_estimates || !data.eta_estimates[0].eta_seconds) {
-          lyftEstimate = -1;
-        } else {
-          lyftEstimate = data.eta_estimates[0].eta_seconds;
+      })
+      .then(res => res.json())
+      .then(data => {
+        let uberEstimate;
+        if (uberPath === 'estimates/price') {
+          if (!data.prices) {
+            uberEstimate = -1;
+          } else {
+            let dollarsString = data.prices[0].estimate.slice(1);
+            // TODO: make car type dynamic. right now hardcoded to POOL/LINE
+            uberEstimate = parseFloat(dollarsString) * 100;
+          }
+        } else if (uberPath === 'estimates/time') {
+          // uber will still give a time estimate even when there's no valid fare
+          uberEstimate = data.times[0].estimate;
         }
-      }
-      if (firstResult) {
-        winner = compare(firstResult, lyftEstimate);
-        console.log('Winner:', winner);
-        let body = {
-          winner: winner,
-          userId: userId,
-          origin: origin,
-          destination: destination
-        };
-        return addRideToDB({ body: body }, res);
-      } else {
-        firstResult = lyftEstimate;
-      }
-      console.log('Lyft Line estimate:', lyftEstimate);
-    })
-    .catch(function (err) {
-      console.log('error in lyft fetch', err);
-    });
+        // check to see if uber or lyft returned an estimate firstResult
+        // and invoke the comparison function when we have both
+        if (firstResult) {
+          let formattedResults = compare(uberEstimate, firstResult);
+          winner = { vendor: formattedResults.vendor, estimate: formattedResults.estimate, estimateType: formattedResults.estimateType };
+          loser = { vendor: formattedResults.loser, estimate: formattedResults.loserEstimate, estimateType: formattedResults.estimateType };
+          let body = {
+            loser: loser,
+            winner: winner,
+            userId: userId,
+            origin: origin,
+            destination: destination
+          };
+          addRideToDB({ body: body }, res);
+        } else {
+          firstResult = uberEstimate;
+        }
+      })
+      .catch(err => console.warn('error in uber fetch', err));
+
+    fetch(lyftEndpoint, {
+        method: 'GET',
+        headers: {
+          Authorization: lyftAuth,
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        let lyftEstimate;
+        if (lyftPath === 'cost') { // note: cost - line is the [1] index return
+          if (!data.cost_estimates || !data.cost_estimates[1].estimated_cost_cents_max) {
+            lyftEstimate = -1;
+          } else {
+            lyftEstimate = parseFloat(data.cost_estimates[1].estimated_cost_cents_max);
+          }
+        } else if (lyftPath === 'eta') {
+          // lyft will still give a time estimate even when there's no valid fare
+          if (!data.eta_estimates || !data.eta_estimates[0].eta_seconds) {
+            lyftEstimate = -1;
+          } else { // note: time - line is the [0] index returned
+            lyftEstimate = data.eta_estimates[0].eta_seconds;
+          }
+        }
+        if (firstResult) {
+          let formattedResults = compare(uberEstimate, firstResult);
+          winner = { vendor: formattedResults.vendor, estimate: formattedResults.estimate, estimateType: formattedResults.estimateType };
+          loser = { vendor: formattedResults.loser, estimate: formattedResults.loserEstimate, estimateType: formattedResults.estimateType };
+          let body = {
+            loser: loser,
+            winner: winner,
+            userId: userId,
+            origin: origin,
+            destination: destination
+          };
+          addRideToDB({ body: body }, res);
+        } else {
+          firstResult = lyftEstimate;
+        }
+      })
+      .catch(err => console.warn('error in lyft fetch', err));
+  });
 };
 
 // this calls the Ride controller addRide method, which adds a ride to the DB
 // and invokes further Lyft/Uber methods
 export const addRideToDB = (req, res) => {
-  console.log('addRideToDB', req.body);
+  let loser = req.body.loser;
   let winner = req.body.winner;
   let userId = req.body.userId;
   let origin = req.body.origin;
@@ -333,14 +293,18 @@ export const addRideToDB = (req, res) => {
   if (winner.vendor === 'Uber') {
     if (winner.estimateType === 'fare') {
       body.uberEstimatedFare = winner.estimate;
+      body.lyftEstimatedFare = loser.estimate;
     } else {
       body.uberEstimatedETA = winner.estimate;
+      body.lyftEstimatedETA = loser.estimate;
     }
   } else {
     if (winner.estimateType === 'fare') {
       body.lyftEstimatedFare = winner.estimate;
+      body.uberEstimatedFare = loser.estimate;
     } else {
       body.lyftEstimatedETA = winner.estimate;
+      body.uberEstimatedETA = loser.estimate;
     }
   }
 
@@ -348,29 +312,14 @@ export const addRideToDB = (req, res) => {
   // - instead of posting to /rides and doing the DB post in models/rideId
   // we do the DB post directly! less latency :)
   Ride.create(body)
-    .then((ride) => { // returns [{}]
+    .then(ride => { // returns [{}]
+    console.log('ride created', ride);
       ride = ride[0];
-      console.log(ride);
       res.json(ride);
       // we return the ride - this should be returned to the web client so the client has access to the carvis rideId for future queries/updates etc.
     })
-    .catch((err) => res.status(400)
+    .catch(err => res.status(400)
       .json(err)); // add catch for errors.
-
-  // === commented out pending team discussion === //
-  // if a rideId is supplied we update instead of create
-  // making this double-function as updateOrCreate for Rides.
-  // delete needed before update as model doesn't have carvisRideId field
-  // if (req.body.carvisRideId) {
-  //   let carvisRideId = req.body.carvisRideId;
-  //   delete req.body.carvisRideId;
-  //   Ride.update({ id: carvisRideId }, req.body)
-  //     .then((ride) => res.json(ride))
-  //     .catch((err) => res.status(400)
-  //       .json(err));
-  // } else {
-  // Ride.create
-  // }
 };
 
 // untested.
@@ -390,11 +339,10 @@ export const requestRide = (req, res) => {
     routableAddress: ride.destinationRoutableAddress
   };
   let partySize = ride.partySize || 1;
-
   // carvisUserId -- to query the user table for tokens etc.
   let userId = ride.userId;
+
   redisHashGetAll(userId, user => {
-    console.log('user on redis getall addRide', user);
     if (user) {
       if (vendor === 'Uber') {
         let body = {
@@ -403,7 +351,7 @@ export const requestRide = (req, res) => {
           destination: destination,
           rideId: rideId
         };
-        return helperAPIQuery(body, vendor);
+        return helperAPIQuery(body, vendor, res);
 
       } else if (vendor === 'Lyft') {
         let body = {
@@ -414,13 +362,11 @@ export const requestRide = (req, res) => {
           destination: destination,
           rideId: rideId
         };
-        return helperAPIQuery(body, vendor);
+        return helperAPIQuery(body, vendor, res);
       }
     } else { // only invoked if we don't have the user in Redis
-      let dbURL = 'http://' + CARVIS_API + '/users/' + userId;
-      console.log('pre db get', vendor, userId, dbURL, rideId);
-
-      return getUserAndRequestRideDB(dbURL, origin, destination, partySize, rideId, vendor);
+      let dbURL = `http://${CARVIS_API}/users/${userId}`;
+      return getUserAndRequestRideDB(dbURL, origin, destination, partySize, rideId, vendor, res);
     }
   });
 };
