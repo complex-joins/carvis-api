@@ -69,7 +69,7 @@ export const addRide = function (req, res) {
       .json(err)); // add catch for errors.
 };
 
-export const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, rideId, vendor) => {
+export const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, rideId, vendor, res) => {
 
   return fetch(dbURL, {
       method: 'GET',
@@ -91,7 +91,8 @@ export const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, r
           destination: destination,
           rideId: rideId
         };
-        return helperAPIQuery(body, vendor);
+        console.log('helperAPIQuery', body, vendor, res);
+        return helperAPIQuery(body, vendor, res);
 
       } else if (vendor === 'Lyft') {
         let body = {
@@ -102,7 +103,8 @@ export const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, r
           destination: destination,
           rideId: rideId
         };
-        return helperAPIQuery(body, vendor);
+        console.log('helperAPIQuery', body, vendor, res);
+        return helperAPIQuery(body, vendor, res);
 
       } else {
         console.warn('not a valid vendor - check stacktrace');
@@ -113,12 +115,11 @@ export const getUserAndRequestRideDB = (dbURL, origin, destination, partySize, r
     });
 };
 
-export const helperAPIQuery = (body, vendor) => {
-  if (vendor === 'Lyft') {
-    let helperURL = CARVIS_HELPER_API + '/lyft/getCost';
-  } else {
-    let helperURL = CARVIS_HELPER_API + '/uber/getEstimate';
-  }
+export const helperAPIQuery = (body, vendor, res) => {
+  console.log('vendor in helperAPIQuery', vendor, vendor === 'Uber', typeof vendor);
+  let helperURL = vendor === 'Lyft' ? CARVIS_HELPER_API + '/lyft/getCost' : CARVIS_HELPER_API + '/uber/getEstimate';
+  console.log(vendor === 'Lyft' ? CARVIS_HELPER_API + '/lyft/getCost' : CARVIS_HELPER_API + '/uber/getEstimate');
+  helperURL = 'http://localhost:8888/uber/getEstimate'; // hardcoded.
 
   return fetch(helperURL, {
       method: 'POST',
@@ -133,6 +134,11 @@ export const helperAPIQuery = (body, vendor) => {
     })
     .then(data => {
       console.log('success request ride', data);
+      if (res) {
+        res.json(data);
+      } else {
+        return;
+      }
     })
     .catch(err => {
       console.warn('err request ride', err);

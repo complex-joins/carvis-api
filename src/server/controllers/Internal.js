@@ -23,22 +23,26 @@ export const updateLyftToken = (req, res) => {
 
 export const getLyftToken = (req, res) => {
   redisGetKey('lyftBearerToken', function (token) {
-    console.log('got key', token);
+    console.log('getLyftToken redis found', token);
     if (token) {
       res.json(token);
     } else {
+      console.log('redis didn\'t find lyftBearerToken');
       // call the helper API to query Lyft for a token
       refreshToken();
       // wait a reasonable amount of time to query redis again for the token
-      setTimeout(() => {
+      return setTimeout(() => {
         getLyftToken();
-      }, 1500);
+      }, 2500);
     }
   });
 };
 
-const refreshToken = () => {
-  let helperURL = 'http://' + CARVIS_HELPER_API + '/lyft/refreshBearerToken';
+export const refreshToken = (cb) => {
+  console.log('refreshToken', CARVIS_HELPER_API);
+  // let helperURL = 'http://' + CARVIS_HELPER_API + '/lyft/refreshBearerToken';
+  // NOTE: hardcoded localhost.
+  let helperURL = CARVIS_HELPER_API + '/lyft/refreshBearerToken';
   fetch(helperURL, {
       method: 'GET',
       headers: {
@@ -51,6 +55,13 @@ const refreshToken = () => {
     })
     .then(data => {
       console.log('success refreshToken', data);
+
+      if (cb) {
+        return cb(data);
+      } else {
+        return;
+      }
+
     })
     .catch(err => {
       console.warn('error refreshing token', err);
